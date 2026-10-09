@@ -2,7 +2,7 @@
  * Edició d'una cita (PLA.md, secció 8). És l'únic lloc amb controls d'edició.
  * Cada canvi es desa a l'acte; "Fet" només torna al pla.
  */
-import { obte, actualitza, dadesInicials } from '../store.js';
+import { obte, actualitza, rutinaGeneral } from '../store.js';
 import { DIES, ACTIVITATS, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
 import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
 import { renderAnimacio } from '../animacions.js';
@@ -68,8 +68,7 @@ export function munta(contenidor, [id, nova]) {
 
   function canviaRutina(fn) {
     actualitza(d => {
-      const c = d.pla.cites.find(x => x.id === id);
-      const r = d.rutines.find(x => x.id === c.rutinaId);
+      const r = d.pla.cites.find(x => x.id === id)?.rutina;
       if (r) fn(r, d);
     });
     pinta();
@@ -226,11 +225,13 @@ export function munta(contenidor, [id, nova]) {
       if (c.activitat === nova) return;
       c.activitat = nova;
       if (nova === 'casa') {
-        if (!d.rutines.length) d.rutines.push(dadesInicials().rutines[0]);
-        if (!d.rutines.some(r => r.id === c.rutinaId)) c.rutinaId = d.rutines[0].id;
+        // Una còpia de la rutina d'una altra cita de casa, si n'hi ha; si no, la rutina inicial.
+        const altra = d.pla.cites.find(x => x !== c && x.rutina)?.rutina;
+        c.rutina ??= altra ? JSON.parse(JSON.stringify(altra)) : rutinaGeneral();
+        c.rutina.exercicis.forEach(ex => { delete ex.pujada; });
         delete c.duracioMin;
       } else {
-        delete c.rutinaId;
+        delete c.rutina;
         c.duracioMin ??= 60;
       }
     });

@@ -26,8 +26,9 @@ export function mateixDia(a, b) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
+/* La rutina d'una cita de casa (o de gimnàs) és dins la mateixa cita (versió 2 de les dades). */
 export function rutinaDe(estat, cita) {
-  return cita.rutinaId ? estat.rutines.find(r => r.id === cita.rutinaId) : null;
+  return cita.rutina ?? null;
 }
 
 /* Descans entre l'última sèrie d'un exercici i la primera del següent. */

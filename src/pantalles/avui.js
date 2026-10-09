@@ -5,9 +5,9 @@ import { creaSessio, iniciaAuto, exerciciAcabat } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlGotes } from '../tema.js';
 import { activaSo } from '../so.js';
-import { ferCopia, calRecordarCopia } from '../copia.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
-import { mostraAvis, confirma } from '../full.js';
+import { htmlPendents } from '../sincronitza.js';
+import { confirma } from '../full.js';
 import { esc, majuscula } from '../dom.js';
 import { icona } from '../icones.js';
 
@@ -98,17 +98,12 @@ export function munta(contenidor) {
         <p class="subtitol">${esc(dataLlarga(ara))}</p>
       </div>
       <span class="capcalera-accions">
+        ${htmlPendents()}
         <a class="boto-icona" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
     </header>
     ${cos}
     <section class="setmana-avui" aria-label="Aquesta setmana">${htmlGotes(estat, ara)}</section>
-    ${calRecordarCopia(estat, ara) ? `
-      <section class="targeta avis-discret">
-        ${icona('desa')}
-        <p>Còpia pendent</p>
-        <button type="button" class="boto contorn petit" data-accio="copia">Fer-la</button>
-      </section>` : ''}
     ${esInstallada() ? '' : `
       <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}`;
 
@@ -141,13 +136,6 @@ export function munta(contenidor) {
     if (accio === 'comenca') demanaComencar(false);
     if (accio === 'curta') demanaComencar(true);
     if (accio === 'continua') { activaSo(); location.hash = '#sessio'; }
-    if (accio === 'copia') {
-      ferCopia().then(fet => {
-        if (!fet) return;
-        boto.closest('.avis-discret')?.remove();
-        mostraAvis('Còpia feta');
-      });
-    }
     if (accio === 'installa') mostraInstallacio().then(() => { if (esInstallada()) boto.remove(); });
   };
   contenidor.addEventListener('click', clic);

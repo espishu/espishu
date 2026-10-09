@@ -9,6 +9,8 @@
  *    aturada: ms | null }        // quan s'ha aturat (compte a zero o "Acabar ara")
  */
 
+import { nouId } from './store.js';
+
 /* Animació de cada activitat (src/animacions.js). */
 export const ANIMACIO_ACTIVITAT = {
   caminar: 'caminar',
@@ -19,7 +21,7 @@ export const ANIMACIO_ACTIVITAT = {
 
 export function creaActivitat(cita, nom, ara = Date.now()) {
   return {
-    id: 's' + ara,
+    id: nouId(),
     tipus: 'activitat',
     citaId: cita?.id ?? null,
     activitat: cita.activitat,

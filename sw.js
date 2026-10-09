@@ -49,6 +49,7 @@ const FITXERS = [
   'src/config.js',
   'src/compte.js',
   'src/formulari.js',
+  'src/sincronitza.js',
   'src/vendor/supabase.js',
   'src/pantalles/avui.js',
   'src/pantalles/sessio.js',
@@ -58,7 +59,8 @@ const FITXERS = [
   'src/pantalles/pla.js',
   'src/pantalles/editar.js',
   'src/pantalles/ajustos.js',
-  'src/pantalles/entrar.js'
+  'src/pantalles/entrar.js',
+  'src/pantalles/importar.js'
 ];
 
 const fresc = url => new Request(url, { cache: 'reload' });

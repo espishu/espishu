@@ -69,14 +69,16 @@ export function ultimesSetmanes(estat, ara = new Date(), quantes = 12) {
  */
 export function aplicaProgressio(estat, registre) {
   if (registre.tipus !== 'rutina') return [];
-  const rutina = estat.rutines.find(r => r.id === registre.rutinaId);
+  // Cada cita de casa té la seva rutina: la progressió va per cita.
+  const cita = estat.pla.cites.find(c => c.id === registre.citaId);
+  const rutina = cita?.rutina;
   if (!rutina) return [];
 
   // L'avís "Nou: …" ja s'ha vist en aquesta sessió.
   rutina.exercicis.forEach(ex => { delete ex.pujada; });
 
   const historial = estat.sessions
-    .filter(s => s.tipus === 'rutina' && s.rutinaId === rutina.id)
+    .filter(s => s.tipus === 'rutina' && s.citaId === cita.id)
     .sort((a, b) => Date.parse(b.inici) - Date.parse(a.inici));
   const canvis = [];
 

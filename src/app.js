@@ -1,5 +1,5 @@
 /*
- * app.js — punt d'entrada: enrutament per hash i barra de navegació.
+ * app.js — punt d'entrada: enrutament per hash, barra de navegació i indicador de canvis pendents.
  * Cada pantalla exporta munta(contenidor, parametres) i pot retornar una funció per desmuntar-se.
  */
 import { obte, demanaPersistencia } from './store.js';
@@ -15,8 +15,12 @@ import * as pla from './pantalles/pla.js';
 import * as editar from './pantalles/editar.js';
 import * as ajustos from './pantalles/ajustos.js';
 import * as entrar from './pantalles/entrar.js';
+import * as importar from './pantalles/importar.js';
+import { iniciaSincronitzacio, escoltaSincronitzacio, sincronitza, calTornarAEntrar } from './sincronitza.js';
+import { mostraAvis } from './full.js';
 
-const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos, entrar };
+const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos, entrar, importar };
+const { obreTornaAEntrar } = entrar;
 const AMB_BARRA = new Set(['avui', 'progres', 'pla', 'ajustos']);
 /* Pestanya que queda marcada a cada pantalla. Ajustos marca la pestanya des d'on s'ha obert (#ajustos/<pestanya>). */
 const PESTANYA = { ajustos: 'pla' };
@@ -28,16 +32,20 @@ let actual = null;
 let hashActual = null;
 let desmunta = null;
 
+/* Sense sessió iniciada, només la pantalla d'entrar; amb un compte buit, només la d'importar. */
+function rutaPermesa(nom) {
+  const { compte } = obte();
+  if (!compte) return nom === 'entrar' ? null : '#entrar';
+  if (compte.nou) return nom === 'importar' ? null : '#importar';
+  if (!PANTALLES[nom] || nom === 'entrar' || nom === 'importar') return '#avui';
+  return null;
+}
+
 function mostra() {
   const [nom, ...parametres] = location.hash.slice(1).split('/');
-  // Sense sessió iniciada, només la pantalla d'entrar; amb sessió, mai.
-  const ambCompte = !!obte().compte;
-  if (!ambCompte && nom !== 'entrar') {
-    location.replace('#entrar');
-    return;
-  }
-  if (!PANTALLES[nom] || (ambCompte && nom === 'entrar')) {
-    location.replace('#avui');
+  const desvia = rutaPermesa(nom);
+  if (desvia) {
+    location.replace(desvia);
     return;
   }
   const canvia = location.hash !== hashActual;
@@ -77,6 +85,22 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('hashchange', mostra);
 escoltaInstallacio();
 
+/*
+ * Indicador de canvis pendents (a la capçalera d'Avui, Arbre i Pla). En tocar-lo, es puja tot
+ * ara mateix; si cal tornar a entrar, demana la contrasenya. Si arriben dades noves, es torna a dibuixar.
+ */
+escoltaSincronitzacio(({ pendents, calEntrar, canviat }) => {
+  document.querySelectorAll('[data-pendents]').forEach(boto => { boto.hidden = !pendents && !calEntrar; });
+  if (canviat && AMB_BARRA.has(actual) && !document.querySelector('dialog[open]')) mostra();
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-pendents]')) return;
+  if (calTornarAEntrar()) return obreTornaAEntrar();
+  sincronitza()
+    .then(() => mostraAvis('Desat'))
+    .catch(error => mostraAvis(error.message));
+});
+
 aplicaEstacio();
 obte();
 demanaPersistencia();
@@ -86,6 +110,7 @@ try {
   console.error('No s\'ha pogut carregar la biblioteca', e);
 }
 mostra();
+iniciaSincronitzacio();
 benvinguda().then(() => { if (actual === 'avui') mostra(); });
 
 if ('serviceWorker' in navigator) {

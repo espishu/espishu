@@ -1,12 +1,24 @@
 /*
  * store.js — l'única porta a les dades de l'app.
- * Tot es desa en un sol objecte JSON a localStorage (clau "espishu:v1").
- * Cap altre mòdul no toca localStorage: si més endavant es canvia per un
- * servidor, només cal tocar aquest fitxer.
+ * Tot es desa en un sol objecte JSON a localStorage (clau "espishu:v1"), que és la còpia
+ * local de les dades del compte. src/sincronitza.js les puja a Supabase i les baixa
+ * (PLA.md, secció 21.4). Cap altre mòdul no toca localStorage.
  */
 
-export const VERSIO = 1;
+export const VERSIO = 2;
 const CLAU = 'espishu:v1';
+const CLAU_ANTERIORS = `${CLAU}:anteriors`;
+
+/* Identificador únic (uuid), també per a les cites i les sessions creades sense connexió. */
+export function nouId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  // Sense context segur (http des d'una altra màquina), randomUUID no hi és.
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
 
 /* ================= Dades de partida (PLA.md, secció 6) ================= */
 
@@ -20,9 +32,8 @@ const CLAU = 'espishu:v1';
  *  - descans: segons de descans després de cada sèrie
  *  - nota: aclariment curt opcional
  */
-function rutinaGeneral() {
+export function rutinaGeneral() {
   return {
-    id: 'rutina-general',
     nom: 'Rutina general',
     exercicis: [
       { id: 'cercles-bracos',    tipus: 'mobilitat',  series: [30],         unitat: 'segons', perCostat: false, descans: 15 },
@@ -39,6 +50,11 @@ function rutinaGeneral() {
   };
 }
 
+/*
+ * Des de la versió 2, cada cita de casa (o de gimnàs) porta la seva rutina (`rutina: { nom, exercicis }`).
+ * `compte`: { id, usuari } del compte amb què s'ha entrat (null si no s'ha entrat).
+ * `pendents`: la cua de canvis per pujar a Supabase (src/sincronitza.js).
+ */
 export function dadesInicials() {
   return {
     versio: VERSIO,
@@ -46,22 +62,55 @@ export function dadesInicials() {
     pla: {
       objectiuSetmanal: 2,
       cites: [
-        { id: 'c1', dia: 5, hora: '18:00', activitat: 'casa', rutinaId: 'rutina-general' },
-        { id: 'c2', dia: 6, hora: '09:00', activitat: 'natacio', duracioMin: 90 },
-        { id: 'c3', dia: 7, hora: '09:00', activitat: 'caminar', duracioMin: 90 }
+        { id: nouId(), dia: 5, hora: '18:00', activitat: 'casa', rutina: rutinaGeneral() },
+        { id: nouId(), dia: 6, hora: '09:00', activitat: 'natacio', duracioMin: 90 },
+        { id: nouId(), dia: 7, hora: '09:00', activitat: 'caminar', duracioMin: 90 }
       ]
     },
-    rutines: [rutinaGeneral()],
     sessioEnCurs: null,
     sessions: [],
-    ajustos: { dolors: [] }
+    ajustos: { dolors: [] },
+    compte: null,
+    pendents: []
   };
 }
 
 /* ================= Migracions ================= */
 
 /* MIGRACIONS[n] passa un objecte de la versió n a la n + 1. */
-const MIGRACIONS = {};
+const MIGRACIONS = {
+  /*
+   * 1 → 2 (comptes, 21.4): la rutina compartida (`rutines` + `rutinaId`) passa a ser dins de
+   * cada cita, i els ids de les cites i de les sessions passen a ser uuid (per a Supabase).
+   */
+  1(d) {
+    const ids = new Map();
+    const id = antic => {
+      if (!ids.has(antic)) ids.set(antic, nouId());
+      return ids.get(antic);
+    };
+    const rutines = new Map((d.rutines ?? []).map(r => [r.id, r]));
+    d.pla.cites = d.pla.cites.map(({ rutinaId, ...cita }) => {
+      const nova = { ...cita, id: id(cita.id) };
+      if (rutinaId || cita.activitat === 'casa' || cita.activitat === 'gimnas') {
+        const r = rutines.get(rutinaId) ?? rutinaGeneral();
+        nova.rutina = { nom: r.nom, exercicis: JSON.parse(JSON.stringify(r.exercicis)) };
+        delete nova.duracioMin;
+      }
+      return nova;
+    });
+    const sessio = ({ rutinaId, ...s }) => ({ ...s, id: id(s.id), citaId: ids.get(s.citaId) ?? null });
+    d.sessions = (d.sessions ?? []).map(sessio);
+    d.sessioEnCurs = d.sessioEnCurs ? sessio(d.sessioEnCurs) : null;
+    delete d.rutines;
+    d.compte ??= null;
+    d.pendents ??= [];
+    // Dades de la versió sense comptes: en entrar, es podran importar al compte.
+    d.anterior = true;
+    d.versio = 2;
+    return d;
+  }
+};
 
 export function migra(dades) {
   while (dades.versio < VERSIO) {
@@ -76,6 +125,7 @@ export function migra(dades) {
 
 let dades = null;
 const oients = new Set();
+let enCanviar = null;
 
 function escriu(objecte) {
   try {
@@ -92,7 +142,11 @@ function carrega() {
   try { text = localStorage.getItem(CLAU); } catch { /* sense accés: treballem en memòria */ }
   if (text) {
     try {
-      return migra(JSON.parse(text));
+      const llegides = JSON.parse(text);
+      const versio = llegides.versio;
+      const migrades = migra(llegides);
+      if (versio !== migrades.versio) escriu(migrades);
+      return migrades;
     } catch (e) {
       // No sobreescrivim mai unes dades que no entenem: les apartem abans.
       console.error('Dades desades il·legibles', e);
@@ -110,16 +164,34 @@ export function obte() {
   return dades;
 }
 
+/*
+ * `fn(dades)` es crida a cada canvi, abans de desar-lo: així la cua de canvis per pujar es
+ * desa alhora que el canvi (src/sincronitza.js). Els canvis que arriben de Supabase (`remot`) no hi passen.
+ */
+export function enCadaCanvi(fn) {
+  enCanviar = fn;
+}
+
 /* Aplica un canvi a les dades, les desa i avisa els oients. */
-export function actualitza(canvi) {
+export function actualitza(canvi, { remot = false } = {}) {
   canvi(obte());
+  if (!remot) enCanviar?.(dades);
   escriu(dades);
   oients.forEach(oient => oient(dades));
 }
 
-/* Substitueix totes les dades (restaurar una còpia). L'objecte ja ha d'estar validat. */
-export function substitueix(noves) {
+/*
+ * Substitueix totes les dades (restaurar una còpia). L'objecte ja ha d'estar validat.
+ * Es queden el compte i la cua de canvis; amb `remot`, l'objecte ja els porta.
+ */
+export function substitueix(noves, { remot = false } = {}) {
+  const abans = obte();
   dades = migra(noves);
+  if (!remot) {
+    dades.compte = abans.compte ?? null;
+    dades.pendents = abans.pendents ?? [];
+    enCanviar?.(dades);
+  }
   escriu(dades);
   oients.forEach(oient => oient(dades));
 }
@@ -128,6 +200,27 @@ export function substitueix(noves) {
 export function escolta(oient) {
   oients.add(oient);
   return () => oients.delete(oient);
+}
+
+/*
+ * Dades de la versió anterior (sense compte), apartades en entrar per primer cop
+ * perquè es puguin importar al compte ("Importar les meves dades").
+ */
+export function desaAnteriors(objecte) {
+  try { localStorage.setItem(CLAU_ANTERIORS, JSON.stringify(objecte)); } catch (e) { console.warn('No s\'han pogut apartar les dades', e); }
+}
+
+export function llegeixAnteriors() {
+  try {
+    const text = localStorage.getItem(CLAU_ANTERIORS);
+    return text ? migra(JSON.parse(text)) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function esborraAnteriors() {
+  try { localStorage.removeItem(CLAU_ANTERIORS); } catch { /* res a fer */ }
 }
 
 /*

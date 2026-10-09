@@ -8,6 +8,7 @@ import { muntaLinia, muntaColumnes } from '../grafics.js';
 import { icona } from '../icones.js';
 import { htmlArbre, htmlEstacio, htmlAnells, etapa, sessionsArbre } from '../tema.js';
 import { esc, majuscula } from '../dom.js';
+import { htmlPendents } from '../sincronitza.js';
 
 /* Ordre i color fixos per activitat (validats per a daltonisme en clar i fosc). */
 const SERIES_ACTIVITAT = [
@@ -105,6 +106,7 @@ function muntaResum(contenidor) {
       <h1>El meu arbre</h1>
       <span class="capcalera-accions">
         ${htmlEstacio(ara)}
+        ${htmlPendents()}
         <a class="boto-icona" href="#ajustos/progres" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
     </header>

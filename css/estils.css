@@ -1235,3 +1235,13 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 .full .formulari p.error-form { margin-bottom: 0; }
 .usuari-compte { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-weight: 600; }
 .usuari-compte .icona { color: var(--muted); }
+
+/* Canvis pendents de pujar: un núvol petit a la capçalera (Avui, Arbre i Pla). */
+.boto-icona.pendents { background: var(--soft); color: var(--acc-text); }
+.boto-icona.pendents[hidden] { display: none; }
+
+/* Compte buit: importar les dades o començar de zero. */
+.importar .secundari { margin-top: -6px; text-align: center; }
+.importar .boto { font-size: 18px; }
+/* A Arbre, si surt el núvol, l'etiqueta de l'estació s'amaga perquè el títol no es parteixi. */
+.capcalera-accions:has(.pendents:not([hidden])) .etiqueta-estacio { display: none; }

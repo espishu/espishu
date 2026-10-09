@@ -3,7 +3,7 @@
  * La sessió en curs es desa tal qual a store (sessioEnCurs) a cada canvi.
  *
  * Forma de la sessió en curs:
- *  { id, tipus: 'rutina', citaId, rutinaId, nom, curta, inici (ISO), actual (índex d'exercici),
+ *  { id (uuid), tipus: 'rutina', citaId, nom, curta, inici (ISO), actual (índex d'exercici),
  *    descans: { fins, total } | null,           // compte enrere del descans, en marques de temps (ms)
  *    compte: { exercici, serie, fins, total, perCostat, unitat, avisat } | null,  // compte enrere d'una sèrie
  *    auto: { pausa: { actual, serie, descans, compte } | null } | undefined,     // mode automàtic
@@ -11,6 +11,7 @@
  *                   series: [ { objectiu, fet, feta } ] } ] }
  */
 import { descansEntreExercicis, SEGONS_PER_REP } from './cites.js';
+import { nouId } from './store.js';
 
 /* Versió curta: descansos més curts perquè quedi en uns 12-13 minuts. */
 const DESCANS_CURTA = 30;
@@ -32,10 +33,9 @@ export function versioCurta(exercicis) {
 export function creaSessio(rutina, cita, curta = false, ara = new Date()) {
   const exercicis = curta ? versioCurta(rutina.exercicis) : rutina.exercicis;
   return {
-    id: 's' + ara.getTime(),
+    id: nouId(),
     tipus: 'rutina',
     citaId: cita?.id ?? null,
-    rutinaId: rutina.id,
     nom: rutina.nom,
     curta: !!curta,
     inici: ara.toISOString(),
@@ -277,7 +277,6 @@ export function registre(sessio, fi = new Date()) {
     fi: fi.toISOString(),
     citaId: sessio.citaId,
     tipus: 'rutina',
-    rutinaId: sessio.rutinaId,
     nom: sessio.nom,
     curta: sessio.curta,
     estat: totAcabat(sessio) && algunaFeta ? 'feta' : algunaFeta ? 'no-acabada' : 'no-feta',

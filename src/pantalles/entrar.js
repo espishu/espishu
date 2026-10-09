@@ -2,12 +2,14 @@
  * Entrar i Crear compte (PLA.md, secció 21.4). Rutes: #entrar i #entrar/nou.
  * Sense sessió iniciada, l'app només mostra aquesta pantalla.
  */
-import { actualitza } from '../store.js';
-import { entra, creaCompte, normalitza, usuariValid, MIN_CONTRASENYA } from '../compte.js';
+import { obte } from '../store.js';
+import { entra, creaCompte, normalitza, usuariValid, MIN_CONTRASENYA, ErrorCompte } from '../compte.js';
+import { iniciaCompte, sincronitza } from '../sincronitza.js';
 import { benvinguda } from '../benvinguda.js';
 import { htmlCampUsuari, htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
-import { obreFull, tancaFull, botoTanca } from '../full.js';
+import { obreFull, tancaFull, botoTanca, mostraAvis } from '../full.js';
 import { icona } from '../icones.js';
+import { esc } from '../dom.js';
 
 export function munta(contenidor, [mode]) {
   const nou = mode === 'nou';
@@ -65,7 +67,9 @@ export function munta(contenidor, [mode]) {
       const compte = nou
         ? await creaCompte(usuari.value, contrasenya.value)
         : await entra(usuari.value, contrasenya.value);
-      entrat(compte);
+      const ruta = await iniciaCompte(compte);
+      location.hash = ruta;
+      if (ruta === '#avui') benvinguda();
     } catch (error) {
       ocupat(formulari, false);
       mostraError(formulari, error.message, error.motiu === 'existeix' ? 'usuari' : null);
@@ -91,9 +95,40 @@ export function munta(contenidor, [mode]) {
   };
 }
 
-/* Ja hi ha sessió: es desa el compte i s'obre l'app. */
-function entrat(compte) {
-  actualitza(d => { d.compte = compte; });
-  location.hash = '#avui';
-  benvinguda();
+/*
+ * La sessió de Supabase ja no val (per exemple, el compte s'ha esborrat o la sessió s'ha tancat
+ * des del servidor): es torna a entrar amb el mateix usuari, sense perdre res del que hi ha aquí.
+ */
+export function obreTornaAEntrar() {
+  const { usuari } = obte().compte;
+  const full = obreFull(`
+    <div class="full-cap"><h2>Torna a entrar</h2>${botoTanca}</div>
+    <form class="formulari" novalidate>
+      <p class="usuari-compte">${icona('usuari')}<span>${esc(usuari)}</span></p>
+      ${htmlCampContrasenya({ nom: 'contrasenya', etiqueta: 'Contrasenya', autocomplete: 'current-password', ull: true })}
+      ${htmlError()}
+      <button type="submit" class="boto principal">Entrar</button>
+    </form>`, {
+    ull: () => commutaUll(formulari)
+  });
+  const formulari = full.querySelector('form');
+  formulari.addEventListener('submit', async e => {
+    e.preventDefault();
+    const { contrasenya } = formulari.elements;
+    if (!contrasenya.value) return mostraError(formulari, 'Escriu la contrasenya', 'contrasenya');
+    if (!navigator.onLine) return mostraError(formulari, 'Sense connexió');
+    mostraError(formulari, '');
+    ocupat(formulari, true);
+    try {
+      const compte = await entra(usuari, contrasenya.value);
+      if (compte.id !== obte().compte.id) throw new ErrorCompte('credencials');
+      tancaFull();
+      await sincronitza();
+      mostraAvis('Desat');
+    } catch (error) {
+      if (!full.open) return mostraAvis(error.message);
+      ocupat(formulari, false);
+      mostraError(formulari, error.message);
+    }
+  });
 }

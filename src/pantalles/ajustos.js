@@ -4,7 +4,8 @@ import { ferCopia, llegeixCopia } from '../copia.js';
 import { mostraAvisSalut } from '../benvinguda.js';
 import { htmlInstruccions, installa } from '../installacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
-import { canviaContrasenya, tancaSessio, MIN_CONTRASENYA } from '../compte.js';
+import { canviaContrasenya, MIN_CONTRASENYA } from '../compte.js';
+import { tancaCompte } from '../sincronitza.js';
 import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
@@ -154,7 +155,7 @@ export function munta(contenidor, [origen]) {
           d.sessions = [];
           d.sessioEnCurs = null;
           // Les fletxes "↑" de pujada parlen de l'historial que s'esborra (les repeticions es queden).
-          d.rutines.forEach(r => r.exercicis.forEach(ex => { delete ex.pujada; }));
+          d.pla.cites.forEach(c => c.rutina?.exercicis.forEach(ex => { delete ex.pujada; }));
         });
         pinta();
         mostraAvis('Progrés reiniciat');
@@ -201,9 +202,14 @@ export function munta(contenidor, [origen]) {
       titol: 'Tancar sessió?',
       boto: `${icona('sortir')} Tancar sessió`,
       enConfirmar: async () => {
-        await tancaSessio();
-        actualitza(d => { d.compte = null; });
-        location.hash = '#entrar';
+        if (await tancaCompte()) {
+          location.hash = '#entrar';
+          return;
+        }
+        obreFull(`
+          <div class="full-cap"><h2>Canvis pendents</h2>${botoTanca}</div>
+          <p>Cal connexió per desar-los.</p>
+          <button type="button" class="boto contorn" data-accio="tanca">D'acord</button>`);
       }
     });
   }
@@ -231,10 +237,7 @@ export function munta(contenidor, [origen]) {
         boto: 'Restablir',
         enConfirmar: () => {
           const inicials = dadesInicials();
-          actualitza(d => {
-            d.pla.cites = inicials.pla.cites;
-            d.rutines = inicials.rutines;
-          });
+          actualitza(d => { d.pla.cites = inicials.pla.cites; });
           mostraAvis('Pla inicial restablert');
         }
       });

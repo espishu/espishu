@@ -7,8 +7,6 @@
 import { obte, actualitza, VERSIO } from './store.js';
 import { ratxa } from './ratxa.js';
 
-const DIES_AVIS_COPIA = 28;
-
 const dos = n => String(n).padStart(2, '0');
 const avuiText = (ara = new Date()) => `${ara.getFullYear()}-${dos(ara.getMonth() + 1)}-${dos(ara.getDate())}`;
 
@@ -17,6 +15,10 @@ export async function ferCopia() {
   const data = avuiText();
   const copia = JSON.parse(JSON.stringify(obte()));
   copia.perfil.ultimaCopia = data;
+  // El compte i la cua de canvis són d'aquest aparell, no de la còpia.
+  delete copia.compte;
+  delete copia.pendents;
+  delete copia.anterior;
   const nom = `espishu-copia-${data}.json`;
   const text = JSON.stringify(copia, null, 2);
   const arxiu = new File([text], nom, { type: 'application/json' });
@@ -52,15 +54,21 @@ export function validaCopia(obj) {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error(noEs);
   if (!Number.isInteger(obj.versio)) throw new Error(noEs);
   if (obj.versio > VERSIO) throw new Error('Aquesta còpia és d\'una versió més nova de l\'app.');
+  // Versió 1: rutina compartida (`rutines`). Versió 2: la rutina és dins de cada cita.
+  const rutinesBe = obj.versio === 1
+    ? Array.isArray(obj.rutines) && obj.rutines.every(r => r && r.id && Array.isArray(r.exercicis))
+    : obj.pla?.cites?.every(c => !c?.rutina || Array.isArray(c.rutina.exercicis));
   const ok = obj.perfil && typeof obj.perfil === 'object'
     && obj.pla && Array.isArray(obj.pla.cites) && Number.isInteger(obj.pla.objectiuSetmanal)
-    && Array.isArray(obj.rutines) && Array.isArray(obj.sessions)
+    && Array.isArray(obj.sessions) && rutinesBe
     && obj.pla.cites.every(c => c && c.id && c.dia >= 1 && c.dia <= 7 && /^\d{2}:\d{2}$/.test(c.hora) && c.activitat)
-    && obj.rutines.every(r => r && r.id && Array.isArray(r.exercicis))
     && obj.sessions.every(s => s && s.id && s.inici && s.estat);
   if (!ok) throw new Error('A l\'arxiu hi falten dades. No es pot restaurar.');
   obj.ajustos ??= { dolors: [] };
   obj.sessioEnCurs ??= null;
+  delete obj.compte;
+  delete obj.pendents;
+  delete obj.anterior;
   return obj;
 }
 
@@ -83,12 +91,4 @@ export async function llegeixCopia(arxiu) {
     parts.push(`còpia del ${new Intl.DateTimeFormat('ca', { day: 'numeric', month: 'long' }).format(data)}`);
   }
   return { dades, resum: parts.join(', ') };
-}
-
-/* Cal recordar la còpia si fa més de 4 setmanes de l'última (o de la primera sessió, si no se n'ha fet cap). */
-export function calRecordarCopia(estat, ara = new Date()) {
-  const referencia = estat.perfil.ultimaCopia
-    ? Date.parse(`${estat.perfil.ultimaCopia}T00:00:00`)
-    : estat.sessions.length ? Math.min(...estat.sessions.map(s => Date.parse(s.inici))) : null;
-  return referencia !== null && ara - referencia > DIES_AVIS_COPIA * 86400000;
 }
