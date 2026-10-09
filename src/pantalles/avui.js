@@ -1,14 +1,14 @@
 /* Pantalla Avui (PLA.md, seccions 7.1 i 13.3): la propera cita i, a sota, les gotes de la setmana. L'arbre i l'estació només surten a la pestanya Arbre. */
 import { obte, actualitza } from '../store.js';
-import { properaCita, nomCita, duracioCita, formatDuracio, formatHora, nomDia, rutinaDe } from '../cites.js';
+import { properaCita, nomCita, duracioCita, formatDuracio, formatHora, rutinaDe, DIES, diaSetmana } from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlGotes } from '../tema.js';
 import { activaSo } from '../so.js';
 import { ferCopia, calRecordarCopia } from '../copia.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
-import { mostraAvis } from '../full.js';
-import { esc } from '../dom.js';
+import { mostraAvis, confirma } from '../full.js';
+import { esc, majuscula } from '../dom.js';
 import { icona } from '../icones.js';
 
 function salutacio(ara) {
@@ -18,16 +18,28 @@ function salutacio(ara) {
   return 'Bona nit';
 }
 
-/* Una sola targeta: icona, nom, quan i, a sota, el botó (13.3). */
-function targetaCita({ icon, etiqueta = null, nom, quan, botons }) {
+/* "Dijous, 9 d'octubre" */
+function dataLlarga(ara) {
+  return majuscula(new Intl.DateTimeFormat('ca', { weekday: 'long', day: 'numeric', month: 'long' }).format(ara));
+}
+
+/* Dies de calendari entre avui i `data` (0 = avui). */
+function diesFins(data, ara) {
+  const dia = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((dia(data) - dia(ara)) / 86400000);
+}
+
+/* Una sola targeta: icona, nom, quan i, a sota, el botó (13.3). `falta`: quant falta, si no és avui. */
+function targetaCita({ icon, etiqueta = null, nom, quan, falta = null, botons }) {
   return `
-    <section class="targeta cita" aria-labelledby="nom-cita">
+    <section class="targeta cita${falta ? ' no-toca' : ''}" aria-labelledby="nom-cita">
       <div class="cita-cap">
         <span class="icona-activitat">${icona(icon)}</span>
         <div>
           ${etiqueta ? `<p class="etiqueta">${esc(etiqueta)}</p>` : ''}
           <h2 id="nom-cita">${esc(nom)}</h2>
           <p class="quan">${esc(quan)}</p>
+          ${falta ? `<p class="falta">${icona('calendari')}${esc(falta)}</p>` : ''}
         </div>
       </div>
       ${botons}
@@ -60,13 +72,15 @@ export function munta(contenidor) {
     });
   } else if (propera) {
     const { cita, data } = propera;
-    const dia = nomDia(data, ara);
+    const dies = diesFins(data, ara);
     const minuts = duracioCita(estat, cita);
     const esRutina = !!rutinaDe(estat, cita);
+    // Si avui no toca, el dia surt a "quan" i el que falta a sota ("Demà", "D'aquí 2 dies"); el botó es veu apagat.
     cos = targetaCita({
       icon: cita.activitat,
       nom: nomCita(estat, cita),
-      quan: `${dia === 'Avui' ? '' : `${dia} `}${formatHora(cita.hora)}` + (minuts ? `, ${formatDuracio(minuts)}` : ''),
+      quan: `${dies ? `${DIES[diaSetmana(data)]} ` : ''}${formatHora(cita.hora)}` + (minuts ? `, ${formatDuracio(minuts)}` : ''),
+      falta: dies === 0 ? null : dies === 1 ? 'Demà' : `D'aquí ${dies} dies`,
       botons: `
         <button type="button" class="boto principal" data-accio="comenca">${icona('gota')} Comença</button>
         ${esRutina ? '<button type="button" class="boto-text" data-accio="curta">Versió curta</button>' : ''}`
@@ -79,7 +93,10 @@ export function munta(contenidor) {
 
   contenidor.innerHTML = `
     <header class="capcalera amb-accio">
-      <h1>${salutacio(ara)}</h1>
+      <div>
+        <h1>${salutacio(ara)}</h1>
+        <p class="subtitol">${esc(dataLlarga(ara))}</p>
+      </div>
       <span class="capcalera-accions">
         <a class="boto-icona" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
@@ -95,6 +112,19 @@ export function munta(contenidor) {
     ${esInstallada() ? '' : `
       <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}`;
 
+  /* Si avui no toca, primer es confirma. */
+  function demanaComencar(curta) {
+    const { data } = propera;
+    const dies = diesFins(data, ara);
+    if (dies === 0) return comenca(curta);
+    confirma({
+      titol: 'Segur que vols començar?',
+      text: `Toca ${dies === 1 ? 'demà' : DIES[diaSetmana(data)].toLowerCase()}.`,
+      boto: `${icona('gota')} Comença`,
+      enConfirmar: () => comenca(curta)
+    });
+  }
+
   function comenca(curta) {
     activaSo();
     const { cita } = propera;
@@ -108,8 +138,8 @@ export function munta(contenidor) {
   const clic = e => {
     const boto = e.target.closest('[data-accio]');
     const accio = boto?.dataset.accio;
-    if (accio === 'comenca') comenca(false);
-    if (accio === 'curta') comenca(true);
+    if (accio === 'comenca') demanaComencar(false);
+    if (accio === 'curta') demanaComencar(true);
     if (accio === 'continua') { activaSo(); location.hash = '#sessio'; }
     if (accio === 'copia') {
       ferCopia().then(fet => {

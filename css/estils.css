@@ -13,6 +13,7 @@
   --bg: #F1F2EC; --card: #FFFFFF; --ink: #22291F; --muted: #566052;
   --acc: #2F6B45; --acc-ink: #FFFFFF; --soft: #E1EBDD; --hi: #A8780D; --sep: #DCE1D6;
   --acc-text: #2F6B45; /* text verd sobre --soft (5,1:1) */
+  --apagat: #D5DFD5; --apagat-ink: #45604D; /* "Comença" quan avui no toca (5:1) */
   --pri: var(--acc); --pri-ink: var(--acc-ink);
   --anell-ple: #B98A5E; --anell-buit: #EFE6D8;
   --body: #EFE9DF; --body-far: #D3CBBE; --line: #2B3A30;
@@ -31,6 +32,7 @@
     --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
     --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
     --acc-text: #6FBF8A;
+    --apagat: #2E3E33; --apagat-ink: #A3B8A9;
     --anell-ple: #B98A5E; --anell-buit: #3A342C;
     --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
     --m1: #6FBF8A; --m2: #2F5E43;
@@ -45,6 +47,7 @@
   --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
   --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
   --acc-text: #6FBF8A;
+  --apagat: #2E3E33; --apagat-ink: #A3B8A9;
   --anell-ple: #B98A5E; --anell-buit: #3A342C;
   --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
   --m1: #6FBF8A; --m2: #2F5E43;
@@ -1164,3 +1167,21 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 
 /* Capçalera de les pestanyes: a la dreta, l'etiqueta de l'estació (Arbre) i el botó d'ajustos. */
 .capcalera-accions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+/* Avui: la data sota la salutació i, si avui no toca, quant falta i "Comença" apagat. */
+.capcalera .subtitol { color: var(--muted); font-size: 17px; margin-top: 2px; }
+.cita .falta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--acc-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+.cita .falta .icona { width: 16px; height: 16px; }
+.cita.no-toca .boto.principal { background: var(--apagat); color: var(--apagat-ink); }
+.cita.no-toca .boto-text { color: var(--muted); }

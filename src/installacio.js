@@ -69,6 +69,7 @@ export function htmlInstruccions() {
   if (peticio) return `<button type="button" class="boto principal" data-accio="installa">${icona('afegir')} Instal·lar</button>`;
   const passos = PASSOS[plataforma()];
   if (!passos) return '<p class="secundari">Aquest navegador no ho permet. Obre-la amb Chrome o Edge.</p>';
+  if (passos.length === 1) return `<p>${passos[0]}</p>`;
   return `<ol class="passos">${passos.map((pas, i) => `<li><span class="num">${i + 1}</span><span>${pas}</span></li>`).join('')}</ol>`;
 }
 
