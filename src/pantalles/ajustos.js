@@ -2,6 +2,7 @@
 import { obte, actualitza, dadesInicials, substitueix } from '../store.js';
 import { ferCopia, llegeixCopia } from '../copia.js';
 import { mostraAvisSalut } from '../benvinguda.js';
+import { htmlInstruccions, installa } from '../installacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
@@ -41,6 +42,11 @@ export function munta(contenidor) {
             <button type="button" class="pas" data-accio="objectiu" data-signe="1" aria-label="Una sessió més"${objectiu >= 4 ? ' disabled' : ''}>${icona('mes')}</button>
           </div>
         </div>
+      </section>
+
+      <section class="targeta">
+        <h2 class="titol-targeta">Accés directe</h2>
+        ${htmlInstruccions()}
       </section>
 
       <section class="targeta">
@@ -149,6 +155,7 @@ export function munta(contenidor) {
     if (accio === 'restaura') contenidor.querySelector('[data-arxiu]').click();
     if (accio === 'salut') mostraAvisSalut();
     if (accio === 'reinicia') reinicia();
+    if (accio === 'installa') installa().then(pinta);
     if (accio === 'objectiu') {
       actualitza(d => { d.pla.objectiuSetmanal = Math.min(4, Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe))); });
       pinta();

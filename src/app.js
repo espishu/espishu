@@ -6,6 +6,7 @@ import { obte, demanaPersistencia } from './store.js';
 import { carregaBiblioteca } from './biblioteca.js';
 import { benvinguda } from './benvinguda.js';
 import { aplicaEstacio } from './tema.js';
+import { escoltaInstallacio } from './installacio.js';
 import * as avui from './pantalles/avui.js';
 import * as sessio from './pantalles/sessio.js';
 import * as fet from './pantalles/fet.js';
@@ -65,6 +66,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 window.addEventListener('hashchange', mostra);
+escoltaInstallacio();
 
 aplicaEstacio();
 obte();

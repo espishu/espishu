@@ -1155,3 +1155,10 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 /* Capçalera de la sessió: "Acabar" i la llista, a la dreta del rellotge. */
 .sessio-accions { display: flex; align-items: center; gap: 8px; }
 .sessio-accions .boto.petit { padding: 6px 16px; }
+
+/* Instal·lar: recordatori petit a Avui i estat a Ajustos */
+.boto-text.recordatori { margin-top: 20px; font-size: 15px; text-decoration: none; }
+.recordatori .icona { width: 18px; height: 18px; }
+.installada { display: flex; align-items: center; gap: 8px; color: var(--acc-text); font-weight: 600; }
+.installada .icona { width: 20px; height: 20px; }
+.targeta .passos { margin-bottom: 0; }

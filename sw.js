@@ -5,7 +5,7 @@
  * o no hi ha connexió, la còpia desada. Les fotos i la lletra no canvien: primer la còpia.
  * Quan canviïs la llista de fitxers, puja el número de VERSIO.
  */
-const VERSIO = 'espishu-2';
+const VERSIO = 'espishu-3';
 const ESPERA_XARXA = 3000;
 
 const FITXERS = [
@@ -37,6 +37,7 @@ const FITXERS = [
   'src/full.js',
   'src/copia.js',
   'src/benvinguda.js',
+  'src/installacio.js',
   'src/biblioteca.js',
   'src/temps.js',
   'src/so.js',

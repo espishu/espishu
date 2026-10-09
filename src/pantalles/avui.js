@@ -6,7 +6,7 @@ import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlEstacio, htmlGotes } from '../tema.js';
 import { activaSo } from '../so.js';
 import { ferCopia, calRecordarCopia } from '../copia.js';
-import { esSafariSenseInstallar, mostraInstallacio } from '../benvinguda.js';
+import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { mostraAvis } from '../full.js';
 import { esc } from '../dom.js';
 import { icona } from '../icones.js';
@@ -90,12 +90,8 @@ export function munta(contenidor) {
         <p>Còpia pendent</p>
         <button type="button" class="boto contorn petit" data-accio="copia">Fer-la</button>
       </section>` : ''}
-    ${esSafariSenseInstallar() ? `
-      <section class="targeta avis-discret">
-        ${icona('mobil')}
-        <p>Obre-la des de la icona</p>
-        <button type="button" class="boto contorn petit" data-accio="installa">Com?</button>
-      </section>` : ''}`;
+    ${esInstallada() ? '' : `
+      <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}`;
 
   function comenca(curta) {
     activaSo();
@@ -120,7 +116,7 @@ export function munta(contenidor) {
         mostraAvis('Còpia feta');
       });
     }
-    if (accio === 'installa') mostraInstallacio();
+    if (accio === 'installa') mostraInstallacio().then(() => { if (esInstallada()) boto.remove(); });
   };
   contenidor.addEventListener('click', clic);
   return () => contenidor.removeEventListener('click', clic);
