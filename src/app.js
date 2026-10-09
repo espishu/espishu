@@ -32,6 +32,14 @@ let actual = null;
 let hashActual = null;
 let desmunta = null;
 
+/* Hi ha una versió nova de l'app esperant: es recarrega en arribar a una pantalla on es pot (a sota). */
+let recarregaPendent = false;
+const ON_ES_POT_RECARREGAR = new Set([...AMB_BARRA, 'entrar']);
+
+function recarregaSiEsPot() {
+  if (recarregaPendent && ON_ES_POT_RECARREGAR.has(actual) && !document.querySelector('dialog[open]')) location.reload();
+}
+
 /* Sense sessió iniciada, només la pantalla d'entrar; amb un compte buit, només la d'importar. */
 function rutaPermesa(nom) {
   const { compte } = obte();
@@ -73,6 +81,7 @@ function mostra() {
     if (hashActual !== null) contenidor.focus({ preventScroll: true });
     hashActual = location.hash;
   }
+  recarregaSiEsPot();
 }
 
 /* En tornar a l'app (potser l'endemà), les pantalles amb barra es tornen a dibuixar. */
@@ -113,14 +122,29 @@ mostra();
 iniciaSincronitzacio();
 benvinguda().then(() => { if (actual === 'avui') mostra(); });
 
+/*
+ * Actualitzacions (sw.js): en obrir l'app, en tornar-hi i en recuperar la connexió es mira si
+ * hi ha una versió nova publicada. Quan la versió nova ja controla l'app, es recarrega,
+ * però només en una pestanya (Avui, Arbre, Pla, Ajustos) o a Entrar, sense cap full obert:
+ * enmig d'una sessió s'espera que s'acabi.
+ */
 if ('serviceWorker' in navigator) {
-  // Si arriba una versió nova de l'app, es recarrega sola (mai enmig d'una sessió).
-  const teniaVersio = !!navigator.serviceWorker.controller;
+  let controlador = navigator.serviceWorker.controller;
+  let registre = null;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (teniaVersio && actual !== 'sessio') location.reload();
+    const abans = controlador;
+    controlador = navigator.serviceWorker.controller;
+    if (!abans) return;   // primera instal·lació: el codi ja és el que hi ha publicat
+    recarregaPendent = true;
+    recarregaSiEsPot();
   });
+  const comprovaVersio = () => registre?.update().catch(() => { /* sense connexió: ja es tornarà a mirar */ });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') comprovaVersio(); });
+  window.addEventListener('online', comprovaVersio);
   // Aquest codi va després de l'await de la biblioteca: potser "load" ja ha passat.
-  const registra = () => navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Service worker no registrat', e));
+  const registra = () => navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+    .then(r => { registre = r; comprovaVersio(); })
+    .catch(e => console.warn('Service worker no registrat', e));
   if (document.readyState === 'complete') registra();
   else window.addEventListener('load', registra);
 }

@@ -3,7 +3,11 @@
  *
  * Amb connexió, primer la xarxa (sempre la versió més nova) i, si no respon en 3 segons
  * o no hi ha connexió, la còpia desada. Les fotos i la lletra no canvien: primer la còpia.
- * Quan canviïs la llista de fitxers, puja el número de VERSIO.
+ *
+ * Actualitzacions: a cada publicació es puja VERSIO (un número més). En obrir l'app (o tornar-hi),
+ * app.js demana al navegador que compari aquest fitxer amb el publicat; si VERSIO ha canviat,
+ * s'instal·la la versió nova, passa a controlar l'app i l'app es recarrega sola, però mai enmig
+ * d'una sessió. El número surt a Ajustos ("Versió 4").
  */
 const VERSIO = 'espishu-4';
 const ESPERA_XARXA = 3000;
@@ -66,14 +70,27 @@ const FITXERS = [
 const fresc = url => new Request(url, { cache: 'reload' });
 const esFix = url => /\/(dades\/imatges|fonts)\//.test(url);
 
+/*
+ * Desa un fitxer a la còpia nova. "reload" evita agafar còpies velles de la memòria cau HTTP.
+ * Les fotos i la lletra no canvien: si ja són a la còpia de la versió anterior, es reaprofiten
+ * (així cada actualització no torna a baixar els 5 MB de fotos).
+ */
+async function desa(cache, url) {
+  if (esFix(`/${url}`)) {
+    const vella = await caches.match(url);
+    if (vella) return cache.put(url, vella);
+  }
+  return cache.add(fresc(url));
+}
+
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(VERSIO);
-    // "reload" evita agafar còpies velles de la memòria cau HTTP del navegador.
-    await cache.addAll(FITXERS.map(fresc));
+    await Promise.all(FITXERS.map(url => desa(cache, url)));
     // Les fotos dels exercicis surten de la biblioteca.
     const biblioteca = await (await cache.match('dades/biblioteca.json')).json();
-    await cache.addAll(biblioteca.flatMap(e => e.imatges).map(fresc));
+    await Promise.all(biblioteca.flatMap(e => e.imatges).map(url => desa(cache, url)));
+    // La versió nova passa a controlar l'app de seguida; l'app es recarrega quan pot (app.js).
     await self.skipWaiting();
   })());
 });

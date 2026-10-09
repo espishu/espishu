@@ -88,10 +88,23 @@ export function munta(contenidor, [origen]) {
           <button type="button" class="boto contorn" data-accio="reinicia">${icona('paperera')} Reiniciar</button>
         </div>
         <div class="sobre">
-          <p>Espishu, versió 1.</p>
+          <p>Espishu</p>
           <p class="secundari">Exercicis i fotos: Free Exercise DB (domini públic). Lletra: Lexend (llicència OFL).</p>
         </div>
-      </details>`;
+      </details>
+      <p class="versio-app" data-versio></p>`;
+    mostraVersio();
+  }
+
+  /* La versió instal·lada en aquest aparell: el número de la còpia del service worker (sw.js, "espishu-4"). */
+  async function mostraVersio() {
+    let numero = null;
+    try {
+      const numeros = (await caches.keys()).map(nom => /^espishu-(\d+)$/.exec(nom)?.[1]).filter(Boolean).map(Number);
+      if (numeros.length) numero = Math.max(...numeros);
+    } catch { /* sense memòria cau (navegador antic o mode privat) */ }
+    const lloc = contenidor.querySelector('[data-versio]');
+    if (lloc) lloc.textContent = numero ? `Versió ${numero}` : '';
   }
 
   async function copia() {

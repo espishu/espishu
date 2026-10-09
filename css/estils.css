@@ -1245,3 +1245,7 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 .importar .boto { font-size: 18px; }
 /* A Arbre, si surt el núvol, l'etiqueta de l'estació s'amaga perquè el títol no es parteixi. */
 .capcalera-accions:has(.pendents:not([hidden])) .etiqueta-estacio { display: none; }
+
+/* Ajustos: la versió instal·lada, petita i a baix de tot. */
+.versio-app { margin: 4px 0 0; color: var(--muted); font-size: 14px; text-align: center; }
+.versio-app:empty { display: none; }

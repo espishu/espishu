@@ -77,7 +77,11 @@ export function dadesInicials() {
 
 /* ================= Migracions ================= */
 
-/* MIGRACIONS[n] passa un objecte de la versió n a la n + 1. */
+/*
+ * MIGRACIONS[n] passa un objecte de la versió n a la n + 1. S'apliquen en obrir una versió nova de
+ * l'app, sobre les dades que hi ha al mòbil. Han de conservar-ho tot: les sessions, la sessió a mitges,
+ * el compte i la cua de canvis per pujar (`pendents`, que una versió nova ha de poder pujar).
+ */
 const MIGRACIONS = {
   /*
    * 1 → 2 (comptes, 21.4): la rutina compartida (`rutines` + `rutinaId`) passa a ser dins de

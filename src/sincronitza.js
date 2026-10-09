@@ -9,6 +9,16 @@
  * Elements de la cua: { n, tipus: 'pla' } (tot el pla: cites, exercicis, objectiu i dolors),
  * { n, tipus: 'sessio', id } i { n, tipus: 'reinicia' } (esborrar l'historial de Supabase).
  * El pla es puja com està en el moment de pujar-lo, no com estava en apuntar-lo.
+ *
+ * Entre versions de l'app: la cua es desa amb les dades (localStorage) i una versió nova la puja
+ * igualment, perquè cada element només diu QUÈ cal pujar (un tipus i un id) i les dades es llegeixen
+ * en el moment de pujar. Per això:
+ *  - No canviïs mai el significat d'un tipus. Si cal una manera nova de pujar, afegeix un tipus nou
+ *    i mantén els antics (o converteix-los a la migració de store.js).
+ *  - Un element només surt de la cua quan Supabase ha dit que sí. Si falla (sense connexió, o la base
+ *    de dades encara no té la migració), es queda i es torna a provar.
+ *  - Pujar-lo dues vegades no fa mal (desa_pla i desa_sessio són idempotents): si l'app es recarrega
+ *    a mig pujar (per exemple, per una actualització), es torna a enviar.
  */
 import { obte, actualitza, substitueix, enCadaCanvi, dadesInicials, desaAnteriors } from './store.js';
 import { obteClient, tancaSessio, ErrorCompte, motiuDe } from './compte.js';
@@ -179,6 +189,9 @@ async function executa(sb, element) {
     if (s) comprova(await sb.rpc('desa_sessio', { sessio: sessioServidor(s, d) }));
   } else if (element.tipus === 'reinicia') {
     comprova(await sb.from('sessions').delete().eq('user_id', d.compte.id));
+  } else {
+    // Un tipus que aquesta versió no coneix (no hauria de passar): es treu perquè no bloquegi la cua.
+    console.warn('Element de la cua desconegut', element);
   }
 }
 
