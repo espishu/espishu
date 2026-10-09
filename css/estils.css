@@ -203,7 +203,6 @@ p { margin: 0; }
 }
 
 /* ================= Avui (13.3) ================= */
-.capcalera.amb-estacio { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .etiqueta-estacio {
   display: inline-flex;
   align-items: center;
@@ -1162,3 +1161,6 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 .installada { display: flex; align-items: center; gap: 8px; color: var(--acc-text); font-weight: 600; }
 .installada .icona { width: 20px; height: 20px; }
 .targeta .passos { margin-bottom: 0; }
+
+/* Capçalera de les pestanyes: a la dreta, l'etiqueta de l'estació (Arbre) i el botó d'ajustos. */
+.capcalera-accions { display: flex; align-items: center; gap: 8px; flex: none; }

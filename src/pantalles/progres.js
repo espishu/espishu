@@ -101,9 +101,12 @@ function muntaResum(contenidor) {
   const total = sessionsArbre(estat);
 
   contenidor.innerHTML = `
-    <header class="capcalera amb-estacio">
+    <header class="capcalera amb-accio">
       <h1>El meu arbre</h1>
-      ${htmlEstacio(ara)}
+      <span class="capcalera-accions">
+        ${htmlEstacio(ara)}
+        <a class="boto-icona" href="#ajustos/progres" aria-label="Ajustos">${icona('ajustos')}</a>
+      </span>
     </header>
 
     <section class="panell-arbre gran" aria-label="El teu arbre">

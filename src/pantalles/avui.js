@@ -78,9 +78,12 @@ export function munta(contenidor) {
   }
 
   contenidor.innerHTML = `
-    <header class="capcalera amb-estacio">
+    <header class="capcalera amb-accio">
       <h1>${salutacio(ara)}</h1>
-      ${htmlEstacio(ara)}
+      <span class="capcalera-accions">
+        ${htmlEstacio(ara)}
+        <a class="boto-icona" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
+      </span>
     </header>
     ${cos}
     <section class="setmana-avui" aria-label="Aquesta setmana">${htmlGotes(estat, ara)}</section>

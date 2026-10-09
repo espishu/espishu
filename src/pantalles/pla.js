@@ -29,7 +29,7 @@ export function munta(contenidor) {
   contenidor.innerHTML = `
     <header class="capcalera amb-accio">
       <h1>Setmana</h1>
-      <a class="boto-icona" href="#ajustos" aria-label="Ajustos">${icona('ajustos')}</a>
+      <a class="boto-icona" href="#ajustos/pla" aria-label="Ajustos">${icona('ajustos')}</a>
     </header>
     ${cites.length ? `<ul class="llista-cites">${targetes}</ul>` : '<section class="targeta"><p>Cap cita</p></section>'}
     <button type="button" class="boto-afegir" data-accio="afegeix" aria-label="Afegir una cita">${icona('mes')}</button>`;

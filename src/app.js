@@ -17,8 +17,9 @@ import * as ajustos from './pantalles/ajustos.js';
 
 const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos };
 const AMB_BARRA = new Set(['avui', 'progres', 'pla', 'ajustos']);
-/* Pestanya que queda marcada a cada pantalla. */
+/* Pestanya que queda marcada a cada pantalla. Ajustos marca la pestanya des d'on s'ha obert (#ajustos/<pestanya>). */
 const PESTANYA = { ajustos: 'pla' };
+const PESTANYES = new Set(['avui', 'progres', 'pla']);
 
 const contenidor = document.getElementById('pantalla');
 const barra = document.querySelector('.barra');
@@ -46,8 +47,9 @@ function mostra() {
 
   barra.hidden = !AMB_BARRA.has(nom);
   document.body.classList.toggle('amb-barra', !barra.hidden);
+  const marcada = nom === 'ajustos' && PESTANYES.has(parametres[0]) ? parametres[0] : (PESTANYA[nom] ?? nom);
   barra.querySelectorAll('a').forEach(a => {
-    if (a.dataset.pantalla === (PESTANYA[nom] ?? nom)) a.setAttribute('aria-current', 'page');
+    if (a.dataset.pantalla === marcada) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   });
 

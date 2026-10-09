@@ -13,13 +13,17 @@ function textUltimaCopia(data) {
   return `Última: ${new Intl.DateTimeFormat('ca', { day: 'numeric', month: 'short', year: 'numeric' }).format(d)}`;
 }
 
-export function munta(contenidor) {
+/* `origen`: la pestanya des d'on s'ha obert (#ajustos/avui, #ajustos/progres o #ajustos/pla). */
+const PESTANYES = ['avui', 'progres', 'pla'];
+
+export function munta(contenidor, [origen]) {
+  const enrere = PESTANYES.includes(origen) ? origen : 'pla';
   function pinta() {
     const { pla, perfil } = obte();
     const objectiu = pla.objectiuSetmanal;
     contenidor.innerHTML = `
       <header class="capcalera amb-enrere">
-        <a class="boto-icona" href="#pla" aria-label="Tornar al pla">${icona('enrere')}</a>
+        <a class="boto-icona" href="#${enrere}" aria-label="Tornar">${icona('enrere')}</a>
         <h1>Ajustos</h1>
       </header>
 
