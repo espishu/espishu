@@ -1,0 +1,67 @@
+# Consulta automàtica perquè Supabase no pausi el projecte (el pla gratuït el pausa
+# després d'una setmana sense activitat). Crida la funció ping() de supabase/schema.sql.
+#
+# Secrets del repositori (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL       https://<projecte>.supabase.co
+#   SUPABASE_ANON_KEY  la clau pública (publishable o anon), la mateixa de src/config.js
+#
+# Si la crida falla, el workflow falla i GitHub avisa per correu.
+
+name: Consulta automàtica
+
+on:
+  schedule:
+    - cron: '17 6 */3 * *'   # cada 3 dies, a les 6:17 UTC
+  workflow_dispatch:          # i a mà, des de la pestanya Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Crida ping() a Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Falten els secrets SUPABASE_URL i SUPABASE_ANON_KEY"
+            exit 1
+          fi
+          resposta=$(curl --silent --show-error --fail-with-body --max-time 30 \
+            --retry 3 --retry-all-errors --retry-delay 20 \
+            -X POST "${SUPABASE_URL%/}/rest/v1/rpc/ping" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}') || { echo "::error::Supabase no respon: $resposta"; exit 1; }
+          echo "Resposta: $resposta"
+          if [ "$resposta" != '"ok"' ]; then
+            echo "::error::Supabase no ha respost \"ok\""
+            exit 1
+          fi
+
+  # GitHub desactiva les tasques programades dels repositoris públics que porten 60 dies
+  # sense activitat. Si l'últim commit té més de 45 dies, se'n fa un de petit
+  # (keepalive/last-ping.txt). Si hi ha commits més nous, no es fa res.
+  repositori-actiu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Commit si fa més de 45 dies de l'últim
+        run: |
+          dies=$(( ($(date +%s) - $(git log -1 --format=%ct)) / 86400 ))
+          echo "L'últim commit és de fa $dies dies"
+          if [ "$dies" -lt 45 ]; then
+            exit 0
+          fi
+          mkdir -p keepalive
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > keepalive/last-ping.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add keepalive/last-ping.txt
+          git commit -m "Consulta automàtica: el repositori continua actiu"
+          git push
