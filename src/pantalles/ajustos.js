@@ -63,6 +63,7 @@ export function munta(contenidor) {
         <div class="pila-botons">
           <button type="button" class="boto contorn" data-accio="salut">${icona('salut')} Avís de salut</button>
           <button type="button" class="boto contorn" data-accio="restableix">${icona('restaura')} Restablir el pla inicial</button>
+          <button type="button" class="boto contorn" data-accio="reinicia">${icona('paperera')} Reiniciar</button>
         </div>
         <div class="sobre">
           <p>Espishu, versió 1.</p>
@@ -102,6 +103,44 @@ export function munta(contenidor) {
     });
   }
 
+  /*
+   * Reiniciar el progrés, en dos passos: primer ofereix fer una còpia; després avisa que no es pot desfer.
+   * Esborra l'historial (i la sessió a mitges): l'arbre i la ratxa surten de les sessions.
+   * Es queden la rutina, les cites, l'objectiu i els ajustos.
+   */
+  function reinicia() {
+    obreFull(`
+      <div class="full-cap"><h2>Reiniciar?</h2>${botoTanca}</div>
+      <p>Historial, arbre i ratxa a zero.</p>
+      <div class="pila-botons">
+        <button type="button" class="boto principal" data-accio="copia">${icona('desa')} Fer còpia</button>
+        <button type="button" class="boto contorn" data-accio="seguir">Seguir</button>
+      </div>`, {
+      copia: async () => {
+        if (await ferCopia()) confirmaReinici();
+      },
+      seguir: () => confirmaReinici()
+    });
+  }
+
+  function confirmaReinici() {
+    confirma({
+      titol: 'Segur?',
+      text: 'No es pot desfer.',
+      boto: 'Reiniciar',
+      enConfirmar: () => {
+        actualitza(d => {
+          d.sessions = [];
+          d.sessioEnCurs = null;
+          // Les fletxes "↑" de pujada parlen de l'historial que s'esborra (les repeticions es queden).
+          d.rutines.forEach(r => r.exercicis.forEach(ex => { delete ex.pujada; }));
+        });
+        pinta();
+        mostraAvis('Progrés reiniciat');
+      }
+    });
+  }
+
   const clic = e => {
     const boto = e.target.closest('[data-accio]');
     if (!boto || boto.disabled) return;
@@ -109,6 +148,7 @@ export function munta(contenidor) {
     if (accio === 'copia') copia();
     if (accio === 'restaura') contenidor.querySelector('[data-arxiu]').click();
     if (accio === 'salut') mostraAvisSalut();
+    if (accio === 'reinicia') reinicia();
     if (accio === 'objectiu') {
       actualitza(d => { d.pla.objectiuSetmanal = Math.min(4, Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe))); });
       pinta();
