@@ -1,0 +1,9 @@
+# Només a l'ordinador: són notes personals i el repositori és públic.
+PLA.md
+CLAUDE.md
+.claude/
+
+# Fitxers de l'editor i del sistema
+.vscode/
+Thumbs.db
+desktop.ini

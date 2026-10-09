@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Icona</title>
+<!--
+  Dibuixa la icona de l'app amb la figura de src/animacions.js.
+  Per regenerar les icones, serveix la carpeta del projecte (per exemple amb Live Server a 127.0.0.1:5500) i,
+  per a cada mida (512, 192 i 180):
+    msedge --headless --hide-scrollbars --window-size=512,512 --screenshot=<ruta absoluta>/icons/icon-512.png "http://127.0.0.1:5500/eines/icona.html?mida=512"
+-->
+<style>
+  :root {
+    --body: #EFE9DF; --body-far: #D3CBBE; --line: #163A25;
+    --m1: #EBC35A; --m2: #9FCDAE; --floor: #4A8A60;
+  }
+  html, body { margin: 0; background: #2F6B45; overflow: hidden; }
+  #icona { display: grid; place-items: center; background: #2F6B45; }
+  #icona svg { width: 80%; height: 80%; }
+  #icona [stroke-dasharray] { display: none; }
+</style>
+</head>
+<body>
+<div id="icona"></div>
+<script type="module">
+  import { renderAnimacio } from '../src/animacions.js';
+  const mida = Number(new URLSearchParams(location.search).get('mida')) || 512;
+  const icona = document.getElementById('icona');
+  icona.style.width = icona.style.height = mida + 'px';
+  icona.innerHTML = renderAnimacio('cercles-bracos', 0);
+</script>
+</body>
+</html>

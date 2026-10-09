@@ -1,0 +1,1153 @@
+/* ================= Tipografia (allotjada al projecte) ================= */
+@font-face { font-family: "Lexend"; src: url("../fonts/lexend-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Lexend"; src: url("../fonts/lexend-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Lexend"; src: url("../fonts/lexend-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Lexend"; src: url("../fonts/lexend-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* ================= Colors: temàtica "L'arbre" (PLA.md, secció 13.6) =================
+   --acc és el color d'acció (--pri a PLA.md). --line és el contorn de la figura (animacions.js);
+   per als separadors de la interfície, --sep. */
+:root {
+  --bg: #F1F2EC; --card: #FFFFFF; --ink: #22291F; --muted: #566052;
+  --acc: #2F6B45; --acc-ink: #FFFFFF; --soft: #E1EBDD; --hi: #A8780D; --sep: #DCE1D6;
+  --acc-text: #2F6B45; /* text verd sobre --soft (5,1:1) */
+  --pri: var(--acc); --pri-ink: var(--acc-ink);
+  --anell-ple: #B98A5E; --anell-buit: #EFE6D8;
+  --body: #EFE9DF; --body-far: #D3CBBE; --line: #2B3A30;
+  --m1: #2F6B45; --m2: #9FCDAE;
+  --mat: #EBC35A; --mat-line: #C79A2C;
+  --prop: #A3AEA6; --prop-dark: #5A665E;
+  --floor: #D7E0D5; --towel: #E7A46B;
+  --water: #7FB6E6; --water-line: #4C8CC8; --bike: #D08A3E;
+  --barra-alt: 68px;
+  --fulla: 28px 8px 28px 8px; --fulla-petita: 18px 6px 18px 6px;
+  --font-titol: "Fraunces", Georgia, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
+    --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
+    --acc-text: #6FBF8A;
+    --anell-ple: #B98A5E; --anell-buit: #3A342C;
+    --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
+    --m1: #6FBF8A; --m2: #2F5E43;
+    --mat: #4A4024; --mat-line: #6B5A2E;
+    --prop: #6F7A72; --prop-dark: #B3BDB5;
+    --floor: #2A352D; --towel: #B87A47;
+    --water: #2C5C86; --water-line: #4C8CC8; --bike: #C98A48;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
+  --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
+  --acc-text: #6FBF8A;
+  --anell-ple: #B98A5E; --anell-buit: #3A342C;
+  --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
+  --m1: #6FBF8A; --m2: #2F5E43;
+  --mat: #4A4024; --mat-line: #6B5A2E;
+  --prop: #6F7A72; --prop-dark: #B3BDB5;
+  --floor: #2A352D; --towel: #B87A47;
+  --water: #2C5C86; --water-line: #4C8CC8; --bike: #C98A48;
+  color-scheme: dark;
+}
+
+/* Color d'estació (13.6): `tema.js` posa data-estacio a <html>. --se-ink és el text sobre --se-soft. */
+:root { --se: #C8782A; --se-soft: #F6E7D3; --se-ink: #6B3E10; }
+:root[data-estacio="primavera"] { --se: #C8577F; --se-soft: #F7E3EA; --se-ink: #7A2E4A; }
+:root[data-estacio="estiu"]     { --se: #C99A16; --se-soft: #F8EFCF; --se-ink: #6B5208; }
+:root[data-estacio="tardor"]    { --se: #C8782A; --se-soft: #F6E7D3; --se-ink: #6B3E10; }
+:root[data-estacio="hivern"]    { --se: #5E7F98; --se-soft: #E6EDF2; --se-ink: #33506A; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-estacio="primavera"] { --se-soft: #33232A; --se-ink: #F0B9CC; }
+  :root:not([data-theme="light"])[data-estacio="estiu"]     { --se-soft: #332C17; --se-ink: #EBCB6B; }
+  :root:not([data-theme="light"])[data-estacio="tardor"]    { --se-soft: #2E261C; --se-ink: #EDB47A; }
+  :root:not([data-theme="light"])[data-estacio="hivern"]    { --se-soft: #1F2830; --se-ink: #A9C3D8; }
+}
+:root[data-theme="dark"][data-estacio="primavera"] { --se-soft: #33232A; --se-ink: #F0B9CC; }
+:root[data-theme="dark"][data-estacio="estiu"]     { --se-soft: #332C17; --se-ink: #EBCB6B; }
+:root[data-theme="dark"][data-estacio="tardor"]    { --se-soft: #2E261C; --se-ink: #EDB47A; }
+:root[data-theme="dark"][data-estacio="hivern"]    { --se-soft: #1F2830; --se-ink: #A9C3D8; }
+
+/* ================= Base ================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+main {
+  max-width: 620px;
+  margin: 0 auto;
+  padding:
+    calc(24px + env(safe-area-inset-top, 0px))
+    calc(16px + env(safe-area-inset-right, 0px))
+    calc(32px + env(safe-area-inset-bottom, 0px))
+    calc(16px + env(safe-area-inset-left, 0px));
+}
+main:focus { outline: none; }
+
+/* Amb la barra inferior visible, deixem lloc perquè no tapi el contingut. */
+body.amb-barra main {
+  padding-bottom: calc(var(--barra-alt) + 32px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Títols i números grans en Fraunces; la resta en Lexend (13.5). */
+h1, h2, h3 { font-family: var(--font-titol); font-weight: 600; margin: 0; }
+h1 { font-size: 30px; letter-spacing: -0.01em; line-height: 1.2; }
+h2 { font-size: 23px; line-height: 1.25; }
+h3 { font-size: 21px; line-height: 1.3; }
+p { margin: 0; }
+
+:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ================= Peces comunes ================= */
+.capcalera { margin: 0 4px 20px; }
+.capcalera .data { color: var(--muted); font-size: 15px; margin-bottom: 2px; }
+
+.targeta {
+  background: var(--card);
+  border-radius: var(--fulla);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.etiqueta { color: var(--muted); font-size: 15px; margin-bottom: 4px; }
+.secundari { color: var(--muted); font-size: 15px; }
+
+.icona {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Botons en forma de píndola. El principal ple, els secundaris amb contorn. */
+.boto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.boto.principal {
+  min-height: 60px;
+  background: var(--acc);
+  color: var(--acc-ink);
+  border: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+.boto.contorn {
+  background: transparent;
+  color: var(--acc);
+  border: 2px solid var(--acc);
+}
+
+.boto[disabled] { opacity: .45; cursor: default; transform: none; }
+
+/* Acció petita en forma de text, amb àrea tàctil de 48 px. */
+.boto-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: 0;
+  color: var(--acc);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ================= Avui (13.3) ================= */
+.capcalera.amb-estacio { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.etiqueta-estacio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 4px 12px 4px 10px;
+  border-radius: 999px;
+  background: var(--se-soft);
+  color: var(--se-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.etiqueta-estacio .icona { width: 16px; height: 16px; }
+
+/* El panell de l'arbre, amb el color de l'estació. */
+.panell-arbre {
+  margin-bottom: 16px;
+  padding: 16px 16px 14px;
+  border-radius: var(--fulla);
+  background: var(--se-soft);
+}
+.panell-arbre .arbre { max-width: 270px; margin: 0 auto; }
+.panell-arbre .arbre > svg { display: block; width: 100%; height: auto; }
+.gotes { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--se-ink); font-size: 17px; }
+.gotes-icones { display: flex; gap: 6px; }
+.gota { display: grid; color: var(--acc); }
+.gota .icona { width: 24px; height: 24px; }
+.gota.plena .icona { fill: currentColor; }
+.gotes .extra { color: var(--se-ink); }
+.setmana-avui { margin-top: 18px; }
+.setmana-avui .gotes { color: var(--muted); }
+
+.cita-cap { display: flex; align-items: center; gap: 14px; }
+.cita h2 { font-size: 24px; }
+.cita .quan { color: var(--muted); font-size: 17px; margin-top: 2px; }
+.cita .boto.principal { margin-top: 20px; }
+.cita .boto-text { margin-top: 6px; }
+.boto.principal .icona { width: 22px; height: 22px; }
+
+/* Icona d'activitat dins una forma de fulla. */
+.icona-activitat {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: var(--fulla-petita);
+  background: var(--soft);
+  color: var(--acc);
+}
+
+/* ================= Barra de navegació ================= */
+.barra {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  background: var(--card);
+  border-top: 1px solid var(--sep);
+  padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.barra[hidden] { display: none; }
+.barra a {
+  flex: 1;
+  max-width: 206px;
+  min-height: var(--barra-alt);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  touch-action: manipulation;
+}
+.barra .pindola {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 32px;
+  border-radius: 999px;
+}
+.barra svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.barra a[aria-current="page"] { color: var(--acc); font-weight: 600; }
+.barra a[aria-current="page"] .pindola { background: var(--soft); }
+.barra a:focus-visible { outline-offset: -4px; }
+
+/* ================= Sessió de rutina (13.3) ================= */
+.boto-icona {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.sessio-cap {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin: calc(-24px - env(safe-area-inset-top, 0px)) -16px 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  background: var(--bg);
+}
+.rellotge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-titol);
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.rellotge .icona { color: var(--acc); width: 20px; height: 20px; }
+
+/* Filera de fulles: una per exercici. */
+.fulles { display: flex; justify-content: space-between; width: 100%; margin: 12px 0 0; padding: 0 2px; list-style: none; }
+.fulles li { display: grid; color: var(--sep); }
+.fulles .icona { width: 24px; height: 24px; stroke-width: 1.8; }
+.fulles .feta { color: var(--acc); }
+.fulles .actual { color: var(--se); }
+.fulles .feta .icona, .fulles .actual .icona { fill: currentColor; stroke: var(--line); stroke-width: 1.4; }
+.fulles .feta .icona path + path, .fulles .actual .icona path + path { stroke: var(--card); }
+
+.exercici { padding-bottom: 12px; }
+.exercici-cap { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.exercici h1 { font-size: 24px; }
+.dosi { margin: -6px 0 10px; color: var(--muted); font-size: 15px; }
+.exercici .secundari { margin: -4px 0 10px; }
+.explicacio { color: var(--muted); font-size: 16px; margin-top: 4px; }
+.figura { padding: 8px 8px 2px; border-radius: 16px; background: var(--bg); }
+
+.escenari {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  cursor: pointer;
+}
+.escenari svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.pista {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 6px;
+  color: var(--muted);
+}
+.pista .icona { width: 18px; height: 18px; fill: currentColor; stroke-width: 1.5; }
+.pista.amagada { visibility: hidden; }
+
+/* "Com es fa": explicació i músculs, plegats. */
+.com-es-fa summary, .mes-opcions summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--acc);
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.com-es-fa summary::-webkit-details-marker, .mes-opcions summary::-webkit-details-marker { display: none; }
+.com-es-fa summary .icona { width: 22px; height: 22px; }
+.com-es-fa .explicacio { margin: 0 0 10px; }
+.com-es-fa .xips { margin: 0; }
+.com-es-fa .xips li { background: var(--bg); }
+
+/* Fotos de Free Exercise DB: transició suau entre les dues. */
+.fotos {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #FFFFFF;
+}
+.fotos img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.fotos img + img { animation: fotos 4s ease-in-out infinite; }
+@keyframes fotos { 0%, 40% { opacity: 0; } 50%, 90% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Números grans */
+.xifra {
+  margin: 0;
+  color: var(--acc);
+  font-family: var(--font-titol);
+  font-size: 46px;
+  font-weight: 600;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.barra-temps {
+  display: block;
+  height: 6px;
+  margin: 8px 0 10px;
+  border-radius: 999px;
+  background: var(--sep);
+  overflow: hidden;
+}
+.barra-temps span { display: block; height: 100%; width: 100%; background: var(--acc); }
+.fila-botons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.fila-botons .boto { padding-inline: 12px; font-size: 17px; white-space: nowrap; }
+.fila-botons.petits { margin: 16px 0 0; }
+/* Lloc perquè l'avís de desfer no tapi els últims botons. */
+body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.fila-botons.petits .boto { font-size: 16px; font-weight: 500; }
+.fila-botons .icona { width: 20px; height: 20px; }
+
+/* Franja verda del descans i del compte enrere: el temps a l'esquerra, els botons a la dreta. */
+.franja {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  margin-bottom: 14px;
+  padding: 14px 16px 12px 20px;
+  border-radius: var(--fulla);
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.franja .xifra { color: var(--acc-ink); }
+.franja-etiqueta { font-size: 14px; font-weight: 500; opacity: .9; }
+.franja-botons { display: flex; align-items: center; gap: 8px; }
+.franja .barra-temps { grid-column: 1 / -1; height: 4px; margin: 6px 0 0; background: rgba(255, 255, 255, .25); }
+.franja .barra-temps span { background: var(--acc-ink); }
+.boto-franja {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  background: none;
+  color: var(--acc-ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.boto-franja.ple { background: var(--acc-ink); border-color: var(--acc-ink); color: var(--acc); }
+.boto-franja.rodo { width: 48px; padding: 0; }
+.boto-franja .icona { width: 22px; height: 22px; }
+.boto-franja.ple .icona { stroke-width: 3; }
+/* Aturat: el mateix lloc, en suau, amb el temps que quedava i "Continua". */
+.franja.pausa { background: var(--soft); color: var(--ink); }
+.franja.pausa .xifra { color: var(--muted); }
+.franja.pausa .boto { width: auto; min-height: 52px; padding-inline: 20px; font-size: 18px; }
+.franja.pausa .boto .icona { fill: currentColor; width: 18px; height: 18px; }
+
+/* Sèries: files en forma de fulla petita. */
+.llista-series { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.serie-fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 60px;
+  padding: 6px 10px 6px 18px;
+  border: 2px solid transparent;
+  border-radius: var(--fulla-petita);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+.serie-num { min-width: 1.4em; font-family: var(--font-titol); font-size: 20px; font-weight: 600; color: var(--acc-text); }
+.serie-valor { flex: 1; text-align: right; font-family: var(--font-titol); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.serie.feta .serie-fila { background: var(--soft); cursor: pointer; }
+.serie.feta .serie-valor { color: var(--acc-text); }
+.serie-marca { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); }
+.serie-marca .icona { width: 20px; height: 20px; }
+.serie.pendent .serie-fila { background: transparent; border: 2px dashed var(--sep); }
+.serie.pendent .serie-valor { padding-right: 8px; color: var(--muted); }
+.serie.propera .serie-fila { background: transparent; border-color: var(--acc); }
+.serie.propera .serie-valor { padding-right: 8px; }
+.serie.activa .serie-fila { border-color: var(--acc); padding-right: 8px; }
+
+.boto-elimina {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.boto-elimina .icona {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border: 2px solid var(--sep);
+  border-radius: 50%;
+}
+.pas-a-pas { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex: 1; }
+.pas {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  padding: 0;
+  border: 2px solid var(--sep);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pas .icona { width: 22px; height: 22px; stroke-width: 2.2; }
+.camp { display: flex; justify-content: center; }
+.camp input {
+  width: 2.4em;
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-titol);
+  font-size: 26px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.camp input:focus { border-bottom-color: var(--acc); outline: none; }
+.camp input::-webkit-outer-spin-button,
+.camp input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.confirma {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--acc);
+  color: var(--acc-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.confirma .icona { width: 26px; height: 26px; stroke-width: 3; }
+.boto.play { flex: 1; min-height: 52px; width: auto; }
+.boto.play .icona { fill: currentColor; width: 18px; height: 18px; }
+
+/* Afegir una sèrie i ajustar-les: botons rodons de línia discontínua. */
+.series-accions { display: flex; justify-content: center; gap: 12px; margin: 12px 0 4px; }
+.boto-discontinu {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 2px dashed var(--muted);
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.boto-discontinu .icona { width: 22px; height: 22px; }
+.boto-discontinu.actiu { border-style: solid; border-color: var(--acc); background: var(--soft); color: var(--acc-text); }
+.series + .boto { margin-top: 12px; }
+
+/* Músculs */
+.xips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 4px; padding: 0; list-style: none; }
+.xips li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 9px;
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 15px;
+}
+.mostra { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.mostra.p { background: var(--m1); }
+.mostra.s { background: var(--m2); }
+
+/* Final de la rutina i resum */
+.final { display: grid; justify-items: center; gap: 8px; text-align: center; }
+.final .icona-activitat { width: 64px; height: 64px; }
+.final .icona-activitat .icona { width: 34px; height: 34px; stroke-width: 2.5; }
+.final .boto { margin-top: 8px; }
+.xifra-mitjana { font-size: 48px; font-weight: 700; color: var(--acc); font-variant-numeric: tabular-nums; line-height: 1.1; }
+
+/* Avís per desfer */
+.avis {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 6px 8px 6px 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  transform: translateX(-50%);
+}
+.avis[hidden] { display: none; }
+.avis button {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ================= Fulls inferiors (llista, alternatives, confirmació) ================= */
+.full {
+  width: 100%;
+  max-width: 620px;
+  max-height: 85vh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 26px 26px 0 0;
+  background: var(--card);
+  color: var(--ink);
+}
+.full::backdrop { background: rgb(0 0 0 / .45); }
+.full-dins { padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.full-cap { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.full-cap h2 { font-size: 22px; }
+.full-cap .boto-icona { background: var(--bg); }
+.full p { margin-bottom: 12px; }
+.pila-botons { display: grid; gap: 12px; }
+
+.llista-ex, .llista-alt { list-style: none; margin: 0 0 8px; padding: 0; }
+.item-ex, .item-alt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.item-ex.actual { background: var(--soft); }
+.item-ex .marca {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+.item-ex.acabat .marca { background: var(--acc); color: var(--acc-ink); }
+.item-ex.acabat .marca .icona { width: 18px; height: 18px; stroke-width: 3; }
+.item-ex.mitges .marca { box-shadow: inset 0 0 0 2px var(--acc); color: var(--acc); }
+.nom-item { display: block; flex: 1; font-weight: 500; }
+.item-ex.acabat .nom-item { text-decoration: line-through; color: var(--muted); }
+.estat-item { color: var(--muted); font-size: 15px; }
+.item-ex.mitges .estat-item { color: var(--acc); font-weight: 600; }
+.boto-text.discret { color: var(--muted); font-size: 16px; }
+
+.item-alt { background: var(--bg); margin-bottom: 8px; }
+.miniatura {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 60px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+}
+.miniatura svg, .miniatura img { width: 100%; height: 100%; object-fit: contain; }
+.item-alt .secundari { display: block; }
+
+.avis-salut {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--bg);
+  font-size: 16px;
+}
+.avis-salut .icona { color: var(--hi); margin-top: 2px; }
+
+/* ================= Peces generals afegides ================= */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.titol-targeta { display: block; font-size: 21px; font-weight: 600; margin-bottom: 8px; }
+.titol-targeta .secundari { display: block; font-size: 15px; font-weight: 400; }
+.fila-pas > span { flex: 1; min-width: 0; }
+.boto.petit { width: auto; min-height: 48px; padding: 6px 18px; font-size: 16px; }
+.boto.gran { min-height: 64px; font-size: 21px; }
+.boto .icona { width: 22px; height: 22px; }
+.capcalera.amb-enrere, .capcalera.amb-accio { display: flex; align-items: center; gap: 12px; }
+.capcalera.amb-enrere .boto-icona { margin-left: -4px; }
+.capcalera.amb-accio { justify-content: space-between; }
+.icona-activitat.petita { width: 44px; height: 44px; }
+.icona-activitat.petita .icona { width: 22px; height: 22px; }
+
+/* Colors fixos per activitat als gràfics (validats per a daltonisme, clar i fosc). */
+:root { --a-natacio: #3B7DBF; --a-caminar: #2F7A4F; --a-correr: #8E5BB8; --a-bici: #C9822F; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --a-natacio: #4F8BD0; --a-caminar: #3F9A66; --a-correr: #A276CF; --a-bici: #C2802F; }
+}
+:root[data-theme="dark"] { --a-natacio: #4F8BD0; --a-caminar: #3F9A66; --a-correr: #A276CF; --a-bici: #C2802F; }
+
+/* ================= Activitat sola ================= */
+.compte-activitat { text-align: center; }
+.compte-activitat .xifra { font-size: 64px; }
+.compte-activitat + .pila-botons { margin-bottom: 4px; }
+.registre { text-align: center; }
+.registre h2 { margin-bottom: 4px; }
+.registre .pila-botons { margin-top: 16px; }
+
+/* ================= Setmana, ratxa i resum ================= */
+.extra { font-weight: 600; white-space: nowrap; }
+.icona.flama { color: var(--hi); width: 28px; height: 28px; flex: none; }
+
+.xifres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.xifres p { display: grid; }
+.xifres .xifra-mitjana { font-size: 36px; }
+.xifra-mitjana span { font-size: 18px; font-weight: 500; color: var(--muted); }
+.detall-activitat { text-align: center; }
+
+.pujades {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--soft);
+  font-size: 16px;
+}
+.pujades-titol { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 4px; }
+.pujades ul { list-style: none; margin: 0; padding: 0; }
+.pujades li { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; }
+.pujades li > span:first-child { flex: 1; }
+.pujades .icona { color: var(--acc); flex: none; width: 20px; height: 20px; }
+.pujades.maxim { display: flex; gap: 10px; }
+.pujades .icona.flama { color: var(--hi); width: 24px; height: 24px; }
+.nou { display: inline-flex; align-items: center; gap: 2px; flex: none; color: var(--acc-text); font-size: 16px; font-weight: 700; }
+.nou .icona { width: 16px; height: 16px; stroke-width: 2.5; }
+
+.taula-resum { width: 100%; border-collapse: collapse; font-size: 16px; }
+.taula-resum th, .taula-resum td { padding: 8px 4px; border-top: 1px solid var(--sep); text-align: left; vertical-align: top; }
+.taula-resum thead th { border-top: 0; color: var(--muted); font-size: 15px; font-weight: 500; }
+.taula-resum tbody th { font-weight: 500; }
+.taula-resum tbody th .secundari { display: block; font-weight: 400; }
+.taula-resum td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ================= Arbre (abans Progrés, 13.3) ================= */
+.panell-arbre.gran .arbre { max-width: 320px; }
+.etapa { display: flex; align-items: center; gap: 10px; padding: 4px 10px 2px; color: var(--se-ink); font-size: 16px; }
+.barra-etapa { flex: 1; height: 8px; border-radius: 999px; background: var(--card); overflow: hidden; }
+.barra-etapa span { display: block; height: 100%; border-radius: 999px; background: var(--se); }
+
+.xifres-arbre { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.xifres-col { display: grid; gap: 10px; }
+.xifres-col p { display: grid; }
+.xifres-col .xifra { font-size: 44px; line-height: 1; }
+.anells { width: 136px; height: 136px; flex: none; }
+
+/* Historial i gràfics, plegats. */
+.plegat summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; }
+.plegat summary::-webkit-details-marker { display: none; }
+.plegat summary .titol-targeta { margin: 0; }
+.plegat[open] summary { margin-bottom: 6px; }
+.plegats { padding-block: 6px; }
+.plegat + .plegat { border-top: 1px solid var(--sep); }
+.plegat[open] { padding-bottom: 12px; }
+.subtitol { margin: 14px 0 8px; font-family: inherit; font-size: 17px; font-weight: 600; }
+.llegenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--muted); }
+.llegenda li { display: flex; align-items: center; gap: 6px; }
+.llegenda .mostra { border-radius: 3px; }
+
+.selector select {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 6px;
+  padding: 8px 40px 8px 14px;
+  border: 2px solid var(--sep);
+  border-radius: 14px;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d8a80' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 20px;
+  color: var(--ink);
+  font: inherit;
+  appearance: none;
+}
+
+.grafic { position: relative; margin-top: 8px; }
+.svg-grafic { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+.svg-grafic:focus-visible { outline-offset: 4px; }
+.svg-grafic text { font-family: inherit; }
+.graella { stroke: var(--sep); stroke-width: 1; }
+.eix { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.etiqueta-valor { fill: var(--ink); font-size: 13px; font-weight: 600; }
+.linia { fill: none; stroke: var(--acc); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.area { fill: var(--acc); fill-opacity: .1; }
+.punt { fill: var(--acc); stroke: var(--card); stroke-width: 2; }
+.creu { stroke: var(--muted); stroke-width: 1; }
+.tram { cursor: pointer; }
+.tram:hover, .tram:focus { filter: brightness(1.12); outline: none; }
+.indicacio {
+  position: absolute;
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.indicacio strong { font-size: 15px; }
+.clau-linia { display: inline-block; width: 12px; height: 3px; margin-right: 6px; border-radius: 2px; vertical-align: middle; }
+.dades { margin-top: 8px; }
+.dades summary { min-height: 48px; display: flex; align-items: center; color: var(--acc); font-weight: 500; cursor: pointer; }
+
+.historial { list-style: none; margin: 0; padding: 0; }
+.historial li + li { border-top: 1px solid var(--sep); }
+.item-historial {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 8px 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+.text-historial { flex: 1; min-width: 0; }
+.text-historial .secundari { display: block; }
+.estat-historial { font-size: 14px; font-weight: 600; color: var(--acc); }
+.estat-historial.no-feta { color: var(--muted); font-weight: 500; }
+
+/* ================= Pla ================= */
+.llista-cites { list-style: none; margin: 0 0 4px; padding: 0; }
+.cita-pla { display: flex; align-items: center; gap: 14px; padding: 14px 14px 14px 16px; margin-bottom: 12px; }
+.cita-text { flex: 1; min-width: 0; }
+.cita-text h2 { font-size: 21px; }
+.cita-text .secundari { font-size: 16px; }
+.boto-icona.editar { background: var(--soft); color: var(--acc-text); }
+/* Afegir: botó de línia discontínua només amb "+". */
+.boto-afegir {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 56px;
+  border: 2px dashed var(--muted);
+  border-radius: var(--fulla-petita);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.boto-afegir .icona { width: 24px; height: 24px; }
+
+/* ================= Editar una cita ================= */
+.camp-edicio { padding-bottom: 18px; }
+.dies { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.dia, .opcio-activitat, .xip {
+  min-height: 48px;
+  border: 2px solid var(--sep);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.dia { padding: 0; font-size: 16px; }
+.dia[aria-checked="true"], .opcio-activitat[aria-checked="true"], .xip[aria-pressed="true"] {
+  border-color: var(--acc);
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.camp-hora {
+  width: 100%;
+  min-height: 56px;
+  padding: 6px 14px;
+  border: 2px solid var(--sep);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 24px;
+  font-weight: 600;
+}
+.activitats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opcio-activitat { display: flex; align-items: center; gap: 10px; padding: 10px 12px; font-weight: 500; text-align: left; }
+.opcio-activitat:first-child { grid-column: 1 / -1; }
+
+.fila-pas { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+.fila-pas + .fila-pas { border-top: 1px solid var(--sep); }
+.fila-pas.gran { margin-top: 10px; font-size: 18px; }
+.pas-a-pas.compacte { flex: none; gap: 10px; }
+.pas-a-pas.compacte .pas { width: 48px; height: 48px; }
+.pas-a-pas.compacte .pas .icona { width: 22px; height: 22px; }
+.pas-a-pas output { width: 4.2em; text-align: center; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pas[disabled] { opacity: .35; cursor: default; }
+
+.llista-editor { list-style: none; margin: 0 0 12px; padding: 0; }
+.ex-editor + .ex-editor { border-top: 1px solid var(--sep); }
+.ex-editor.obert { border-radius: 18px; background: var(--bg); border-top-color: transparent; }
+.ex-editor.obert + .ex-editor { border-top-color: transparent; }
+.ex-fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 6px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ex-fila .miniatura { width: 64px; height: 46px; background: var(--bg); }
+.ex-editor.obert .ex-fila .miniatura { background: var(--card); }
+.ex-text { flex: 1; min-width: 0; }
+.ex-text .secundari { display: block; }
+.icona.plec { color: var(--muted); transition: transform .2s; }
+.ex-editor.obert .icona.plec { transform: rotate(90deg); }
+.ex-ajustos { padding: 0 12px 14px; }
+.ex-ajustos .fila-botons { margin-top: 10px; gap: 8px; }
+.ex-ajustos .fila-botons .boto { font-size: 16px; font-weight: 500; }
+
+/* Cercador */
+.full.alt { height: 90vh; }
+.full.alt .full-dins { display: flex; flex-direction: column; height: 100%; }
+.cerca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 2px solid var(--sep);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--muted);
+}
+.cerca:focus-within { border-color: var(--acc); }
+.cerca input { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); font: inherit; outline: none; }
+.xips-filtre { display: flex; gap: 8px; margin: 10px -20px 10px 0; padding: 2px 20px 4px 0; overflow-x: auto; scrollbar-width: none; }
+.xips-filtre::-webkit-scrollbar { display: none; }
+.xip { flex: none; min-height: 48px; padding: 0 14px; border-radius: 999px; font-size: 15px; font-weight: 500; }
+.resultats { flex: 1; overflow-y: auto; margin: 0; }
+.item-alt .secundari strong { color: var(--ink); font-weight: 600; }
+
+/* Ajustos */
+.sobre p + p { margin-top: 4px; }
+.targeta .secundari + .pila-botons { margin-top: 12px; }
+.opcions-aviat { list-style: none; margin: 0; padding: 0; }
+.opcions-aviat li { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 0; color: var(--muted); }
+.opcions-aviat li + li { border-top: 1px solid var(--sep); }
+.opcions-aviat .icona-activitat { background: var(--bg); color: var(--muted); }
+.text-opcio { flex: 1; min-width: 0; }
+.text-opcio .nom-item { color: var(--ink); }
+.text-opcio .secundari { display: block; }
+.aviat {
+  display: inline-block;
+  margin-top: 4px;
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--acc);
+  font-size: 13px;
+  font-weight: 600;
+}
+.interruptor {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--sep);
+  opacity: .7;
+}
+.interruptor::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--card);
+}
+
+/* Text verd sobre el fons suau: un to més fosc perquè es llegeixi bé (contrast 4.5:1). */
+.nou, .aviat, .item-ex.actual .estat-item, .item-ex.mitges .estat-item, .item-ex.mitges .marca,
+.pujades .icona:not(.flama) {
+  color: var(--acc-text);
+  border-color: var(--acc-text);
+}
+
+/* Avisos discrets a Avui (còpia de seguretat, instal·lar) */
+.avis-discret { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 16px; }
+.avis-discret > .icona { color: var(--muted); }
+.avis-discret p { flex: 1; color: var(--muted); }
+
+/* Benvinguda: avís de salut i com instal·lar l'app */
+.full.benvinguda .full-dins { padding-top: 24px; }
+.benvinguda-cap { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.benvinguda-cap h2 { font-size: 24px; }
+.full.benvinguda p { font-size: 18px; margin-bottom: 18px; }
+.passos { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 12px; }
+.passos li { display: flex; align-items: center; gap: 12px; }
+.passos .num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--acc);
+  color: var(--acc-ink);
+  font-weight: 700;
+}
+.passos .icona { width: 22px; height: 22px; vertical-align: -5px; color: var(--acc); }
+.targeta .secundari + .boto { margin-top: 12px; }
+
+/* ================= Resum: l'arbre que es rega (13.7) ================= */
+.panell-arbre.resum { text-align: center; }
+.panell-arbre.resum h1 { margin-top: 8px; }
+.panell-arbre.resum .secundari { margin-bottom: 8px; }
+.panell-arbre.resum .gotes { margin-top: 4px; }
+.etapa-nova { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--se-ink); font-weight: 600; }
+.etapa-nova .icona { width: 20px; height: 20px; }
+.panell-arbre.resum .arbre { position: relative; }
+.arbre-abans { position: absolute; inset: 0; }
+.arbre-abans svg, .arbre-nou svg { display: block; width: 100%; height: auto; }
+.gota-cau, .fulla-nova { position: absolute; display: grid; opacity: 0; pointer-events: none; }
+.gota-cau { left: calc(38% + var(--n) * 12%); top: 0; color: var(--water-line); }
+.gota-cau .icona { width: 22px; height: 22px; fill: var(--water); stroke: var(--line); stroke-width: 1.5; }
+.fulla-nova { left: 56%; top: 30%; color: var(--se); }
+.fulla-nova .icona { width: 30px; height: 30px; fill: currentColor; stroke: var(--line); stroke-width: 1.5; }
+.fulla-nova .icona path + path { stroke: var(--card); }
+
+/* ================= Transicions (13.7). Res si l'usuari ha demanat menys moviment. ================= */
+@media (prefers-reduced-motion: no-preference) {
+  /* Canvi de pantalla: lliscament curt amb fosa. */
+  main.entra { animation: entra .3s ease-out; }
+  @keyframes entra { from { opacity: 0; transform: translateY(10px); } }
+
+  .boto:active, .boto-franja:active, .confirma:active, .pas:active, .boto-discontinu:active { transform: scale(.97); }
+
+  /* ✓ d'una sèrie: la fila passa a verd suau i la fulla es dibuixa amb un traç. */
+  .serie.nova .serie-fila { animation: fila-feta .4s ease-out; }
+  @keyframes fila-feta { from { background: var(--card); } }
+  .serie.nova .serie-marca { animation: marca .3s ease-out; }
+  @keyframes marca { from { transform: scale(.4); opacity: 0; } }
+  .serie.nova .serie-marca path { stroke-dasharray: 40; animation: traç .45s .1s ease-out backwards; }
+  @keyframes traç { from { stroke-dashoffset: 40; } }
+
+  /* Exercici acabat: la seva fulla de la filera s'omple de verd. */
+  .fulles .nova .icona { animation: fulla-plena .5s ease-out; transform-origin: 50% 50%; }
+  @keyframes fulla-plena { from { fill: transparent; transform: scale(.6) rotate(-20deg); } 60% { transform: scale(1.2); } }
+
+  /* Resum: tres gotes cauen sobre l'arbre i apareix una fulla nova. */
+  .rega .gota-cau { animation: gota-cau .7s cubic-bezier(.5, 0, .9, .5) calc(.25s + var(--n) * .22s) both; }
+  @keyframes gota-cau { 0% { opacity: 0; transform: translateY(-10px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(110px); } }
+  .rega .fulla-nova { animation: fulla-nova .5s 1.2s cubic-bezier(.3, 1.5, .5, 1) both; }
+  @keyframes fulla-nova { from { opacity: 1; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+  /* Si passa d'etapa, l'arbre creix suaument fins a la mida nova. */
+  .creix .arbre-nou { transform-origin: 50% 88.7%; animation: creix 1.2s 1.4s ease-in-out both; }
+  @keyframes creix { from { transform: scale(var(--escala-abans)); opacity: 0; } 30% { opacity: 1; } }
+  .creix .arbre-abans { animation: esvaeix .6s 1.6s ease-in both; }
+  @keyframes esvaeix { to { opacity: 0; } }
+
+  /* Ratxa: els anells es dibuixen de dins cap a fora. */
+  .anells .anell { animation: anell .35s ease-out calc(var(--i) * 45ms) both; }
+  @keyframes anell { from { opacity: 0; } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icona.plec { transition: none; }
+  .boto:active { transform: none; }
+  .fotos img + img { animation: none; }
+}
+
+/* Menys text (8 d'octubre): dia i hora a la mateixa targeta, botons d'icona a Editar. */
+.dies + .titol-targeta { margin-top: 18px; }
+.fila-botons.icones { grid-template-columns: repeat(4, 1fr); }
+.fila-botons.icones .icona { width: 24px; height: 24px; }
+.mes-opcions { padding-block: 6px; }
+.mes-opcions summary { font-size: 18px; }
+.mes-opcions[open] { padding-bottom: 20px; }
+.mes-opcions .pila-botons { margin: 4px 0 16px; }
+details[open] > summary .icona.plec { transform: rotate(90deg); }
+.dades summary { gap: 6px; }
+.dades summary .icona.plec { width: 20px; height: 20px; color: currentColor; }
+.sense-tall { white-space: nowrap; }
+.dades summary { list-style: none; }
+.dades summary::-webkit-details-marker { display: none; }
