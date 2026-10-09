@@ -195,6 +195,27 @@ export function reprenAuto(sessio, ara = Date.now()) {
   avancaAuto(sessio, ara);
 }
 
+/* ---------- Panell "Acabar": atura el temps mentre és obert ---------- */
+
+/* Atura els comptes enrere (descans o sèrie) des d'ara. El rellotge total continua. */
+export function aturaTemps(sessio, ara = Date.now()) {
+  sessio.panell ??= { des: ara };
+}
+
+/* Continua on era: els comptes enrere s'allarguen el temps que han estat aturats. */
+export function reprenTemps(sessio, ara = Date.now()) {
+  if (!sessio.panell) return;
+  const aturat = Math.max(0, ara - sessio.panell.des);
+  if (sessio.descans) sessio.descans.fins += aturat;
+  if (sessio.compte) sessio.compte.fins += aturat;
+  delete sessio.panell;
+}
+
+/* Hi ha alguna sèrie feta (si no, "Desar" no té res a desar). */
+export function algunaSerieFeta(sessio) {
+  return sessio.exercicis.some(ex => ex.series.some(sr => sr.feta));
+}
+
 /* Canvia d'exercici des de la llista. Atura qualsevol compte enrere. */
 export function vesA(sessio, index) {
   sessio.actual = index;

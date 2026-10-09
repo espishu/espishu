@@ -1151,3 +1151,7 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 .sense-tall { white-space: nowrap; }
 .dades summary { list-style: none; }
 .dades summary::-webkit-details-marker { display: none; }
+
+/* Capçalera de la sessió: "Acabar" i la llista, a la dreta del rellotge. */
+.sessio-accions { display: flex; align-items: center; gap: 8px; }
+.sessio-accions .boto.petit { padding: 6px 16px; }

@@ -8,7 +8,8 @@ import { muntaAnimacio, renderAnimacio } from '../animacions.js';
 import {
   exerciciAcabat, exerciciAMitges, serieActiva, primerPendent, totAcabat,
   confirmaSerie, vesA, saltaExercici, substitueix, afegeixSerie, registre, iniciaCompte,
-  autoEnMarxa, esperaPasAuto, avancaAuto, pausaAuto, reprenAuto, pausaVigent
+  autoEnMarxa, esperaPasAuto, avancaAuto, pausaAuto, reprenAuto, pausaVigent,
+  aturaTemps, reprenTemps, algunaSerieFeta
 } from '../rutina.js';
 import { aplicaProgressio } from '../ratxa.js';
 import { formatRellotge, formatCompte, restant } from '../temps.js';
@@ -35,7 +36,10 @@ export function munta(contenidor) {
     <header class="sessio-cap">
       <span class="rellotge">${icona('rellotge')}<span data-rellotge>00:00</span></span>
       <span class="visually-hidden" data-progres></span>
-      <button type="button" class="boto-icona" data-accio="llista" aria-label="Llista d'exercicis">${icona('llista')}</button>
+      <span class="sessio-accions">
+        <button type="button" class="boto contorn petit" data-accio="panell-acabar">Acabar</button>
+        <button type="button" class="boto-icona" data-accio="llista" aria-label="Llista d'exercicis">${icona('llista')}</button>
+      </span>
       <ol class="fulles" data-fulles aria-hidden="true"></ol>
     </header>
     <div data-zona="exercici"></div>
@@ -320,6 +324,13 @@ export function munta(contenidor) {
     const ara = Date.now();
     contenidor.querySelector('[data-rellotge]').textContent = formatRellotge(ara - Date.parse(s.inici));
 
+    // Amb el panell "Acabar" obert, els comptes enrere es queden on eren.
+    if (s.panell) {
+      if (s.descans) posaCompte('descans', restant(s.descans.fins, s.panell.des), s.descans.total * 1000);
+      if (s.compte) posaCompte('serie', restant(s.compte.fins, s.panell.des), s.compte.total * 1000);
+      return;
+    }
+
     if (s.descans) {
       const r = restant(s.descans.fins, ara);
       posaCompte('descans', r, s.descans.total * 1000);
@@ -476,22 +487,69 @@ export function munta(contenidor) {
     }).join('');
     obreFull(`
       <div class="full-cap"><h2>Exercicis</h2>${botoTanca}</div>
-      <ol class="llista-ex">${items}</ol>
-      <button type="button" class="boto-text discret" data-accio="acaba-abans">Acabar abans d'hora</button>`, {
-      ves: ({ i }) => { tancaFull(); canvia(s => vesA(s, Number(i))); },
-      'acaba-abans': () => confirmaAcabarAbans()
+      <ol class="llista-ex">${items}</ol>`, {
+      ves: ({ i }) => { tancaFull(); canvia(s => vesA(s, Number(i))); }
     });
   }
 
-  function confirmaAcabarAbans() {
-    obreFull(`
-      <div class="full-cap"><h2>Vols acabar ara?</h2>${botoTanca}</div>
+  /*
+   * Panell "Acabar" (capçalera): Desar, Descartar o Continuar. Mentre és obert, el temps s'atura.
+   * Tancar-lo de qualsevol manera (Continuar, la creu o tocant fora) és continuar.
+   * Si ja està tot fet, no cal panell: es desa com sempre.
+   */
+  let panellObert = 0;   // identifica el full obert, perquè tancar-ne un en obrir el següent no compti com a "Continuar"
+
+  function obrePanellAcabar() {
+    const s = sessio();
+    if (totAcabat(s)) return acaba();
+    canvia(s => aturaTemps(s), { pinta: false });
+    mostraPanell(s => `
+      <div class="full-cap"><h2>Acabar</h2>${botoTanca}</div>
       <div class="pila-botons">
-        <button type="button" class="boto principal" data-accio="si">Acabar ara</button>
-        <button type="button" class="boto contorn" data-accio="tanca">Continuar la sessió</button>
+        ${algunaSerieFeta(s) ? '<button type="button" class="boto principal" data-accio="desa">Desar</button>' : ''}
+        <button type="button" class="boto contorn" data-accio="descarta">Descartar</button>
+        <button type="button" class="boto contorn" data-accio="tanca">Continuar</button>
       </div>`, {
-      si: () => { tancaFull(); acaba(); }
+      desa: () => { tancaPanell(); acaba(); },
+      descarta: () => confirmaDescartar()
     });
+  }
+
+  function confirmaDescartar() {
+    mostraPanell(() => `
+      <div class="full-cap"><h2>Descartar?</h2>${botoTanca}</div>
+      <p>No es desa res.</p>
+      <div class="pila-botons">
+        <button type="button" class="boto principal" data-accio="descarta">Descartar</button>
+        <button type="button" class="boto contorn" data-accio="enrere">Enrere</button>
+      </div>`, {
+      descarta: () => { tancaPanell(); descarta(); },
+      enrere: () => obrePanellAcabar()
+    });
+  }
+
+  function mostraPanell(html, accions) {
+    const id = ++panellObert;
+    const full = obreFull(html(sessio()), accions);
+    full.addEventListener('close', () => {
+      if (id === panellObert) continuaSessio();
+    });
+  }
+
+  function tancaPanell() {
+    panellObert++;
+    tancaFull();
+  }
+
+  function continuaSessio() {
+    panellObert++;
+    if (sessio()?.panell) canvia(s => reprenTemps(s));
+  }
+
+  /* No es desa res: ni la sessió ni la progressió. */
+  function descarta() {
+    actualitza(d => { d.sessioEnCurs = null; });
+    location.hash = '#avui';
   }
 
   function obreAlternatives(motiu) {
@@ -547,7 +605,8 @@ export function munta(contenidor) {
     dolor: () => obreAlternatives('dolor'),
     seguent: () => canvia(s => { const i = primerPendent(s); if (i !== -1) vesA(s, i); }),
     refes: () => canvia(s => { s.exercicis[s.actual].saltat = false; }),
-    acaba
+    acaba,
+    'panell-acabar': obrePanellAcabar
   };
 
   function clic(e) {
@@ -589,11 +648,14 @@ export function munta(contenidor) {
   const interval = setInterval(tic, 250);
   mantePantalla();
   pinta();
+  // Si l'app es va tancar amb el panell "Acabar" obert, el temps continua aturat: es torna a obrir.
+  if (sessio().panell) obrePanellAcabar();
 
   return () => {
     clearInterval(interval);
     amagaAvis();
     desmuntaAnimacio?.();
+    panellObert++;   // sortir de la pantalla no és "Continuar"
     tancaFull();
     desmuntada = true;
     bloqueig?.release().catch(() => {});
