@@ -39,6 +39,7 @@ const MISSATGES = {
   sessio: 'Cal tornar a entrar',
   config: 'Falta configurar Supabase',
   confirmacio: 'Cal desactivar "Confirm email" a Supabase',
+  tancat: 'No es poden crear comptes nous',
   error: 'No ha funcionat. Torna-ho a provar'
 };
 
@@ -60,6 +61,7 @@ export function motiuDe(error) {
   if (codi === 'over_request_rate_limit' || estat === 429) return 'intents';
   if (codi === 'weak_password') return 'feble';
   if (codi === 'same_password') return 'igual';
+  if (codi === 'signup_disabled' || codi === 'email_provider_disabled') return 'tancat';
   if (codi === 'session_not_found' || codi === 'refresh_token_not_found' || codi === 'PGRST301'
     || codi === 'PGRST303' || error?.name === 'AuthSessionMissingError' || estat === 401) return 'sessio';
   return 'error';
