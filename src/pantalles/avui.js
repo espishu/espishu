@@ -1,9 +1,9 @@
-/* Pantalla Avui (PLA.md, seccions 7.1 i 13.3): la propera cita i, a sota, les gotes de la setmana. L'arbre només surt a la pestanya Arbre. */
+/* Pantalla Avui (PLA.md, seccions 7.1 i 13.3): la propera cita i, a sota, les gotes de la setmana. L'arbre i l'estació només surten a la pestanya Arbre. */
 import { obte, actualitza } from '../store.js';
 import { properaCita, nomCita, duracioCita, formatDuracio, formatHora, nomDia, rutinaDe } from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
-import { htmlEstacio, htmlGotes } from '../tema.js';
+import { htmlGotes } from '../tema.js';
 import { activaSo } from '../so.js';
 import { ferCopia, calRecordarCopia } from '../copia.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
@@ -81,7 +81,6 @@ export function munta(contenidor) {
     <header class="capcalera amb-accio">
       <h1>${salutacio(ara)}</h1>
       <span class="capcalera-accions">
-        ${htmlEstacio(ara)}
         <a class="boto-icona" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
     </header>
