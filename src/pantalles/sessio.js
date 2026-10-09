@@ -53,6 +53,7 @@ export function munta(contenidor) {
   let noves = new Set();
   let desmuntaAnimacio = null;
   let bloqueig = null;
+  let desmuntada = false;
 
   /*
    * Aplica un canvi a la sessió desada i torna a dibuixar.
@@ -565,11 +566,15 @@ export function munta(contenidor) {
     }
   }
 
-  /* La pantalla no s'apaga durant la sessió (si el navegador ho permet). */
+  /*
+   * La pantalla no s'apaga durant la sessió (si el navegador ho permet). El navegador l'allibera
+   * quan l'app passa a segon pla: es torna a demanar en tornar-hi, i s'allibera en sortir de la sessió.
+   */
   async function mantePantalla() {
     try {
-      if ('wakeLock' in navigator && document.visibilityState === 'visible') {
+      if ('wakeLock' in navigator && document.visibilityState === 'visible' && (!bloqueig || bloqueig.released)) {
         bloqueig = await navigator.wakeLock.request('screen');
+        if (desmuntada) bloqueig.release().catch(() => {});
       }
     } catch { /* no és imprescindible */ }
   }
@@ -590,6 +595,7 @@ export function munta(contenidor) {
     amagaAvis();
     desmuntaAnimacio?.();
     tancaFull();
+    desmuntada = true;
     bloqueig?.release().catch(() => {});
     contenidor.removeEventListener('click', clic);
     contenidor.removeEventListener('input', escriu);
