@@ -14,6 +14,7 @@
   --acc: #2F6B45; --acc-ink: #FFFFFF; --soft: #E1EBDD; --hi: #A8780D; --sep: #DCE1D6;
   --acc-text: #2F6B45; /* text verd sobre --soft (5,1:1) */
   --apagat: #D5DFD5; --apagat-ink: #45604D; /* "Comença" quan avui no toca (5:1) */
+  --err: #A63A2B; /* errors dels formularis (7:1 sobre --bg) */
   --pri: var(--acc); --pri-ink: var(--acc-ink);
   --anell-ple: #B98A5E; --anell-buit: #EFE6D8;
   --body: #EFE9DF; --body-far: #D3CBBE; --line: #2B3A30;
@@ -33,6 +34,7 @@
     --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
     --acc-text: #6FBF8A;
     --apagat: #2E3E33; --apagat-ink: #A3B8A9;
+    --err: #F0A79B;
     --anell-ple: #B98A5E; --anell-buit: #3A342C;
     --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
     --m1: #6FBF8A; --m2: #2F5E43;
@@ -48,6 +50,7 @@
   --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
   --acc-text: #6FBF8A;
   --apagat: #2E3E33; --apagat-ink: #A3B8A9;
+  --err: #F0A79B;
   --anell-ple: #B98A5E; --anell-buit: #3A342C;
   --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
   --m1: #6FBF8A; --m2: #2F5E43;
@@ -1185,3 +1188,50 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 .cita .falta .icona { width: 16px; height: 16px; }
 .cita.no-toca .boto.principal { background: var(--apagat); color: var(--apagat-ink); }
 .cita.no-toca .boto-text { color: var(--muted); }
+
+/* ================= Comptes: Entrar, Crear compte i Contrasenya (21.4) ================= */
+.entrar-cap { display: grid; justify-items: center; gap: 10px; margin: 24px 0 24px; text-align: center; }
+.entrar-cap img { width: 72px; height: 72px; border-radius: 20px; }
+.entrar-cap h1 { font-size: 34px; }
+.formulari { display: grid; gap: 14px; }
+.formulari .boto.principal { margin-top: 4px; }
+.camp-form { display: grid; gap: 6px; }
+.camp-nom { font-size: 16px; font-weight: 600; }
+.camp-text {
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 16px;
+  border: 2px solid var(--sep);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px;
+}
+.camp-text:focus { outline: none; border-color: var(--acc); }
+.camp-text[aria-invalid="true"] { border-color: var(--err); }
+.camp-amb-boto { position: relative; }
+.camp-amb-boto .camp-text { padding-right: 60px; }
+.boto-ull {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.boto-ull[aria-pressed="true"] { color: var(--acc); }
+.error-form { color: var(--err); font-size: 16px; font-weight: 600; }
+.error-form:empty { display: none; }
+.boto[aria-busy="true"] { opacity: .6; cursor: progress; }
+.full .formulari p.error-form { margin-bottom: 0; }
+.usuari-compte { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-weight: 600; }
+.usuari-compte .icona { color: var(--muted); }

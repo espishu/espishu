@@ -14,8 +14,9 @@ import * as progres from './pantalles/progres.js';
 import * as pla from './pantalles/pla.js';
 import * as editar from './pantalles/editar.js';
 import * as ajustos from './pantalles/ajustos.js';
+import * as entrar from './pantalles/entrar.js';
 
-const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos };
+const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos, entrar };
 const AMB_BARRA = new Set(['avui', 'progres', 'pla', 'ajustos']);
 /* Pestanya que queda marcada a cada pantalla. Ajustos marca la pestanya des d'on s'ha obert (#ajustos/<pestanya>). */
 const PESTANYA = { ajustos: 'pla' };
@@ -29,7 +30,13 @@ let desmunta = null;
 
 function mostra() {
   const [nom, ...parametres] = location.hash.slice(1).split('/');
-  if (!PANTALLES[nom]) {
+  // Sense sessió iniciada, només la pantalla d'entrar; amb sessió, mai.
+  const ambCompte = !!obte().compte;
+  if (!ambCompte && nom !== 'entrar') {
+    location.replace('#entrar');
+    return;
+  }
+  if (!PANTALLES[nom] || (ambCompte && nom === 'entrar')) {
     location.replace('#avui');
     return;
   }

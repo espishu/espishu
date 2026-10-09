@@ -26,10 +26,16 @@ export function mostraAvisSalut() {
     });
 }
 
-/* A la primera obertura: primer com instal·lar-la (si no s'obre ja com a app) i després l'avís de salut. */
-export async function benvinguda() {
-  const { perfil } = obte();
-  if (!esInstallada() && !perfil.installacioVista) await mostraInstallacio();
-  if (!obte().perfil.avisSalutVist) await mostraAvisSalut();
+/*
+ * A la primera obertura: primer com instal·lar-la (si no s'obre ja com a app), encara que no s'hagi
+ * entrat (a l'iPhone, Safari i l'app instal·lada no comparteixen la sessió). L'avís de salut, després d'entrar.
+ */
+let enCurs = null;
+export function benvinguda() {
+  enCurs ??= (async () => {
+    if (!esInstallada() && !obte().perfil.installacioVista) await mostraInstallacio();
+    if (obte().compte && !obte().perfil.avisSalutVist) await mostraAvisSalut();
+  })().finally(() => { enCurs = null; });
+  return enCurs;
 }
 

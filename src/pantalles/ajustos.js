@@ -4,6 +4,8 @@ import { ferCopia, llegeixCopia } from '../copia.js';
 import { mostraAvisSalut } from '../benvinguda.js';
 import { htmlInstruccions, installa } from '../installacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
+import { canviaContrasenya, tancaSessio, MIN_CONTRASENYA } from '../compte.js';
+import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
 
@@ -19,13 +21,22 @@ const PESTANYES = ['avui', 'progres', 'pla'];
 export function munta(contenidor, [origen]) {
   const enrere = PESTANYES.includes(origen) ? origen : 'pla';
   function pinta() {
-    const { pla, perfil } = obte();
+    const { pla, perfil, compte } = obte();
     const objectiu = pla.objectiuSetmanal;
     contenidor.innerHTML = `
       <header class="capcalera amb-enrere">
         <a class="boto-icona" href="#${enrere}" aria-label="Tornar">${icona('enrere')}</a>
         <h1>Ajustos</h1>
       </header>
+
+      <section class="targeta">
+        <h2 class="titol-targeta">Compte</h2>
+        <p class="usuari-compte">${icona('usuari')}<span>${esc(compte?.usuari ?? '')}</span></p>
+        <div class="pila-botons">
+          <button type="button" class="boto contorn" data-accio="contrasenya">${icona('clau')} Contrasenya</button>
+          <button type="button" class="boto contorn" data-accio="surt">${icona('sortir')} Tancar sessió</button>
+        </div>
+      </section>
 
       <section class="targeta">
         <h2 class="titol-targeta">Còpia de seguretat</h2>
@@ -151,10 +162,58 @@ export function munta(contenidor, [origen]) {
     });
   }
 
+  /* Canviar la contrasenya: l'actual i la nova dues vegades. */
+  function contrasenya() {
+    const full = obreFull(`
+      <div class="full-cap"><h2>Contrasenya</h2>${botoTanca}</div>
+      <form class="formulari" novalidate>
+        ${htmlCampContrasenya({ nom: 'actual', etiqueta: 'Actual', autocomplete: 'current-password', ull: true })}
+        ${htmlCampContrasenya({ nom: 'nova', etiqueta: 'Nova', autocomplete: 'new-password' })}
+        ${htmlCampContrasenya({ nom: 'repeteix', etiqueta: 'Repetir', autocomplete: 'new-password' })}
+        ${htmlError()}
+        <button type="submit" class="boto principal">Canviar</button>
+      </form>`, {
+      ull: () => commutaUll(formulari)
+    });
+    const formulari = full.querySelector('form');
+    formulari.addEventListener('submit', async e => {
+      e.preventDefault();
+      const { actual, nova, repeteix } = formulari.elements;
+      if (!actual.value) return mostraError(formulari, 'Escriu l\'actual', 'actual');
+      if (nova.value.length < MIN_CONTRASENYA) return mostraError(formulari, `Mínim ${MIN_CONTRASENYA} caràcters`, 'nova');
+      if (nova.value !== repeteix.value) return mostraError(formulari, 'No coincideixen', 'repeteix');
+      if (!navigator.onLine) return mostraError(formulari, 'Sense connexió');
+      mostraError(formulari, '');
+      ocupat(formulari, true);
+      try {
+        await canviaContrasenya(obte().compte.usuari, actual.value, nova.value);
+        tancaFull();
+        mostraAvis('Contrasenya canviada');
+      } catch (error) {
+        ocupat(formulari, false);
+        mostraError(formulari, error.message, error.motiu === 'actual' ? 'actual' : error.motiu === 'igual' ? 'nova' : null);
+      }
+    });
+  }
+
+  function surt() {
+    confirma({
+      titol: 'Tancar sessió?',
+      boto: `${icona('sortir')} Tancar sessió`,
+      enConfirmar: async () => {
+        await tancaSessio();
+        actualitza(d => { d.compte = null; });
+        location.hash = '#entrar';
+      }
+    });
+  }
+
   const clic = e => {
     const boto = e.target.closest('[data-accio]');
     if (!boto || boto.disabled) return;
     const accio = boto.dataset.accio;
+    if (accio === 'contrasenya') contrasenya();
+    if (accio === 'surt') surt();
     if (accio === 'copia') copia();
     if (accio === 'restaura') contenidor.querySelector('[data-arxiu]').click();
     if (accio === 'salut') mostraAvisSalut();

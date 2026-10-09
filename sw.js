@@ -5,7 +5,7 @@
  * o no hi ha connexió, la còpia desada. Les fotos i la lletra no canvien: primer la còpia.
  * Quan canviïs la llista de fitxers, puja el número de VERSIO.
  */
-const VERSIO = 'espishu-3';
+const VERSIO = 'espishu-4';
 const ESPERA_XARXA = 3000;
 
 const FITXERS = [
@@ -46,6 +46,10 @@ const FITXERS = [
   'src/animacions.js',
   'src/arbre.js',
   'src/tema.js',
+  'src/config.js',
+  'src/compte.js',
+  'src/formulari.js',
+  'src/vendor/supabase.js',
   'src/pantalles/avui.js',
   'src/pantalles/sessio.js',
   'src/pantalles/activitat.js',
@@ -53,7 +57,8 @@ const FITXERS = [
   'src/pantalles/progres.js',
   'src/pantalles/pla.js',
   'src/pantalles/editar.js',
-  'src/pantalles/ajustos.js'
+  'src/pantalles/ajustos.js',
+  'src/pantalles/entrar.js'
 ];
 
 const fresc = url => new Request(url, { cache: 'reload' });

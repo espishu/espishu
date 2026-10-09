@@ -130,6 +130,22 @@ export function escolta(oient) {
   return () => oients.delete(oient);
 }
 
+/*
+ * Emmagatzematge per a la sessió de Supabase (src/compte.js), perquè cap altre mòdul
+ * no toqui localStorage. Fa servir claus pròpies, que comencen per "espishu:sessio".
+ */
+export const emmagatzematge = {
+  getItem(clau) {
+    try { return localStorage.getItem(clau); } catch { return null; }
+  },
+  setItem(clau, valor) {
+    try { localStorage.setItem(clau, valor); } catch (e) { console.warn('No s\'ha pogut desar la sessió', e); }
+  },
+  removeItem(clau) {
+    try { localStorage.removeItem(clau); } catch { /* res a fer */ }
+  }
+};
+
 /* Demana al navegador que no esborri les dades si li falta espai. */
 export async function demanaPersistencia() {
   try {
