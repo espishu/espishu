@@ -1,9 +1,10 @@
 -- =====================================================================
--- Espishu: base de dades a Supabase
+-- Espishu: migració 001 — la base de dades inicial
 --
 -- Enganxa tot el fitxer a l'SQL Editor de Supabase i prem "Run".
 -- Es pot tornar a executar sense perdre dades (crea només el que falta
 -- i torna a posar les funcions, els triggers i les polítiques).
+-- Les migracions següents són 002_..., 003_... (vegeu LLEGEIX.md).
 --
 -- Cada usuari només veu i toca les seves files: RLS a totes les taules,
 -- amb user_id = auth.uid(). La biblioteca d'exercicis és al codi de
@@ -330,3 +331,20 @@ $$;
 
 revoke all on function public.desa_sessio(jsonb) from public, anon;
 grant execute on function public.desa_sessio(jsonb) to authenticated;
+
+
+-- ---------------------------------------------------------------------
+-- Registre de migracions: quines s'han executat i quan.
+-- Per consultar-ho: select * from public.migracions order by nom;
+-- Amb RLS i sense polítiques: des de l'app no es pot llegir ni tocar
+-- (només des del tauler de Supabase). No són dades de cap usuari.
+-- ---------------------------------------------------------------------
+
+create table if not exists public.migracions (
+  nom      text primary key,
+  aplicada timestamptz not null default now()
+);
+alter table public.migracions enable row level security;
+revoke all on public.migracions from anon, authenticated;
+
+insert into public.migracions (nom) values ('001_inicial') on conflict (nom) do nothing;

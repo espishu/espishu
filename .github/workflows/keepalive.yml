@@ -1,5 +1,5 @@
 # Consulta automàtica perquè Supabase no pausi el projecte (el pla gratuït el pausa
-# després d'una setmana sense activitat). Crida la funció ping() de supabase/schema.sql.
+# després d'una setmana sense activitat). Crida la funció ping() (supabase/migracions/001_inicial.sql).
 #
 # Secrets del repositori (Settings → Secrets and variables → Actions):
 #   SUPABASE_URL       https://<projecte>.supabase.co
