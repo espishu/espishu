@@ -65,7 +65,7 @@ export function munta(contenidor) {
           <button type="button" class="boto contorn" data-accio="restableix">${icona('restaura')} Restablir el pla inicial</button>
         </div>
         <div class="sobre">
-          <p>ESPISHU, versió 1.</p>
+          <p>Espishu, versió 1.</p>
           <p class="secundari">Exercicis i fotos: Free Exercise DB (domini públic). Lletra: Lexend (llicència OFL).</p>
         </div>
       </details>`;

@@ -83,7 +83,8 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (teniaVersio && actual !== 'sessio') location.reload();
   });
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Service worker no registrat', e));
-  });
+  // Aquest codi va després de l'await de la biblioteca: potser "load" ja ha passat.
+  const registra = () => navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Service worker no registrat', e));
+  if (document.readyState === 'complete') registra();
+  else window.addEventListener('load', registra);
 }

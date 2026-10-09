@@ -23,7 +23,7 @@ export async function ferCopia() {
 
   if (navigator.canShare?.({ files: [arxiu] })) {
     try {
-      await navigator.share({ files: [arxiu], title: 'Còpia de seguretat d\'ESPISHU' });
+      await navigator.share({ files: [arxiu], title: 'Còpia de seguretat d\'Espishu' });
     } catch (e) {
       if (e.name === 'AbortError') return false;
       descarrega(arxiu);

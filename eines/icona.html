@@ -2,32 +2,65 @@
 <html lang="ca">
 <head>
 <meta charset="utf-8">
-<title>Icona</title>
+<title>Icones</title>
 <!--
-  Dibuixa la icona de l'app amb la figura de src/animacions.js.
-  Per regenerar les icones, serveix la carpeta del projecte (per exemple amb Live Server a 127.0.0.1:5500) i,
-  per a cada mida (512, 192 i 180):
-    msedge --headless --hide-scrollbars --window-size=512,512 --screenshot=<ruta absoluta>/icons/icon-512.png "http://127.0.0.1:5500/eines/icona.html?mida=512"
+  Dibuixa totes les icones de l'app a partir de icons/icon.svg (mestre) i icons/favicon.svg (mides petites).
+  Cada PNG surt com a data URL dins un <pre data-nom>. Per desar-los, executa eines/icones.ps1
+  (obre aquesta pàgina amb Edge sense interfície, desa els PNG i munta favicon.ico).
 -->
 <style>
-  :root {
-    --body: #EFE9DF; --body-far: #D3CBBE; --line: #163A25;
-    --m1: #EBC35A; --m2: #9FCDAE; --floor: #4A8A60;
-  }
-  html, body { margin: 0; background: #2F6B45; overflow: hidden; }
-  #icona { display: grid; place-items: center; background: #2F6B45; }
-  #icona svg { width: 80%; height: 80%; }
-  #icona [stroke-dasharray] { display: none; }
+  body { margin: 16px; font: 14px system-ui; background: #ddd; }
+  figure { display: inline-block; margin: 8px; text-align: center; }
+  figure img { display: block; max-width: 192px; }
+  pre { display: none; }
 </style>
 </head>
 <body>
-<div id="icona"></div>
-<script type="module">
-  import { renderAnimacio } from '../src/animacions.js';
-  const mida = Number(new URLSearchParams(location.search).get('mida')) || 512;
-  const icona = document.getElementById('icona');
-  icona.style.width = icona.style.height = mida + 'px';
-  icona.innerHTML = renderAnimacio('cercles-bracos', 0);
+<script>
+  const FONS = '#2F5D3A';
+  // La maskable: l'arbre i el sol dins el cercle central (radi del 40 %), amb el fons fins a les vores.
+  const ESCALA_MASKABLE = 0.78;
+
+  const ICONES = [
+    { nom: 'icon-512.png', svg: '../icons/icon.svg', mida: 512 },
+    { nom: 'icon-192.png', svg: '../icons/icon.svg', mida: 192 },
+    { nom: 'apple-touch-icon.png', svg: '../icons/icon.svg', mida: 180 },
+    { nom: 'icon-maskable-512.png', svg: '../icons/icon.svg', mida: 512, escala: ESCALA_MASKABLE },
+    { nom: 'favicon-48.png', svg: '../icons/favicon.svg', mida: 48 },
+    { nom: 'favicon-32.png', svg: '../icons/favicon.svg', mida: 32 },
+    { nom: 'favicon-16.png', svg: '../icons/favicon.svg', mida: 16 }
+  ];
+
+  const carrega = src => new Promise((resol, falla) => {
+    const img = new Image();
+    img.onload = () => resol(img);
+    img.onerror = falla;
+    img.src = src;
+  });
+
+  (async () => {
+    for (const { nom, svg, mida, escala = 1 } of ICONES) {
+      const img = await carrega(svg);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = mida;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = FONS;
+      ctx.fillRect(0, 0, mida, mida);
+      const costat = mida * escala, marge = (mida - costat) / 2;
+      ctx.drawImage(img, marge, marge, costat, costat);
+      const url = canvas.toDataURL('image/png');
+
+      const figura = document.createElement('figure');
+      figura.innerHTML = `<img alt=""><figcaption></figcaption><pre></pre>`;
+      figura.querySelector('img').src = url;
+      figura.querySelector('figcaption').textContent = nom;
+      const pre = figura.querySelector('pre');
+      pre.dataset.nom = nom;
+      pre.textContent = url;
+      document.body.append(figura);
+    }
+    document.body.dataset.fet = 'si';
+  })();
 </script>
 </body>
 </html>
