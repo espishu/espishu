@@ -3,6 +3,5 @@
  * La clau és la pública ("publishable" o "anon"): es pot publicar perquè les dades
  * les protegeix RLS. Mai hi posis la clau "service_role" ni la "secret".
  */
-export const SUPABASE_URL =  'https://xxxxxxxx.supabase.co';
-export const SUPABASE_CLAU = 'sb_publishable_xxxxxxxxxxxxxxxx';
-
+export const SUPABASE_URL =  'https://vyklblzynsscxbuojmxd.supabase.co';
+export const SUPABASE_CLAU = 'sb_publishable_EOKFXpq5yR2KBbZnnx-g-w_HAnkwGIM';
