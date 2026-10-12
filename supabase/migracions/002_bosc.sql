@@ -1,6 +1,7 @@
 -- =====================================================================
 -- Espishu: migració 002 — el bosc al compte (historial de l'objectiu setmanal,
--- noms de les valls i elements ja vistos), perquè sigui igual a tots els aparells.
+-- noms de les valls i elements ja vistos), perquè sigui igual a tots els aparells,
+-- i objectiu setmanal de 1 a 10.
 -- Executar a Supabase ABANS de publicar la versió 5 de l'app.
 -- Només afegeix: no esborra ni canvia cap dada existent. Es pot tornar a executar.
 -- =====================================================================
@@ -10,6 +11,30 @@ alter table public.perfils add column if not exists bosc jsonb not null default 
 
 -- L'app només pot canviar aquestes columnes del perfil (001: objectiu_setmanal, dolors…; ara també bosc).
 grant update (bosc) on public.perfils to authenticated;
+
+
+-- ---------------------------------------------------------------------
+-- Objectiu setmanal: de 1 a 10 (abans de 1 a 4). És fer les cites del pla, i se'n poden tenir més de 4.
+-- Només amplia el límit: cap valor que ja hi hagi (1–4) deixa de ser vàlid, i la versió 4 de l'app
+-- continua funcionant. Es treu la regla vella (sigui quin sigui el nom que li va posar Postgres) i se'n
+-- posa una de nova amb nom fix, perquè es pugui tornar a executar.
+-- ---------------------------------------------------------------------
+
+do $$
+declare
+  regla record;
+begin
+  for regla in
+    select conname from pg_constraint
+    where conrelid = 'public.perfils'::regclass and contype = 'c'
+      and pg_get_constraintdef(oid) like '%objectiu_setmanal%'
+  loop
+    execute format('alter table public.perfils drop constraint %I', regla.conname);
+  end loop;
+end $$;
+
+alter table public.perfils add constraint perfils_objectiu_setmanal_1_10
+  check (objectiu_setmanal between 1 and 10);
 
 
 -- ---------------------------------------------------------------------

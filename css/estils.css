@@ -1219,8 +1219,8 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
   color: var(--muted);
   font-size: 15px;
 }
-.barretes { display: flex; gap: 4px; flex: none; }
-.barretes span { width: 26px; height: 8px; border-radius: 4px; background: var(--sep-fort); }
+.barretes { display: flex; gap: 4px; flex: 0 1 auto; min-width: 0; }
+.barretes span { flex: 0 1 26px; min-width: 6px; height: 8px; border-radius: 4px; background: var(--sep-fort); }
 .barretes .feta { background: var(--green); }
 .barretes .cura { background: var(--gold); }
 .sota-bosc { margin: 16px 16px 0; }

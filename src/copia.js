@@ -60,6 +60,7 @@ export function validaCopia(obj) {
     : obj.pla?.cites?.every(c => !c?.rutina || Array.isArray(c.rutina.exercicis));
   const ok = obj.perfil && typeof obj.perfil === 'object'
     && obj.pla && Array.isArray(obj.pla.cites) && Number.isInteger(obj.pla.objectiuSetmanal)
+    && obj.pla.objectiuSetmanal >= 1 && obj.pla.objectiuSetmanal <= 10
     && Array.isArray(obj.sessions) && rutinesBe
     && obj.pla.cites.every(c => c && c.id && c.dia >= 1 && c.dia <= 7 && /^\d{2}:\d{2}$/.test(c.hora) && c.activitat)
     && obj.sessions.every(s => s && s.id && s.inici && s.estat);

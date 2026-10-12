@@ -72,11 +72,13 @@ export function registraObjectiu(d, nou, ara = new Date()) {
 }
 
 /*
- * L'objectiu setmanal és fer les cites del pla: com a màxim, tantes com cites hi ha (i 4 com a molt,
- * el límit de la base de dades). Es pot baixar a Ajustos: 2/3, 1/3…
+ * L'objectiu setmanal és fer les cites del pla: com a màxim, tantes com cites hi ha (i 10 com a molt,
+ * el límit de la base de dades, migració 002). Es pot baixar a Ajustos: 2/3, 1/3…
  */
+export const MAX_OBJECTIU = 10;
+
 export function maxObjectiu(estat) {
-  return Math.max(1, Math.min(4, estat.pla.cites.length));
+  return Math.max(1, Math.min(MAX_OBJECTIU, estat.pla.cites.length));
 }
 
 /*
@@ -85,7 +87,7 @@ export function maxObjectiu(estat) {
  */
 export function ajustaObjectiu(d, citesAbans, ara = new Date()) {
   const actual = d.pla.objectiuSetmanal, max = maxObjectiu(d);
-  const maxAbans = Math.max(1, Math.min(4, citesAbans));
+  const maxAbans = Math.max(1, Math.min(MAX_OBJECTIU, citesAbans));
   const nou = Math.min(actual === maxAbans ? max : actual, max);
   if (nou === actual) return;
   registraObjectiu(d, nou, ara);
