@@ -1,16 +1,15 @@
-/* Pestanya Arbre (PLA.md, seccions 7.5 i 13.3): l'arbre, l'etapa, la ratxa en anells i, plegats, l'historial i els gràfics. */
+/* Pestanya Bosc (PLA.md, seccions 7.5 i 13.3): l'escena del bosc i, a sota, plegats, l'historial i els gràfics. */
 import { obte } from '../store.js';
-import { ratxa, ultimesSetmanes, sessionsDeLaSetmana, dilluns } from '../ratxa.js';
+import { sessionsDeLaSetmana, dilluns } from '../ratxa.js';
 import { exercici } from '../biblioteca.js';
 import { ACTIVITATS } from '../cites.js';
 import { htmlDetall, nomSessio, iconaSessio, dataCurta, minutsDe } from '../resum.js';
 import { muntaLinia, muntaColumnes } from '../grafics.js';
 import { icona } from '../icones.js';
-import { htmlArbre, htmlEstacio, htmlAnells, etapa, sessionsArbre } from '../tema.js';
 import { esc, majuscula } from '../dom.js';
 import { htmlPendents } from '../sincronitza.js';
 
-/* Ordre i color fixos per activitat (validats per a daltonisme en clar i fosc). */
+/* Ordre i color fixos per activitat (to i lluminositat diferents sobre fons fosc). */
 const SERIES_ACTIVITAT = [
   { clau: 'natacio', nom: ACTIVITATS.natacio, color: 'var(--a-natacio)' },
   { clau: 'caminar', nom: ACTIVITATS.caminar, color: 'var(--a-caminar)' },
@@ -31,7 +30,7 @@ function muntaDetall(contenidor, id) {
   if (!sessio) { location.replace('#progres'); return; }
   contenidor.innerHTML = `
     <header class="capcalera amb-enrere">
-      <a class="boto-icona" href="#progres" aria-label="Tornar a l'arbre">${icona('enrere')}</a>
+      <a class="boto-icona" href="#progres" aria-label="Tornar al bosc">${icona('enrere')}</a>
       <div>
         <p class="data">${esc(dataCurta(new Date(sessio.inici)))}</p>
         <h1>${esc(nomSessio(sessio))}</h1>
@@ -78,8 +77,6 @@ function minutsPerSetmana(estat, ara, quantes = 8) {
 function muntaResum(contenidor) {
   const estat = obte();
   const ara = new Date();
-  const n = ratxa(estat, ara);
-  const setmanes = ultimesSetmanes(estat, ara, 12);
   const sessions = [...estat.sessions].sort((a, b) => Date.parse(b.inici) - Date.parse(a.inici));
 
   const historial = sessions.length ? sessions.map(s => `
@@ -98,34 +95,15 @@ function muntaResum(contenidor) {
   const activitats = minutsPerSetmana(estat, ara);
   const seriesAmbDades = SERIES_ACTIVITAT.filter(sr => activitats.some(s => s.valors[sr.clau] > 0));
 
-  const et = etapa(estat);
-  const total = sessionsArbre(estat);
 
   contenidor.innerHTML = `
     <header class="capcalera amb-accio">
-      <h1>El meu arbre</h1>
+      <h1>El bosc</h1>
       <span class="capcalera-accions">
-        ${htmlEstacio(ara)}
         ${htmlPendents()}
         <a class="boto-icona" href="#ajustos/progres" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
     </header>
-
-    <section class="panell-arbre gran" aria-label="El teu arbre">
-      <div class="arbre">${htmlArbre(estat, { data: ara })}</div>
-      <div class="etapa" aria-label="${esc(et.nom)}: etapa ${et.index} de 5">
-        <strong>${et.index}/5</strong>
-        <span class="barra-etapa"><span style="width:${Math.round(et.progres * 100)}%"></span></span>
-      </div>
-    </section>
-
-    <section class="targeta xifres-arbre">
-      <div class="xifres-col">
-        <p><span class="xifra">${n}</span><span class="secundari">${n === 1 ? 'setmana' : 'setmanes'}</span></p>
-        <p><span class="xifra">${total}</span><span class="secundari">${total === 1 ? 'sessió' : 'sessions'}</span></p>
-      </div>
-      ${htmlAnells(setmanes)}
-    </section>
 
     <section class="targeta plegats">
     <details class="plegat">

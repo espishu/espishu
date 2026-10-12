@@ -10,7 +10,7 @@
  *    exercicis: [ { id, substitueix?, tipus, unitat, perCostat, descans, nota, saltat,
  *                   series: [ { objectiu, fet, feta } ] } ] }
  */
-import { descansEntreExercicis, SEGONS_PER_REP } from './cites.js';
+import { descansEntreExercicis, duracioRutina, SEGONS_PER_REP } from './cites.js';
 import { nouId } from './store.js';
 
 /* Versió curta: descansos més curts perquè quedi en uns 12-13 minuts. */
@@ -28,6 +28,11 @@ export function versioCurta(exercicis) {
     .map(e => e.tipus === 'força'
       ? { ...e, series: e.series.slice(0, 2), descans: Math.min(e.descans, DESCANS_CURTA) }
       : e);
+}
+
+/* Minuts que dura la versió curta d'una rutina (botó petit d'Avui). */
+export function duracioCurta(rutina) {
+  return duracioRutina({ exercicis: versioCurta(rutina.exercicis) });
 }
 
 export function creaSessio(rutina, cita, curta = false, ara = new Date()) {

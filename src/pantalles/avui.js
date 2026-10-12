@@ -1,15 +1,20 @@
-/* Pantalla Avui (PLA.md, seccions 7.1 i 13.3): la propera cita i, a sota, les gotes de la setmana. L'arbre i l'estació només surten a la pestanya Arbre. */
+/*
+ * Pantalla Avui (PLA.md, seccions 7.1 i 13.3; bosc-pantalles.html): a dalt l'escena del bosc amb la
+ * salutació; a sota, un panell amb la propera cita, "Comença", la versió curta i els pins de la setmana.
+ */
 import { obte, actualitza } from '../store.js';
-import { properaCita, nomCita, duracioCita, formatDuracio, formatHora, rutinaDe, DIES, diaSetmana } from '../cites.js';
-import { creaSessio, iniciaAuto, exerciciAcabat } from '../rutina.js';
+import { properaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, DIES, diaSetmana } from '../cites.js';
+import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
-import { htmlGotes } from '../tema.js';
+import { htmlPins } from '../tema.js';
 import { activaSo } from '../so.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { htmlPendents } from '../sincronitza.js';
 import { confirma } from '../full.js';
-import { esc, majuscula } from '../dom.js';
+import { esc } from '../dom.js';
 import { icona } from '../icones.js';
+
+const ABREUJATS = ['', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
 
 function salutacio(ara) {
   const h = ara.getHours();
@@ -18,41 +23,39 @@ function salutacio(ara) {
   return 'Bona nit';
 }
 
-/* "Dijous, 9 d'octubre" */
-function dataLlarga(ara) {
-  return majuscula(new Intl.DateTimeFormat('ca', { weekday: 'long', day: 'numeric', month: 'long' }).format(ara));
-}
-
 /* Dies de calendari entre avui i `data` (0 = avui). */
 function diesFins(data, ara) {
   const dia = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
   return Math.round((dia(data) - dia(ara)) / 86400000);
 }
 
-/* Una sola targeta: icona, nom, quan i, a sota, el botó (13.3). `falta`: quant falta, si no és avui. */
-function targetaCita({ icon, etiqueta = null, nom, quan, falta = null, botons }) {
-  return `
-    <section class="targeta cita${falta ? ' no-toca' : ''}" aria-labelledby="nom-cita">
-      <div class="cita-cap">
-        <span class="icona-activitat">${icona(icon)}</span>
-        <div>
-          ${etiqueta ? `<p class="etiqueta">${esc(etiqueta)}</p>` : ''}
-          <h2 id="nom-cita">${esc(nom)}</h2>
-          <p class="quan">${esc(quan)}</p>
-          ${falta ? `<p class="falta">${icona('calendari')}${esc(falta)}</p>` : ''}
-        </div>
-      </div>
-      ${botons}
-    </section>`;
+/* "Avui", "Demà", "En 4 dies" (es mostra en majúscules). */
+function textQuan(dies) {
+  if (dies === 0) return 'Avui';
+  if (dies === 1) return 'Demà';
+  return `En ${dies} dies`;
 }
 
 function textEnCurs(s) {
-  if (s.tipus === 'rutina') {
-    return `${s.exercicis.filter(exerciciAcabat).length}/${s.exercicis.length} exercicis`;
-  }
-  if (s.aturada) return 'Falta dir com ha anat';
-  const queden = formatDuracio(Math.ceil(restantMs(s) / 60000));
-  return enPausa(s) ? `En pausa · ${queden}` : `Queden ${queden}`;
+  if (s.tipus === 'rutina') return `${s.exercicis.filter(exerciciAcabat).length}/${s.exercicis.length}`;
+  if (s.aturada) return '';
+  const queden = formatMinuts(Math.ceil(restantMs(s) / 60000));
+  return enPausa(s) ? `Pausa · ${queden}` : queden;
+}
+
+function panell({ etiqueta, dada = '', nom, botons, pins }) {
+  return `
+    <section class="panell-avui" aria-labelledby="nom-cita">
+      <div class="panell-cap">
+        <span class="quan-etiqueta">${esc(etiqueta)}</span>
+        ${dada ? `<span class="quan-dada">${esc(dada)}</span>` : ''}
+      </div>
+      <h2 class="nom-gran" id="nom-cita">${esc(nom)}</h2>
+      ${botons}
+      ${pins}
+      ${esInstallada() ? '' : `
+        <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}
+    </section>`;
 }
 
 export function munta(contenidor) {
@@ -60,52 +63,54 @@ export function munta(contenidor) {
   const ara = new Date();
   const enCurs = estat.sessioEnCurs;
   const propera = properaCita(estat, ara);
+  const pins = htmlPins(estat, ara);
 
   let cos;
   if (enCurs) {
-    cos = targetaCita({
-      icon: enCurs.tipus === 'rutina' ? 'casa' : enCurs.activitat,
+    cos = panell({
       etiqueta: 'A mitges',
+      dada: textEnCurs(enCurs),
       nom: enCurs.nom,
-      quan: textEnCurs(enCurs),
-      botons: `<button type="button" class="boto principal" data-accio="continua">${icona('play')} Continua</button>`
+      botons: `<div class="botons-avui sol"><button type="button" class="boto principal" data-accio="continua">Continua</button></div>`,
+      pins
     });
   } else if (propera) {
     const { cita, data } = propera;
-    const dies = diesFins(data, ara);
     const minuts = duracioCita(estat, cita);
-    const esRutina = !!rutinaDe(estat, cita);
-    // Si avui no toca, el dia surt a "quan" i el que falta a sota ("Demà", "D'aquí 2 dies"); el botó es veu apagat.
-    cos = targetaCita({
-      icon: cita.activitat,
+    const rutina = rutinaDe(estat, cita);
+    const curta = rutina ? duracioCurta(rutina) : null;
+    cos = panell({
+      etiqueta: textQuan(diesFins(data, ara)),
+      dada: `${ABREUJATS[cita.dia]} ${formatHora(cita.hora)}${minuts ? ` · ${formatMinuts(minuts)}` : ''}`,
       nom: nomCita(estat, cita),
-      quan: `${dies ? `${DIES[diaSetmana(data)]} ` : ''}${formatHora(cita.hora)}` + (minuts ? `, ${formatDuracio(minuts)}` : ''),
-      falta: dies === 0 ? null : dies === 1 ? 'Demà' : `D'aquí ${dies} dies`,
       botons: `
-        <button type="button" class="boto principal" data-accio="comenca">${icona('gota')} Comença</button>
-        ${esRutina ? '<button type="button" class="boto-text" data-accio="curta">Versió curta</button>' : ''}`
+        <div class="botons-avui${rutina ? '' : ' sol'}">
+          <button type="button" class="boto principal" data-accio="comenca">Comença</button>
+          ${rutina ? `<button type="button" class="boto contorn curta" data-accio="curta" aria-label="Versió curta de ${curta} minuts">${formatMinuts(curta)}</button>` : ''}
+        </div>`,
+      pins
     });
   } else {
-    cos = `
-      <section class="targeta"><p>Cap cita</p></section>
-      <a class="boto contorn" href="#pla">Pla</a>`;
+    cos = panell({
+      etiqueta: 'Setmana',
+      nom: 'Cap cita',
+      botons: '<div class="botons-avui sol"><a class="boto contorn" href="#pla">Pla</a></div>',
+      pins
+    });
   }
 
   contenidor.innerHTML = `
-    <header class="capcalera amb-accio">
-      <div>
+    <div class="avui">
+      <div class="escena escena-avui" data-escena aria-hidden="true"></div>
+      <header class="capcalera-escena">
         <h1>${salutacio(ara)}</h1>
-        <p class="subtitol">${esc(dataLlarga(ara))}</p>
-      </div>
-      <span class="capcalera-accions">
-        ${htmlPendents()}
-        <a class="boto-icona" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
-      </span>
-    </header>
-    ${cos}
-    <section class="setmana-avui" aria-label="Aquesta setmana">${htmlGotes(estat, ara)}</section>
-    ${esInstallada() ? '' : `
-      <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}`;
+        <span class="capcalera-accions">
+          ${htmlPendents('sobre-escena')}
+          <a class="boto-icona sobre-escena" href="#ajustos/avui" aria-label="Ajustos">${icona('ajustos')}</a>
+        </span>
+      </header>
+      ${cos}
+    </div>`;
 
   /* Si avui no toca, primer es confirma. */
   function demanaComencar(curta) {
@@ -115,7 +120,7 @@ export function munta(contenidor) {
     confirma({
       titol: 'Segur que vols començar?',
       text: `Toca ${dies === 1 ? 'demà' : DIES[diaSetmana(data)].toLowerCase()}.`,
-      boto: `${icona('gota')} Comença`,
+      boto: 'Comença',
       enConfirmar: () => comenca(curta)
     });
   }

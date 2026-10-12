@@ -5,7 +5,6 @@
 import { obte, demanaPersistencia } from './store.js';
 import { carregaBiblioteca } from './biblioteca.js';
 import { benvinguda } from './benvinguda.js';
-import { aplicaEstacio } from './tema.js';
 import { escoltaInstallacio } from './installacio.js';
 import * as avui from './pantalles/avui.js';
 import * as sessio from './pantalles/sessio.js';
@@ -59,6 +58,10 @@ function mostra() {
   const canvia = location.hash !== hashActual;
   desmunta?.();
   contenidor.replaceChildren();
+  // Avui i Bosc van de vora a vora (l'escena del bosc): el CSS ho mira aquí.
+  contenidor.dataset.pantalla = nom;
+  if (parametres[0]) contenidor.dataset.detall = '';
+  else delete contenidor.dataset.detall;
   desmunta = PANTALLES[nom].munta(contenidor, parametres) || null;
   // Transició curta en canviar de pantalla (13.7); no en tornar a dibuixar la mateixa.
   if (canvia && hashActual !== null) {
@@ -87,7 +90,6 @@ function mostra() {
 /* En tornar a l'app (potser l'endemà), les pantalles amb barra es tornen a dibuixar. */
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
-  aplicaEstacio();
   if (AMB_BARRA.has(actual)) mostra();
 });
 
@@ -95,7 +97,7 @@ window.addEventListener('hashchange', mostra);
 escoltaInstallacio();
 
 /*
- * Indicador de canvis pendents (a la capçalera d'Avui, Arbre i Pla). En tocar-lo, es puja tot
+ * Indicador de canvis pendents (a la capçalera d'Avui, Bosc i Pla). En tocar-lo, es puja tot
  * ara mateix; si cal tornar a entrar, demana la contrasenya. Si arriben dades noves, es torna a dibuixar.
  */
 escoltaSincronitzacio(({ pendents, calEntrar, canviat }) => {
@@ -110,7 +112,6 @@ document.addEventListener('click', e => {
     .catch(error => mostraAvis(error.message));
 });
 
-aplicaEstacio();
 obte();
 demanaPersistencia();
 try {
@@ -125,7 +126,7 @@ benvinguda().then(() => { if (actual === 'avui') mostra(); });
 /*
  * Actualitzacions (sw.js): en obrir l'app, en tornar-hi i en recuperar la connexió es mira si
  * hi ha una versió nova publicada. Quan la versió nova ja controla l'app, es recarrega,
- * però només en una pestanya (Avui, Arbre, Pla, Ajustos) o a Entrar, sense cap full obert:
+ * però només en una pestanya (Avui, Bosc, Pla, Ajustos) o a Entrar, sense cap full obert:
  * enmig d'una sessió s'espera que s'acabi.
  */
 if ('serviceWorker' in navigator) {

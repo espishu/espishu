@@ -68,6 +68,13 @@ export function formatDuracio(minuts) {
   return m ? `${h} h ${m} min` : `${h} h`;
 }
 
+/* Format curt de les targetes (DISSENY.md): "25′", "1 h 30", "2 h" */
+export function formatMinuts(minuts) {
+  const h = Math.floor(minuts / 60), m = minuts % 60;
+  if (!h) return `${m}′`;
+  return m ? `${h} h ${m}` : `${h} h`;
+}
+
 /* "09:00" → "9:00" */
 export function formatHora(hora) {
   return hora.replace(/^0(\d)/, '$1');

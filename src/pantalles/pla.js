@@ -1,7 +1,11 @@
-/* Pantalla Pla (PLA.md, seccions 7.6 i 13.3): les cites de la setmana. L'edició només s'obre amb el llapis. */
+/*
+ * Pantalla Pla (PLA.md, seccions 7.6 i 13.3; bosc-pantalles.html): la carena amb els set dies i un pi
+ * sobre els que tenen cita, i una targeta per cita. Tocar-la obre l'edició.
+ */
 import { obte, actualitza, nouId } from '../store.js';
-import { DIES, nomCita, formatHora } from '../cites.js';
+import { DIES, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
 import { htmlPendents } from '../sincronitza.js';
+import { htmlPi } from '../tema.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
 
@@ -11,19 +15,37 @@ export function ordenaCites(cites) {
   return [...cites].sort((a, b) => a.dia - b.dia || a.hora.localeCompare(b.hora));
 }
 
+/* Carena de muntanya amb Dl…Dg i un pi petit sobre els dies amb alguna cita. */
+function htmlCarena(cites) {
+  const plens = new Set(cites.map(c => c.dia));
+  const dies = [1, 2, 3, 4, 5, 6, 7].map(d => {
+    const x = 16 + (d - 1) * 52;
+    return `${plens.has(d) ? `<path d="M${x} 62l-8 12h16z" fill="var(--green)"/>` : ''}
+      <text class="dia-carena${plens.has(d) ? ' ple' : ''}" x="${x}" y="86" text-anchor="middle">${ABREUJATS[d]}</text>`;
+  }).join('');
+  return `
+    <svg class="carena" viewBox="0 0 342 90" aria-hidden="true">
+      <path d="M0 70L40 40L70 56L110 22L150 50L190 18L230 46L270 28L310 52L342 36V90H0Z" fill="#26302B"/>
+      ${dies}
+    </svg>`;
+}
+
 export function munta(contenidor) {
   const estat = obte();
   const cites = ordenaCites(estat.pla.cites);
 
   const targetes = cites.map(cita => {
+    const nom = nomCita(estat, cita), minuts = duracioCita(estat, cita);
     return `
-      <li class="targeta cita-pla">
-        <span class="icona-activitat">${icona(cita.activitat)}</span>
-        <div class="cita-text">
-          <h2>${esc(nomCita(estat, cita))}</h2>
-          <p class="secundari">${ABREUJATS[cita.dia]} ${formatHora(cita.hora)}</p>
-        </div>
-        <a class="boto-icona editar" href="#editar/${esc(cita.id)}" aria-label="Editar ${esc(nomCita(estat, cita))} del ${DIES[cita.dia].toLowerCase()}">${icona('llapis')}</a>
+      <li>
+        <a class="cita-pla" href="#editar/${esc(cita.id)}" aria-label="Editar ${esc(nom)} del ${DIES[cita.dia].toLowerCase()} a les ${formatHora(cita.hora)}">
+          ${htmlPi(cita.activitat)}
+          <span class="cita-text">
+            <span class="cita-nom">${esc(nom)}</span>
+            <span class="secundari">${ABREUJATS[cita.dia]}${minuts ? ` · ${formatMinuts(minuts)}` : ''}</span>
+          </span>
+          <span class="cita-hora">${formatHora(cita.hora)}</span>
+        </a>
       </li>`;
   }).join('');
 
@@ -35,6 +57,7 @@ export function munta(contenidor) {
         <a class="boto-icona" href="#ajustos/pla" aria-label="Ajustos">${icona('ajustos')}</a>
       </span>
     </header>
+    ${htmlCarena(cites)}
     ${cites.length ? `<ul class="llista-cites">${targetes}</ul>` : '<section class="targeta"><p>Cap cita</p></section>'}
     <button type="button" class="boto-afegir" data-accio="afegeix" aria-label="Afegir una cita">${icona('mes')}</button>`;
 

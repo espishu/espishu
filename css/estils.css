@@ -1,82 +1,34 @@
-/* ================= Tipografia (allotjada al projecte) ================= */
-@font-face { font-family: "Lexend"; src: url("../fonts/lexend-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Lexend"; src: url("../fonts/lexend-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: "Lexend"; src: url("../fonts/lexend-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: "Lexend"; src: url("../fonts/lexend-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+/* ================= Tipografia (allotjada al projecte, de Google Fonts, OFL) ================= */
+@font-face { font-family: "Gloock"; src: url("../fonts/gloock-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+/* Public Sans és variable: un sol arxiu per als pesos 500–700. */
+@font-face { font-family: "Public Sans"; src: url("../fonts/public-sans.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
 
-@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
-
-/* ================= Colors: temàtica "L'arbre" (PLA.md, secció 13.6) =================
-   --acc és el color d'acció (--pri a PLA.md). --line és el contorn de la figura (animacions.js);
-   per als separadors de la interfície, --sep. */
+/* ================= Colors: temàtica "El bosc", només fosc (PLA.md, secció 13.6) =================
+   --acc és el color d'acció (el daurat de DISSENY.md). --line és el contorn de la figura
+   (figura.js i animacions.js); per a vores i separadors de la interfície, --sep i --sep-fort. */
 :root {
-  --bg: #F1F2EC; --card: #FFFFFF; --ink: #22291F; --muted: #566052;
-  --acc: #2F6B45; --acc-ink: #FFFFFF; --soft: #E1EBDD; --hi: #A8780D; --sep: #DCE1D6;
-  --acc-text: #2F6B45; /* text verd sobre --soft (5,1:1) */
-  --apagat: #D5DFD5; --apagat-ink: #45604D; /* "Comença" quan avui no toca (5:1) */
-  --err: #A63A2B; /* errors dels formularis (7:1 sobre --bg) */
+  --bg: #1E2B2A; --panel: #16201F; --card: var(--panel); --ink: #EDE6D3; --muted: #A9BFB4; --muted-fluix: #7F978C;
+  --gold: #E8C27A; --green: #8DB36A;
+  --acc: var(--gold); --acc-ink: #16201F; --acc-text: var(--gold);
+  --soft: #24332F;            /* fons suau (sèrie feta, element triat) */
+  --sep: #2C3D3B; --sep-fort: #3F5A54;
+  --hi: var(--gold); --err: #F0A79B;
   --pri: var(--acc); --pri-ink: var(--acc-ink);
-  --anell-ple: #B98A5E; --anell-buit: #EFE6D8;
-  --body: #EFE9DF; --body-far: #D3CBBE; --line: #2B3A30;
-  --m1: #2F6B45; --m2: #9FCDAE;
-  --mat: #EBC35A; --mat-line: #C79A2C;
-  --prop: #A3AEA6; --prop-dark: #5A665E;
-  --floor: #D7E0D5; --towel: #E7A46B;
-  --water: #7FB6E6; --water-line: #4C8CC8; --bike: #D08A3E;
-  --barra-alt: 68px;
-  --fulla: 28px 8px 28px 8px; --fulla-petita: 18px 6px 18px 6px;
-  --font-titol: "Fraunces", Georgia, serif;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
-    --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
-    --acc-text: #6FBF8A;
-    --apagat: #2E3E33; --apagat-ink: #A3B8A9;
-    --err: #F0A79B;
-    --anell-ple: #B98A5E; --anell-buit: #3A342C;
-    --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
-    --m1: #6FBF8A; --m2: #2F5E43;
-    --mat: #4A4024; --mat-line: #6B5A2E;
-    --prop: #6F7A72; --prop-dark: #B3BDB5;
-    --floor: #2A352D; --towel: #B87A47;
-    --water: #2C5C86; --water-line: #4C8CC8; --bike: #C98A48;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #141A15; --card: #1D241E; --ink: #ECF0E8; --muted: #A7B0A2;
-  --acc: #6FBF8A; --acc-ink: #0F1A12; --soft: #26352A; --hi: #E9B949; --sep: #2F3A30;
-  --acc-text: #6FBF8A;
-  --apagat: #2E3E33; --apagat-ink: #A3B8A9;
-  --err: #F0A79B;
-  --anell-ple: #B98A5E; --anell-buit: #3A342C;
-  --body: #D9D3C9; --body-far: #8E887E; --line: #0B100D;
-  --m1: #6FBF8A; --m2: #2F5E43;
-  --mat: #4A4024; --mat-line: #6B5A2E;
-  --prop: #6F7A72; --prop-dark: #B3BDB5;
-  --floor: #2A352D; --towel: #B87A47;
+  /* Figura de les animacions (DISSENY.md) */
+  --body: #E4DCCD; --body-far: #8C8F86; --line: #0E120F; --hair: #2B2F2C;
+  --m1: #8DB36A; --m2: #4E7A5A;
+  --mat: #3B4436; --mat-line: #4E5A48;
+  --prop: #5C6B66; --prop-dark: #A9BFB4;
+  --floor: #2C3D3B; --towel: #C46A4A;
   --water: #2C5C86; --water-line: #4C8CC8; --bike: #C98A48;
+  /* Activitats: el pi de cada cita al Pla i els gràfics */
+  --pi-casa: #E8C27A; --pi-natacio: #8DB36A; --pi-caminar: #A9BFB4; --pi-correr: #D9967A; --pi-bici: #9FB6E0;
+  --barra-alt: 64px;
+  --fulla: 18px; --fulla-petita: 14px;
+  --font-titol: "Gloock", Georgia, serif;
+  --font-text: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: dark;
 }
-
-/* Color d'estació (13.6): `tema.js` posa data-estacio a <html>. --se-ink és el text sobre --se-soft. */
-:root { --se: #C8782A; --se-soft: #F6E7D3; --se-ink: #6B3E10; }
-:root[data-estacio="primavera"] { --se: #C8577F; --se-soft: #F7E3EA; --se-ink: #7A2E4A; }
-:root[data-estacio="estiu"]     { --se: #C99A16; --se-soft: #F8EFCF; --se-ink: #6B5208; }
-:root[data-estacio="tardor"]    { --se: #C8782A; --se-soft: #F6E7D3; --se-ink: #6B3E10; }
-:root[data-estacio="hivern"]    { --se: #5E7F98; --se-soft: #E6EDF2; --se-ink: #33506A; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"])[data-estacio="primavera"] { --se-soft: #33232A; --se-ink: #F0B9CC; }
-  :root:not([data-theme="light"])[data-estacio="estiu"]     { --se-soft: #332C17; --se-ink: #EBCB6B; }
-  :root:not([data-theme="light"])[data-estacio="tardor"]    { --se-soft: #2E261C; --se-ink: #EDB47A; }
-  :root:not([data-theme="light"])[data-estacio="hivern"]    { --se-soft: #1F2830; --se-ink: #A9C3D8; }
-}
-:root[data-theme="dark"][data-estacio="primavera"] { --se-soft: #33232A; --se-ink: #F0B9CC; }
-:root[data-theme="dark"][data-estacio="estiu"]     { --se-soft: #332C17; --se-ink: #EBCB6B; }
-:root[data-theme="dark"][data-estacio="tardor"]    { --se-soft: #2E261C; --se-ink: #EDB47A; }
-:root[data-theme="dark"][data-estacio="hivern"]    { --se-soft: #1F2830; --se-ink: #A9C3D8; }
 
 /* ================= Base ================= */
 *, *::before, *::after { box-sizing: border-box; }
@@ -90,9 +42,9 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 18px;
-  font-weight: 400;
+  font-family: var(--font-text);
+  font-size: 17px;
+  font-weight: 500;
   line-height: 1.5;
   -webkit-tap-highlight-color: transparent;
 }
@@ -113,11 +65,11 @@ body.amb-barra main {
   padding-bottom: calc(var(--barra-alt) + 32px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Títols i números grans en Fraunces; la resta en Lexend (13.5). */
-h1, h2, h3 { font-family: var(--font-titol); font-weight: 600; margin: 0; }
-h1 { font-size: 30px; letter-spacing: -0.01em; line-height: 1.2; }
-h2 { font-size: 23px; line-height: 1.25; }
-h3 { font-size: 21px; line-height: 1.3; }
+/* Títols i números grans en Gloock; la resta en Public Sans (13.5). */
+h1, h2, h3 { font-family: var(--font-titol); font-weight: 400; margin: 0; }
+h1 { font-size: 40px; line-height: 1.05; }
+h2 { font-size: 24px; line-height: 1.15; }
+h3 { font-size: 21px; line-height: 1.2; }
 p { margin: 0; }
 
 :focus-visible {
@@ -160,7 +112,7 @@ p { margin: 0; }
   width: 100%;
   min-height: 48px;
   padding: 10px 22px;
-  border-radius: 999px;
+  border-radius: 14px;
   font: inherit;
   font-size: 18px;
   font-weight: 600;
@@ -172,7 +124,7 @@ p { margin: 0; }
   -webkit-user-select: none;
 }
 .boto.principal {
-  min-height: 60px;
+  min-height: 58px;
   background: var(--acc);
   color: var(--acc-ink);
   border: 0;
@@ -181,8 +133,8 @@ p { margin: 0; }
 }
 .boto.contorn {
   background: transparent;
-  color: var(--acc);
-  border: 2px solid var(--acc);
+  color: var(--ink);
+  border: 1.5px solid var(--sep-fort);
 }
 
 .boto[disabled] { opacity: .45; cursor: default; transform: none; }
@@ -208,47 +160,62 @@ p { margin: 0; }
   touch-action: manipulation;
 }
 
-/* ================= Avui (13.3) ================= */
-.etiqueta-estacio {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-  padding: 4px 12px 4px 10px;
-  border-radius: 999px;
-  background: var(--se-soft);
-  color: var(--se-ink);
-  font-size: 14px;
-  font-weight: 600;
+/* ================= Avui (DISSENY.md, bosc-pantalles.html) ================= */
+/* Avui ocupa tota l'amplada: l'escena del bosc va de vora a vora. */
+main[data-pantalla="avui"] {
+  max-width: 620px;
+  padding: 0 0 calc(var(--barra-alt) + env(safe-area-inset-bottom, 0px));
 }
-.etiqueta-estacio .icona { width: 16px; height: 16px; }
-
-/* El panell de l'arbre, amb el color de l'estació. */
-.panell-arbre {
-  margin-bottom: 16px;
-  padding: 16px 16px 14px;
-  border-radius: var(--fulla);
-  background: var(--se-soft);
+.avui {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--barra-alt) - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh - var(--barra-alt) - env(safe-area-inset-bottom, 0px));
 }
-.panell-arbre .arbre { max-width: 270px; margin: 0 auto; }
-.panell-arbre .arbre > svg { display: block; width: 100%; height: auto; }
-.gotes { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--se-ink); font-size: 17px; }
-.gotes-icones { display: flex; gap: 6px; }
-.gota { display: grid; color: var(--acc); }
-.gota .icona { width: 24px; height: 24px; }
-.gota.plena .icona { fill: currentColor; }
-.gotes .extra { color: var(--se-ink); }
-.setmana-avui { margin-top: 18px; }
-.setmana-avui .gotes { color: var(--muted); }
+.escena { position: absolute; left: 0; right: 0; top: 0; overflow: hidden; background: var(--bg); }
+.escena > svg { display: block; width: 100%; height: 100%; }
+.escena-avui { height: 64%; }
+.capcalera-escena {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(34px + env(safe-area-inset-top, 0px)) 24px 0;
+}
+.capcalera-escena h1 { font-size: 42px; line-height: 1; }
+.boto-icona.sobre-escena { background: rgb(22 32 31 / .7); }
+.panell-avui {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: auto;
+  padding: 22px 24px 20px;
+  border-radius: 28px 28px 0 0;
+  background: var(--panel);
+}
+.panell-cap { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.quan-etiqueta { color: var(--gold); font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.quan-dada { color: var(--muted); font-size: 15px; white-space: nowrap; }
+.nom-gran { font-family: var(--font-titol); font-size: 34px; font-weight: 400; line-height: 1.05; }
+.botons-avui { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; }
+.botons-avui .boto { min-height: 58px; font-size: 18px; }
+.botons-avui .boto.curta { padding: 0; font-size: 15px; }
+.botons-avui.sol { grid-template-columns: 1fr; }
+.panell-avui .recordatori { margin: -6px 0 -8px; justify-content: flex-start; padding-inline: 0; }
 
-.cita-cap { display: flex; align-items: center; gap: 14px; }
-.cita h2 { font-size: 24px; }
-.cita .quan { color: var(--muted); font-size: 17px; margin-top: 2px; }
-.cita .boto.principal { margin-top: 20px; }
-.cita .boto-text { margin-top: 6px; }
-.boto.principal .icona { width: 22px; height: 22px; }
+/* Pins de la setmana (verd fet, gris pendent) i "1/2". */
+.pins { display: flex; align-items: flex-end; gap: 6px; }
+.pins-icones { display: flex; align-items: flex-end; gap: 6px; }
+.pi { display: block; width: 22px; height: 30px; flex: none; fill: var(--sep-fort); }
+.pi.fet { fill: var(--green); }
+.pi.actual { fill: var(--gold); }
+.pins-xifra { margin-left: 6px; font-family: var(--font-titol); font-size: 20px; line-height: 1; }
+.pins-xifra .extra { margin-left: 6px; font-family: var(--font-text); font-size: 15px; color: var(--muted); }
 
-/* Icona d'activitat dins una forma de fulla. */
+/* Icona d'activitat (sessió, historial, ajustos). */
 .icona-activitat {
   display: grid;
   place-items: center;
@@ -257,10 +224,10 @@ p { margin: 0; }
   flex: none;
   border-radius: var(--fulla-petita);
   background: var(--soft);
-  color: var(--acc);
+  color: var(--gold);
 }
 
-/* ================= Barra de navegació ================= */
+/* ================= Barra de navegació: Avui · Bosc · Pla ================= */
 .barra {
   position: fixed;
   left: 0;
@@ -269,8 +236,7 @@ p { margin: 0; }
   z-index: 10;
   display: flex;
   justify-content: center;
-  background: var(--card);
-  border-top: 1px solid var(--sep);
+  background: var(--panel);
   padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
 .barra[hidden] { display: none; }
@@ -282,31 +248,23 @@ p { margin: 0; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  color: var(--muted);
+  gap: 4px;
+  color: var(--muted-fluix);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   touch-action: manipulation;
-}
-.barra .pindola {
-  display: grid;
-  place-items: center;
-  width: 60px;
-  height: 32px;
-  border-radius: 999px;
 }
 .barra svg {
   width: 24px;
   height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.barra a[aria-current="page"] { color: var(--acc); font-weight: 600; }
-.barra a[aria-current="page"] .pindola { background: var(--soft); }
+.barra a[aria-current="page"] { color: var(--gold); }
 .barra a:focus-visible { outline-offset: -4px; }
 
 /* ================= Sessió de rutina (13.3) ================= */
@@ -343,19 +301,15 @@ p { margin: 0; }
   gap: 8px;
   font-family: var(--font-titol);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
 .rellotge .icona { color: var(--acc); width: 20px; height: 20px; }
 
-/* Filera de fulles: una per exercici. */
-.fulles { display: flex; justify-content: space-between; width: 100%; margin: 12px 0 0; padding: 0 2px; list-style: none; }
-.fulles li { display: grid; color: var(--sep); }
-.fulles .icona { width: 24px; height: 24px; stroke-width: 1.8; }
-.fulles .feta { color: var(--acc); }
-.fulles .actual { color: var(--se); }
-.fulles .feta .icona, .fulles .actual .icona { fill: currentColor; stroke: var(--line); stroke-width: 1.4; }
-.fulles .feta .icona path + path, .fulles .actual .icona path + path { stroke: var(--card); }
+/* Pins petits de la sessió: un per exercici (verd fet, daurat l'actual, gris pendent). */
+.pins-sessio { display: flex; justify-content: space-between; width: 100%; margin: 12px 0 0; padding: 0 2px; list-style: none; }
+.pins-sessio li { display: grid; }
+.pins-sessio .pi { width: 18px; height: 25px; }
 
 .exercici { padding-bottom: 12px; }
 .exercici-cap { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
@@ -417,10 +371,10 @@ p { margin: 0; }
 /* Números grans */
 .xifra {
   margin: 0;
-  color: var(--acc);
+  color: var(--ink);
   font-family: var(--font-titol);
   font-size: 46px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
@@ -456,7 +410,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .franja .xifra { color: var(--acc-ink); }
 .franja-etiqueta { font-size: 14px; font-weight: 500; opacity: .9; }
 .franja-botons { display: flex; align-items: center; gap: 8px; }
-.franja .barra-temps { grid-column: 1 / -1; height: 4px; margin: 6px 0 0; background: rgba(255, 255, 255, .25); }
+.franja .barra-temps { grid-column: 1 / -1; height: 4px; margin: 6px 0 0; background: rgb(22 32 31 / .2); }
 .franja .barra-temps span { background: var(--acc-ink); }
 .boto-franja {
   display: grid;
@@ -501,13 +455,14 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   font: inherit;
   text-align: left;
 }
-.serie-num { min-width: 1.4em; font-family: var(--font-titol); font-size: 20px; font-weight: 600; color: var(--acc-text); }
-.serie-valor { flex: 1; text-align: right; font-family: var(--font-titol); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.serie-num { min-width: 1.4em; font-family: var(--font-titol); font-size: 21px; font-weight: 400; color: var(--muted); }
+.serie-valor { flex: 1; text-align: right; font-family: var(--font-titol); font-size: 24px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .serie.feta .serie-fila { background: var(--soft); cursor: pointer; }
-.serie.feta .serie-valor { color: var(--acc-text); }
-.serie-marca { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); }
+.serie.feta .serie-valor { color: var(--ink); }
+.serie-marca { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--green); color: var(--acc-ink); }
+.serie-marca .icona { stroke-width: 3; }
 .serie-marca .icona { width: 20px; height: 20px; }
-.serie.pendent .serie-fila { background: transparent; border: 2px dashed var(--sep); }
+.serie.pendent .serie-fila { background: transparent; border: 2px dashed var(--sep-fort); }
 .serie.pendent .serie-valor { padding-right: 8px; color: var(--muted); }
 .serie.propera .serie-fila { background: transparent; border-color: var(--acc); }
 .serie.propera .serie-valor { padding-right: 8px; }
@@ -558,7 +513,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   color: var(--ink);
   font-family: var(--font-titol);
   font-size: 26px;
-  font-weight: 600;
+  font-weight: 400;
   text-align: center;
   font-variant-numeric: tabular-nums;
   -moz-appearance: textfield;
@@ -592,10 +547,10 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   width: 52px;
   height: 52px;
   padding: 0;
-  border: 2px dashed var(--muted);
+  border: 1.5px dashed var(--sep-fort);
   border-radius: 50%;
   background: none;
-  color: var(--muted);
+  color: var(--ink);
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -623,7 +578,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .final .icona-activitat { width: 64px; height: 64px; }
 .final .icona-activitat .icona { width: 34px; height: 34px; stroke-width: 2.5; }
 .final .boto { margin-top: 8px; }
-.xifra-mitjana { font-size: 48px; font-weight: 700; color: var(--acc); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.xifra-mitjana { font-family: var(--font-titol); font-size: 48px; font-weight: 400; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
 
 /* Avís per desfer */
 .avis {
@@ -748,8 +703,8 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-.titol-targeta { display: block; font-size: 21px; font-weight: 600; margin-bottom: 8px; }
-.titol-targeta .secundari { display: block; font-size: 15px; font-weight: 400; }
+.titol-targeta { display: block; font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+.titol-targeta .secundari { display: block; font-family: var(--font-text); font-size: 15px; font-weight: 500; }
 .fila-pas > span { flex: 1; min-width: 0; }
 .boto.petit { width: auto; min-height: 48px; padding: 6px 18px; font-size: 16px; }
 .boto.gran { min-height: 64px; font-size: 21px; }
@@ -760,12 +715,8 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .icona-activitat.petita { width: 44px; height: 44px; }
 .icona-activitat.petita .icona { width: 22px; height: 22px; }
 
-/* Colors fixos per activitat als gràfics (validats per a daltonisme, clar i fosc). */
-:root { --a-natacio: #3B7DBF; --a-caminar: #2F7A4F; --a-correr: #8E5BB8; --a-bici: #C9822F; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --a-natacio: #4F8BD0; --a-caminar: #3F9A66; --a-correr: #A276CF; --a-bici: #C2802F; }
-}
-:root[data-theme="dark"] { --a-natacio: #4F8BD0; --a-caminar: #3F9A66; --a-correr: #A276CF; --a-bici: #C2802F; }
+/* Colors fixos per activitat als gràfics (to i lluminositat diferents, sobre fons fosc). */
+:root { --a-natacio: #6AA6E0; --a-caminar: #8DB36A; --a-correr: #E0906A; --a-bici: #B48CD8; }
 
 /* ================= Activitat sola ================= */
 .compte-activitat { text-align: center; }
@@ -782,7 +733,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .xifres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .xifres p { display: grid; }
 .xifres .xifra-mitjana { font-size: 36px; }
-.xifra-mitjana span { font-size: 18px; font-weight: 500; color: var(--muted); }
+.xifra-mitjana span { font-family: var(--font-text); font-size: 18px; font-weight: 500; color: var(--muted); }
 .detall-activitat { text-align: center; }
 
 .pujades {
@@ -809,18 +760,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .taula-resum tbody th .secundari { display: block; font-weight: 400; }
 .taula-resum td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-/* ================= Arbre (abans Progrés, 13.3) ================= */
-.panell-arbre.gran .arbre { max-width: 320px; }
-.etapa { display: flex; align-items: center; gap: 10px; padding: 4px 10px 2px; color: var(--se-ink); font-size: 16px; }
-.barra-etapa { flex: 1; height: 8px; border-radius: 999px; background: var(--card); overflow: hidden; }
-.barra-etapa span { display: block; height: 100%; border-radius: 999px; background: var(--se); }
-
-.xifres-arbre { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.xifres-col { display: grid; gap: 10px; }
-.xifres-col p { display: grid; }
-.xifres-col .xifra { font-size: 44px; line-height: 1; }
-.anells { width: 136px; height: 136px; flex: none; }
-
+/* ================= Bosc: historial i gràfics plegats ================= */
 /* Historial i gràfics, plegats. */
 .plegat summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; }
 .plegat summary::-webkit-details-marker { display: none; }
@@ -892,27 +832,49 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .estat-historial { font-size: 14px; font-weight: 600; color: var(--acc); }
 .estat-historial.no-feta { color: var(--muted); font-weight: 500; }
 
-/* ================= Pla ================= */
-.llista-cites { list-style: none; margin: 0 0 4px; padding: 0; }
-.cita-pla { display: flex; align-items: center; gap: 14px; padding: 14px 14px 14px 16px; margin-bottom: 12px; }
-.cita-text { flex: 1; min-width: 0; }
-.cita-text h2 { font-size: 21px; }
-.cita-text .secundari { font-size: 16px; }
-.boto-icona.editar { background: var(--soft); color: var(--acc-text); }
-/* Afegir: botó de línia discontínua només amb "+". */
+/* ================= Pla: la carena amb els dies i una targeta per cita ================= */
+.carena { display: block; width: 100%; height: auto; margin: -4px 0 14px; }
+.carena .dia-carena { fill: #5C7A6E; font-family: var(--font-text); font-size: 12px; font-weight: 700; }
+.carena .dia-carena.ple { fill: var(--ink); }
+.llista-cites { display: grid; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
+.cita-pla {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+}
+.cita-pla .pi { justify-self: center; }
+.cita-text { min-width: 0; }
+.cita-nom { display: block; font-family: var(--font-titol); font-size: 22px; line-height: 1.15; }
+.cita-text .secundari { display: block; font-size: 14px; color: var(--muted-fluix); }
+.cita-hora { font-weight: 700; font-variant-numeric: tabular-nums; }
+.pi.casa, .pi.gimnas { fill: var(--pi-casa); }
+.pi.natacio { fill: var(--pi-natacio); }
+.pi.caminar { fill: var(--pi-caminar); }
+.pi.correr { fill: var(--pi-correr); }
+.pi.bici { fill: var(--pi-bici); }
+/* Afegir: botó rodó de línia discontínua només amb "+". */
 .boto-afegir {
   display: grid;
   place-items: center;
-  width: 100%;
-  min-height: 56px;
-  border: 2px dashed var(--muted);
-  border-radius: var(--fulla-petita);
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+  padding: 0;
+  border: 1.5px dashed var(--sep-fort);
+  border-radius: 50%;
   background: none;
-  color: var(--muted);
+  color: var(--ink);
   cursor: pointer;
   touch-action: manipulation;
 }
-.boto-afegir .icona { width: 24px; height: 24px; }
+.boto-afegir .icona { width: 22px; height: 22px; }
 
 /* ================= Editar una cita ================= */
 .camp-edicio { padding-bottom: 18px; }
@@ -1083,23 +1045,6 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .passos .icona { width: 22px; height: 22px; vertical-align: -5px; color: var(--acc); }
 .targeta .secundari + .boto { margin-top: 12px; }
 
-/* ================= Resum: l'arbre que es rega (13.7) ================= */
-.panell-arbre.resum { text-align: center; }
-.panell-arbre.resum h1 { margin-top: 8px; }
-.panell-arbre.resum .secundari { margin-bottom: 8px; }
-.panell-arbre.resum .gotes { margin-top: 4px; }
-.etapa-nova { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--se-ink); font-weight: 600; }
-.etapa-nova .icona { width: 20px; height: 20px; }
-.panell-arbre.resum .arbre { position: relative; }
-.arbre-abans { position: absolute; inset: 0; }
-.arbre-abans svg, .arbre-nou svg { display: block; width: 100%; height: auto; }
-.gota-cau, .fulla-nova { position: absolute; display: grid; opacity: 0; pointer-events: none; }
-.gota-cau { left: calc(38% + var(--n) * 12%); top: 0; color: var(--water-line); }
-.gota-cau .icona { width: 22px; height: 22px; fill: var(--water); stroke: var(--line); stroke-width: 1.5; }
-.fulla-nova { left: 56%; top: 30%; color: var(--se); }
-.fulla-nova .icona { width: 30px; height: 30px; fill: currentColor; stroke: var(--line); stroke-width: 1.5; }
-.fulla-nova .icona path + path { stroke: var(--card); }
-
 /* ================= Transicions (13.7). Res si l'usuari ha demanat menys moviment. ================= */
 @media (prefers-reduced-motion: no-preference) {
   /* Canvi de pantalla: lliscament curt amb fosa. */
@@ -1116,24 +1061,10 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   .serie.nova .serie-marca path { stroke-dasharray: 40; animation: traç .45s .1s ease-out backwards; }
   @keyframes traç { from { stroke-dashoffset: 40; } }
 
-  /* Exercici acabat: la seva fulla de la filera s'omple de verd. */
-  .fulles .nova .icona { animation: fulla-plena .5s ease-out; transform-origin: 50% 50%; }
-  @keyframes fulla-plena { from { fill: transparent; transform: scale(.6) rotate(-20deg); } 60% { transform: scale(1.2); } }
+  /* Exercici acabat: el seu pi de la filera creix. */
+  .pins-sessio .nova .pi { animation: pi-nou .5s ease-out; transform-origin: 50% 100%; }
+  @keyframes pi-nou { from { transform: scale(.4); } 60% { transform: scale(1.2); } }
 
-  /* Resum: tres gotes cauen sobre l'arbre i apareix una fulla nova. */
-  .rega .gota-cau { animation: gota-cau .7s cubic-bezier(.5, 0, .9, .5) calc(.25s + var(--n) * .22s) both; }
-  @keyframes gota-cau { 0% { opacity: 0; transform: translateY(-10px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(110px); } }
-  .rega .fulla-nova { animation: fulla-nova .5s 1.2s cubic-bezier(.3, 1.5, .5, 1) both; }
-  @keyframes fulla-nova { from { opacity: 1; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
-  /* Si passa d'etapa, l'arbre creix suaument fins a la mida nova. */
-  .creix .arbre-nou { transform-origin: 50% 88.7%; animation: creix 1.2s 1.4s ease-in-out both; }
-  @keyframes creix { from { transform: scale(var(--escala-abans)); opacity: 0; } 30% { opacity: 1; } }
-  .creix .arbre-abans { animation: esvaeix .6s 1.6s ease-in both; }
-  @keyframes esvaeix { to { opacity: 0; } }
-
-  /* Ratxa: els anells es dibuixen de dins cap a fora. */
-  .anells .anell { animation: anell .35s ease-out calc(var(--i) * 45ms) both; }
-  @keyframes anell { from { opacity: 0; } }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1171,23 +1102,6 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 /* Capçalera de les pestanyes: a la dreta, l'etiqueta de l'estació (Arbre) i el botó d'ajustos. */
 .capcalera-accions { display: flex; align-items: center; gap: 8px; flex: none; }
 
-/* Avui: la data sota la salutació i, si avui no toca, quant falta i "Comença" apagat. */
-.capcalera .subtitol { color: var(--muted); font-size: 17px; margin-top: 2px; }
-.cita .falta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--soft);
-  color: var(--acc-text);
-  font-size: 15px;
-  font-weight: 600;
-}
-.cita .falta .icona { width: 16px; height: 16px; }
-.cita.no-toca .boto.principal { background: var(--apagat); color: var(--apagat-ink); }
-.cita.no-toca .boto-text { color: var(--muted); }
 
 /* ================= Comptes: Entrar, Crear compte i Contrasenya (21.4) ================= */
 .entrar-cap { display: grid; justify-items: center; gap: 10px; margin: 24px 0 24px; text-align: center; }
@@ -1243,9 +1157,11 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 /* Compte buit: importar les dades o començar de zero. */
 .importar .secundari { margin-top: -6px; text-align: center; }
 .importar .boto { font-size: 18px; }
-/* A Arbre, si surt el núvol, l'etiqueta de l'estació s'amaga perquè el títol no es parteixi. */
-.capcalera-accions:has(.pendents:not([hidden])) .etiqueta-estacio { display: none; }
 
 /* Ajustos: la versió instal·lada, petita i a baix de tot. */
 .versio-app { margin: 4px 0 0; color: var(--muted); font-size: 14px; text-align: center; }
 .versio-app:empty { display: none; }
+
+/* ================= Resum de la sessió ================= */
+.resum-cap { display: grid; justify-items: center; gap: 6px; margin: 8px 0 18px; text-align: center; }
+.resum-cap .pins { margin-top: 6px; }

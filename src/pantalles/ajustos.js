@@ -89,7 +89,7 @@ export function munta(contenidor, [origen]) {
         </div>
         <div class="sobre">
           <p>Espishu</p>
-          <p class="secundari">Exercicis i fotos: Free Exercise DB (domini públic). Lletra: Lexend (llicència OFL).</p>
+          <p class="secundari">Exercicis i fotos: Free Exercise DB (domini públic). Lletres: Gloock i Public Sans (llicència OFL).</p>
         </div>
       </details>
       <p class="versio-app" data-versio></p>`;
@@ -140,13 +140,13 @@ export function munta(contenidor, [origen]) {
 
   /*
    * Reiniciar el progrés, en dos passos: primer ofereix fer una còpia; després avisa que no es pot desfer.
-   * Esborra l'historial (i la sessió a mitges): l'arbre i la ratxa surten de les sessions.
+   * Esborra l'historial (i la sessió a mitges): el bosc surt de les sessions.
    * Es queden la rutina, les cites, l'objectiu i els ajustos.
    */
   function reinicia() {
     obreFull(`
       <div class="full-cap"><h2>Reiniciar?</h2>${botoTanca}</div>
-      <p>Historial, arbre i ratxa a zero.</p>
+      <p>Historial i bosc a zero.</p>
       <div class="pila-botons">
         <button type="button" class="boto principal" data-accio="copia">${icona('desa')} Fer còpia</button>
         <button type="button" class="boto contorn" data-accio="seguir">Seguir</button>

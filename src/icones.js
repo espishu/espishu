@@ -34,11 +34,8 @@ const TRACATS = {
   calendari: '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   desa: '<path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4.5 16v2.5A2 2 0 0 0 6.5 20.5h11a2 2 0 0 0 2-2V16"/>',
   restaura: '<path d="M12 14.5v-11M7.5 8 12 3.5 16.5 8"/><path d="M4.5 16v2.5A2 2 0 0 0 6.5 20.5h11a2 2 0 0 0 2-2V16"/>',
-  /* temàtica de l'arbre */
-  gota: '<path d="M12 3.5c3.6 4.5 6 7.7 6 10.8a6 6 0 0 1-12 0c0-3.1 2.4-6.3 6-10.8z"/>',
-  fulla: '<path d="M5 19c0-8 5.2-13.6 14-14 .3 8.7-5.3 14-14 14z"/><path d="m5 19 8.5-8.5"/>',
+  /* temàtica del bosc */
   brot: '<path d="M12 21v-8.5"/><path d="M12 12.5C12 9 9.4 6.5 5.5 6.5c0 3.6 2.7 6 6.5 6z"/><path d="M12 10.5c0-3.3 2.4-5.5 6.5-5.5 0 3.4-2.5 5.5-6.5 5.5z"/>',
-  arbre: '<circle cx="12" cy="9" r="5.5"/><path d="M12 14.5V21M12 18l-2.5-2.2"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.75v.01"/>',
   llapis: '<path d="M4.5 19.5 5.5 15 15.5 5a2.1 2.1 0 0 1 3 3l-10 10z"/><path d="m13.5 7 3 3"/>',
   ajustos: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',

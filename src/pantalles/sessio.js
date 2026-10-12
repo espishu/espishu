@@ -16,6 +16,7 @@ import { formatRellotge, formatCompte, restant } from '../temps.js';
 import { activaSo, xiulet } from '../so.js';
 import { obreFull, tancaFull, botoTanca, mostraAvis, amagaAvis } from '../full.js';
 import { icona } from '../icones.js';
+import { htmlPi } from '../tema.js';
 import { esc } from '../dom.js';
 import * as activitat from './activitat.js';
 
@@ -40,7 +41,7 @@ export function munta(contenidor) {
         <button type="button" class="boto contorn petit" data-accio="panell-acabar">Acabar</button>
         <button type="button" class="boto-icona" data-accio="llista" aria-label="Llista d'exercicis">${icona('llista')}</button>
       </span>
-      <ol class="fulles" data-fulles aria-hidden="true"></ol>
+      <ol class="pins-sessio" data-pins aria-hidden="true"></ol>
     </header>
     <div data-zona="exercici"></div>
     <div data-zona="cos"></div>
@@ -79,15 +80,15 @@ export function munta(contenidor) {
     const s = sessio();
     if (!s) return;
     contenidor.querySelector('[data-progres]').textContent = totAcabat(s) ? 'Tot fet' : `Exercici ${s.actual + 1} de ${s.exercicis.length}`;
-    // Filera de fulles (13.3): verda si l'exercici està acabat, color d'estació si és l'actual, buida si és pendent.
+    // Pins petits (13.3): verd si l'exercici està acabat, daurat si és l'actual, gris si és pendent.
     const fetesAra = new Set(s.exercicis.flatMap((ex, e) => [
       ...(exerciciAcabat(ex) ? [`ex${e}`] : []),
       ...ex.series.flatMap((sr, i) => sr.feta ? [`${e}:${i}`] : [])
     ]));
     noves = fetesAbans ? new Set([...fetesAra].filter(k => !fetesAbans.has(k))) : new Set();
     fetesAbans = fetesAra;
-    contenidor.querySelector('[data-fulles]').innerHTML = s.exercicis.map((ex, i) =>
-      `<li class="${exerciciAcabat(ex) ? 'feta' : i === s.actual ? 'actual' : 'pendent'}${noves.has(`ex${i}`) ? ' nova' : ''}">${icona('fulla')}</li>`).join('');
+    contenidor.querySelector('[data-pins]').innerHTML = s.exercicis.map((ex, i) =>
+      `<li${noves.has(`ex${i}`) ? ' class="nova"' : ''}>${htmlPi(exerciciAcabat(ex) ? 'fet' : i === s.actual ? 'actual' : '')}</li>`).join('');
 
     const clau = `${s.actual}:${s.exercicis[s.actual].id}`;
     if (clau !== exMostrat) {
@@ -171,7 +172,7 @@ export function munta(contenidor) {
 
   const botoPausa = `<button type="button" class="boto-franja rodo" data-accio="pausa" aria-label="Pausa">${icona('pausa')}</button>`;
 
-  /* Franja verda (13.3): el compte enrere gran a l'esquerra i els botons a la dreta. */
+  /* Targeta daurada (13.3): el compte enrere gran a l'esquerra i els botons a la dreta. */
   function htmlFranja({ classe, etiqueta, aria, compte, botons }) {
     return `
       <section class="franja ${classe}" aria-label="${esc(aria)}">
@@ -240,7 +241,7 @@ export function munta(contenidor) {
 
   /*
    * Sèries (13.3): files amb el número i les repeticions (sense repetir "reps").
-   * Feta: fons suau i una fulla blanca dins un cercle verd. Activa: − / número / + i ✓.
+   * Feta: fons suau i un ✓ dins un cercle verd. Activa: − / número / + i ✓.
    */
   function htmlSeries(s) {
     const ex = s.exercicis[s.actual];
@@ -262,7 +263,7 @@ export function munta(contenidor) {
             <button type="button" class="serie-fila" data-accio="obre" data-i="${i}" aria-label="${nom}: ${sr.fet} fetes. Toca per corregir">
               ${num}
               <span class="serie-valor">${valor(sr.fet)}</span>
-              <span class="serie-marca">${icona('fulla')}</span>
+              <span class="serie-marca">${icona('check')}</span>
             </button>
           </li>`;
       }

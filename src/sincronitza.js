@@ -398,8 +398,8 @@ export async function tancaCompte() {
 
 /* ================= Indicador de canvis pendents ================= */
 
-/* Botó petit de la capçalera (Avui, Arbre i Pla). Només es veu si hi ha canvis per pujar. */
-export function htmlPendents() {
+/* Botó petit de la capçalera (Avui, Bosc i Pla). Només es veu si hi ha canvis per pujar. */
+export function htmlPendents(classe = '') {
   const visible = hiHaPendents() || calEntrar;
-  return `<button type="button" class="boto-icona pendents" data-pendents aria-label="Canvis pendents"${visible ? '' : ' hidden'}>${icona('nuvol')}</button>`;
+  return `<button type="button" class="boto-icona pendents${classe ? ` ${classe}` : ''}" data-pendents aria-label="Canvis pendents"${visible ? '' : ' hidden'}>${icona('nuvol')}</button>`;
 }
