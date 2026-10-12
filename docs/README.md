@@ -2,9 +2,9 @@
 
 Web app per a iPhone (HTML, CSS i JavaScript sense compilació). Es pot servir la carpeta tal qual, per exemple amb GitHub Pages.
 
-Contingut de la carpeta:
+Contingut de la carpeta (rutes des de l'arrel del projecte):
 
-- `CLAUDE.md` i `PLA.md` (només a l'ordinador, no es publiquen): les instruccions per a Claude Code i l'especificació completa de la v1.
+- `docs/`: aquest fitxer i, només a l'ordinador (no es publiquen), les instruccions per a Claude Code, l'especificació i les notes de cada versió.
 - `index.html`, `manifest.webmanifest`, `sw.js`: l'app, la instal·lació i el funcionament sense connexió.
 - `css/estils.css`: la temàtica "L'arbre" (clar i fosc).
 - `src/`: el codi. Totes les dades passen per `src/store.js`; les pantalles són a `src/pantalles/`.

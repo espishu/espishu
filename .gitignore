@@ -1,7 +1,9 @@
 # Només a l'ordinador: són notes personals i el repositori és públic.
-PLA.md
 CLAUDE.md
-INSTRUCCIONS-SUPABASE.md
+docs/PLA.md
+docs/CLAUDE.md
+docs/INSTRUCCIONS-SUPABASE.md
+docs/v5/
 .claude/
 
 # Fitxers de l'editor i del sistema
