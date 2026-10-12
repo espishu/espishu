@@ -60,7 +60,7 @@ export function dadesInicials() {
     versio: VERSIO,
     perfil: { nom: '', avisSalutVist: false, installacioVista: false, ultimaCopia: null },
     pla: {
-      objectiuSetmanal: 2,
+      objectiuSetmanal: 3,
       cites: [
         { id: nouId(), dia: 5, hora: '18:00', activitat: 'casa', rutina: rutinaGeneral() },
         { id: nouId(), dia: 6, hora: '09:00', activitat: 'natacio', duracioMin: 90 },

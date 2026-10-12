@@ -6,6 +6,7 @@ import { obte, actualitza, nouId } from '../store.js';
 import { DIES, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
 import { htmlPendents } from '../sincronitza.js';
 import { htmlPi } from '../tema.js';
+import { ajustaObjectiu } from '../boscdades.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
 
@@ -66,7 +67,11 @@ export function munta(contenidor) {
     const ocupats = new Set(obte().pla.cites.map(c => c.dia));
     const dia = [6, 7, 5, 1, 2, 3, 4].find(d => !ocupats.has(d)) ?? 6;
     const cita = { id: nouId(), dia, hora: '09:00', activitat: 'caminar', duracioMin: 60 };
-    actualitza(d => { d.pla.cites.push(cita); });
+    actualitza(d => {
+      const abans = d.pla.cites.length;
+      d.pla.cites.push(cita);
+      ajustaObjectiu(d, abans);
+    });
     location.hash = `#editar/${cita.id}/nova`;
   };
   contenidor.addEventListener('click', clic);

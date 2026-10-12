@@ -72,6 +72,27 @@ export function registraObjectiu(d, nou, ara = new Date()) {
 }
 
 /*
+ * L'objectiu setmanal és fer les cites del pla: com a màxim, tantes com cites hi ha (i 4 com a molt,
+ * el límit de la base de dades). Es pot baixar a Ajustos: 2/3, 1/3…
+ */
+export function maxObjectiu(estat) {
+  return Math.max(1, Math.min(4, estat.pla.cites.length));
+}
+
+/*
+ * Després d'afegir o treure cites (dins actualitza): si l'objectiu era el màxim, segueix el nombre
+ * de cites; si ara és massa alt, baixa fins al màxim. El canvi s'apunta (registraObjectiu).
+ */
+export function ajustaObjectiu(d, citesAbans, ara = new Date()) {
+  const actual = d.pla.objectiuSetmanal, max = maxObjectiu(d);
+  const maxAbans = Math.max(1, Math.min(4, citesAbans));
+  const nou = Math.min(actual === maxAbans ? max : actual, max);
+  if (nou === actual) return;
+  registraObjectiu(d, nou, ara);
+  d.pla.objectiuSetmanal = nou;
+}
+
+/*
  * Totes les valls, de la més antiga a la d'ara:
  * [{ any, vall, nom, estat (Bosc.state), sessions, arbres, actual }]
  */

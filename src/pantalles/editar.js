@@ -9,6 +9,7 @@ import { renderAnimacio } from '../animacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
+import { ajustaObjectiu } from '../boscdades.js';
 
 const ABREUJATS = ['', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
 const OPCIONS_ACTIVITAT = ['casa', 'natacio', 'caminar', 'bici', 'correr'];
@@ -323,7 +324,11 @@ export function munta(contenidor, [id, nova]) {
       text: 'L\'historial de sessions no s\'esborra.',
       boto: 'Esborrar la cita',
       enConfirmar: () => {
-        actualitza(d => { d.pla.cites = d.pla.cites.filter(c => c.id !== id); });
+        actualitza(d => {
+          const abans = d.pla.cites.length;
+          d.pla.cites = d.pla.cites.filter(c => c.id !== id);
+          ajustaObjectiu(d, abans);
+        });
         location.hash = '#pla';
       }
     })

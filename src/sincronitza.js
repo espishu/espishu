@@ -7,8 +7,10 @@
  * i després es baixen les dades del compte (si no hi ha res pendent).
  *
  * Elements de la cua: { n, tipus: 'pla' } (tot el pla: cites, exercicis, objectiu i dolors),
- * { n, tipus: 'sessio', id } i { n, tipus: 'reinicia' } (esborrar l'historial de Supabase).
- * El pla es puja com està en el moment de pujar-lo, no com estava en apuntar-lo.
+ * { n, tipus: 'sessio', id }, { n, tipus: 'reinicia' } (esborrar l'historial de Supabase) i,
+ * des de la versió 5, { n, tipus: 'bosc' } (tot `perfil.bosc`: historial de l'objectiu, noms de les
+ * valls i elements vistos; RPC desa_bosc, migració 002).
+ * El pla i el bosc es pugen com estan en el moment de pujar-los, no com estaven en apuntar-los.
  *
  * Entre versions de l'app: la cua es desa amb les dades (localStorage) i una versió nova la puja
  * igualment, perquè cada element només diu QUÈ cal pujar (un tipus i un id) i les dades es llegeixen
@@ -32,19 +34,23 @@ const PAGINA = 1000;
 
 /* El que es desa a Supabase del pla, per saber si ha canviat. */
 const textPla = d => JSON.stringify([d.pla.objectiuSetmanal, d.ajustos.dolors, d.pla.cites]);
+const textBosc = d => canonic(d.perfil?.bosc ?? {});
 
 /* El que ja és a la cua o a Supabase: amb això es compara cada canvi. */
 let foto = null;
 
 function prenFoto(d) {
-  foto = d?.compte ? { pla: textPla(d), sessions: new Set(d.sessions.map(s => s.id)) } : null;
+  foto = d?.compte ? { pla: textPla(d), bosc: textBosc(d), sessions: new Set(d.sessions.map(s => s.id)) } : null;
 }
 
 const op = (tipus, extra = {}) => ({ n: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, tipus, ...extra });
 
-/* Afegeix el pla a la cua si encara no hi és. */
+/* Afegeix el pla (o el bosc) a la cua si encara no hi és. */
 function encuaPla(d) {
   if (!d.pendents.some(p => p.tipus === 'pla')) d.pendents.push(op('pla'));
+}
+function encuaBosc(d) {
+  if (!d.pendents.some(p => p.tipus === 'bosc')) d.pendents.push(op('bosc'));
 }
 
 /* Es crida a cada canvi (store.js), abans de desar-lo. */
@@ -59,6 +65,7 @@ function detecta(d) {
 
   // Fins que no s'han baixat les dades del compte, no es puja el pla (es trepitjaria el de Supabase).
   if (d.compte.baixat && textPla(d) !== abans.pla) { encuaPla(d); canvis = true; }
+  if (d.compte.baixat && textBosc(d) !== abans.bosc) { encuaBosc(d); canvis = true; }
 
   if ([...abans.sessions].some(id => !actuals.has(id))) {
     // S'han esborrat sessions (Reiniciar o restaurar una còpia): Supabase ha de quedar igual que aquí.
@@ -70,7 +77,11 @@ function detecta(d) {
     d.pendents.push(...noves.map(id => op('sessio', { id })));
     if (noves.length) canvis = true;
   }
-  foto = { pla: d.compte.baixat ? textPla(d) : abans.pla, sessions: actuals };
+  foto = {
+    pla: d.compte.baixat ? textPla(d) : abans.pla,
+    bosc: d.compte.baixat ? textBosc(d) : abans.bosc,
+    sessions: actuals
+  };
   if (canvis) programa();
 }
 
@@ -190,6 +201,8 @@ async function executa(sb, element) {
     if (s) comprova(await sb.rpc('desa_sessio', { sessio: sessioServidor(s, d) }));
   } else if (element.tipus === 'reinicia') {
     comprova(await sb.from('sessions').delete().eq('user_id', d.compte.id));
+  } else if (element.tipus === 'bosc') {
+    comprova(await sb.rpc('desa_bosc', { dades: d.perfil.bosc ?? {} }));
   } else {
     // Un tipus que aquesta versió no coneix (no hauria de passar): es treu perquè no bloquegi la cua.
     console.warn('Element de la cua desconegut', element);
@@ -208,7 +221,7 @@ async function puja(sb) {
 
 async function llegeixCompte(sb, uid) {
   const perfil = comprova(await sb.from('perfils')
-    .select('objectiu_setmanal, dolors, inicialitzat')
+    .select('objectiu_setmanal, dolors, inicialitzat, bosc')
     .eq('user_id', uid).maybeSingle());
   return perfil;
 }
@@ -237,11 +250,19 @@ async function baixa(sb) {
   const posicio = c => ordre.get(c.id) ?? Infinity;
   const cites = activitats.map(citaLocal)
     .sort((a, b) => posicio(a) - posicio(b) || a.dia - b.dia || a.hora.localeCompare(b.hora) || a.id.localeCompare(b.id));
-  const abans = canonic([d.pla, d.ajustos.dolors, d.sessions]);
+  const estatComparable = x => canonic([x.pla, x.ajustos.dolors, x.sessions, x.perfil.bosc ?? {}]);
+  const abans = estatComparable(d);
+  const boscServidor = perfil.bosc && typeof perfil.bosc === 'object' && !Array.isArray(perfil.bosc) ? perfil.bosc : {};
+  let apuntat = false;
   actualitza(x => {
-    // Si l'objectiu s'ha canviat en un altre aparell, les setmanes passades es queden amb el d'abans
-    // (boscdades.js). La primera baixada no és un canvi: només porta el que ja hi havia.
-    if (x.compte.baixat && x.pla.objectiuSetmanal !== perfil.objectiu_setmanal) registraObjectiu(x, perfil.objectiu_setmanal);
+    x.perfil.bosc = JSON.parse(JSON.stringify(boscServidor));
+    // Si l'objectiu ha canviat en un aparell amb una versió sense bosc al compte, s'apunta aquí perquè
+    // les setmanes passades es quedin amb el d'abans (boscdades.js). La primera baixada no és un canvi.
+    const ultim = x.perfil.bosc.objectius?.at(-1)?.objectiu ?? x.pla.objectiuSetmanal;
+    if (x.compte.baixat && ultim !== perfil.objectiu_setmanal) {
+      registraObjectiu(x, perfil.objectiu_setmanal);
+      apuntat = true;
+    }
     x.pla.objectiuSetmanal = perfil.objectiu_setmanal;
     x.ajustos.dolors = perfil.dolors ?? [];
     x.pla.cites = cites;
@@ -249,7 +270,11 @@ async function baixa(sb) {
     x.compte.baixat = true;
   }, { remot: true });
   prenFoto(obte());
-  return canonic([obte().pla, obte().ajustos.dolors, obte().sessions]) !== abans;
+  if (apuntat) {
+    actualitza(x => encuaBosc(x), { remot: true });
+    programa();
+  }
+  return estatComparable(obte()) !== abans;
 }
 
 /* JSON amb les claus ordenades, per comparar sense que importi l'ordre de les claus. */
@@ -329,10 +354,11 @@ export function iniciaSincronitzacio() {
 /* L'aparell s'ha fet servir amb la versió sense comptes (store.js, migració 1 → 2). */
 const teDadesAnteriors = d => d.anterior && !d.compte && (d.sessions.length > 0 || d.perfil.avisSalutVist);
 
-/* Dades buides per a un compte, amb el que és de l'aparell (avisos vistos, instal·lada). */
+/* Dades buides per a un compte, amb el que és de l'aparell (avisos vistos, instal·lada). El bosc és del compte. */
 function dadesNoves(d, compte) {
   const noves = dadesInicials();
-  noves.perfil = { ...d.perfil };
+  const { bosc, ...perfil } = d.perfil;
+  noves.perfil = perfil;
   noves.compte = compte;
   return noves;
 }
@@ -369,9 +395,11 @@ export async function iniciaCompte({ id, usuari }) {
 export function comencaCompte(dades = null) {
   const compte = { id: obte().compte.id, usuari: obte().compte.usuari, baixat: true };
   const base = dades ?? dadesNoves(obte(), compte);
+  const { bosc, ...perfil } = obte().perfil;
   const noves = {
     ...base,
-    perfil: { ...obte().perfil },
+    // El bosc (historial de l'objectiu, noms de les valls) ve amb les dades importades, si en porten.
+    perfil: { ...perfil, bosc: dades?.perfil?.bosc ?? {} },
     sessioEnCurs: null,
     compte,
     pendents: []
@@ -379,7 +407,7 @@ export function comencaCompte(dades = null) {
   delete noves.anterior;
   substitueix(noves, { remot: true });
   actualitza(d => {
-    d.pendents = [op('pla'), ...d.sessions.map(s => op('sessio', { id: s.id }))];
+    d.pendents = [op('pla'), op('bosc'), ...d.sessions.map(s => op('sessio', { id: s.id }))];
   }, { remot: true });
   prenFoto(obte());
   programa();

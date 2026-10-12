@@ -1262,3 +1262,7 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
   .creix .escena-ara { animation: apareix 1.2s .4s ease-in-out both; }
   @keyframes apareix { from { opacity: 0; } }
 }
+
+/* Ajustos: l'objectiu setmanal com a "2/3" (de les cites del pla). */
+.objectiu-xifra { font-family: var(--font-titol); font-size: 30px; color: var(--muted); }
+.objectiu-xifra strong { color: var(--ink); font-weight: 400; }

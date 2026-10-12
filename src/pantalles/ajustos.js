@@ -9,7 +9,7 @@ import { tancaCompte } from '../sincronitza.js';
 import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
-import { registraObjectiu } from '../boscdades.js';
+import { registraObjectiu, ajustaObjectiu, maxObjectiu } from '../boscdades.js';
 
 function textUltimaCopia(data) {
   if (!data) return 'Cap còpia encara';
@@ -24,7 +24,7 @@ export function munta(contenidor, [origen]) {
   const enrere = PESTANYES.includes(origen) ? origen : 'pla';
   function pinta() {
     const { pla, perfil, compte } = obte();
-    const objectiu = pla.objectiuSetmanal;
+    const objectiu = pla.objectiuSetmanal, max = maxObjectiu(obte());
     contenidor.innerHTML = `
       <header class="capcalera amb-enrere">
         <a class="boto-icona" href="#${enrere}" aria-label="Tornar">${icona('enrere')}</a>
@@ -53,10 +53,10 @@ export function munta(contenidor, [origen]) {
       <section class="targeta">
         <h2 class="titol-targeta">Objectiu setmanal</h2>
         <div class="fila-pas gran">
-          <span><strong>${objectiu}</strong> ${objectiu === 1 ? 'sessió' : 'sessions'} per setmana</span>
+          <span class="objectiu-xifra" aria-label="${objectiu} de ${pla.cites.length} cites per setmana"><strong>${objectiu}</strong>/${pla.cites.length}</span>
           <div class="pas-a-pas compacte">
             <button type="button" class="pas" data-accio="objectiu" data-signe="-1" aria-label="Una sessió menys"${objectiu <= 1 ? ' disabled' : ''}>${icona('menys')}</button>
-            <button type="button" class="pas" data-accio="objectiu" data-signe="1" aria-label="Una sessió més"${objectiu >= 4 ? ' disabled' : ''}>${icona('mes')}</button>
+            <button type="button" class="pas" data-accio="objectiu" data-signe="1" aria-label="Una sessió més"${objectiu >= max ? ' disabled' : ''}>${icona('mes')}</button>
           </div>
         </div>
       </section>
@@ -244,7 +244,7 @@ export function munta(contenidor, [origen]) {
     if (accio === 'objectiu') {
       // Les setmanes passades es queden amb l'objectiu que tenien (boscdades.js).
       actualitza(d => {
-        const nou = Math.min(4, Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe)));
+        const nou = Math.min(maxObjectiu(d), Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe)));
         if (nou !== d.pla.objectiuSetmanal) registraObjectiu(d, nou);
         d.pla.objectiuSetmanal = nou;
       });
@@ -258,7 +258,11 @@ export function munta(contenidor, [origen]) {
         boto: 'Restablir',
         enConfirmar: () => {
           const inicials = dadesInicials();
-          actualitza(d => { d.pla.cites = inicials.pla.cites; });
+          actualitza(d => {
+            const abans = d.pla.cites.length;
+            d.pla.cites = inicials.pla.cites;
+            ajustaObjectiu(d, abans);
+          });
           mostraAvis('Pla inicial restablert');
         }
       });
