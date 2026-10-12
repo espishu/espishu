@@ -161,8 +161,8 @@ p { margin: 0; }
 }
 
 /* ================= Avui (DISSENY.md, bosc-pantalles.html) ================= */
-/* Avui ocupa tota l'amplada: l'escena del bosc va de vora a vora. */
-main[data-pantalla="avui"] {
+/* Avui i Bosc ocupen tota l'amplada: l'escena del bosc va de vora a vora. */
+main[data-pantalla="avui"], main[data-pantalla="progres"]:not([data-detall]) {
   max-width: 620px;
   padding: 0 0 calc(var(--barra-alt) + env(safe-area-inset-bottom, 0px));
 }
@@ -175,7 +175,9 @@ main[data-pantalla="avui"] {
 }
 .escena { position: absolute; left: 0; right: 0; top: 0; overflow: hidden; background: var(--bg); }
 .escena > svg { display: block; width: 100%; height: 100%; }
-.escena-avui { height: 64%; }
+/* A Avui l'escena omple l'espai de sobre el panell; la salutació hi va a sobre. */
+.avui .escena-avui { position: relative; flex: 1; min-height: 240px; }
+.avui .capcalera-escena { position: absolute; left: 0; right: 0; top: 0; }
 .capcalera-escena {
   position: relative;
   display: flex;
@@ -191,7 +193,7 @@ main[data-pantalla="avui"] {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: auto;
+  margin-top: -28px;
   padding: 22px 24px 20px;
   border-radius: 28px 28px 0 0;
   background: var(--panel);
@@ -1165,3 +1167,98 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
 /* ================= Resum de la sessió ================= */
 .resum-cap { display: grid; justify-items: center; gap: 6px; margin: 8px 0 18px; text-align: center; }
 .resum-cap .pins { margin-top: 6px; }
+
+/* ================= Bosc: l'escena sencera (DISSENY.md, bosc-valls.html opció B) ================= */
+.bosc {
+  position: relative;
+  min-height: calc(100vh - var(--barra-alt) - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh - var(--barra-alt) - env(safe-area-inset-bottom, 0px));
+}
+.escena-bosc { bottom: 0; }
+.bosc-titol { display: grid; justify-items: start; gap: 8px; min-width: 0; }
+.nom-vall {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin-top: 2px;
+  padding: 4px 10px 4px 10px;
+  border-radius: 999px;
+  background: rgb(22 32 31 / .7);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.nom-vall .icona { width: 16px; height: 16px; color: var(--gold); }
+.nom-vall .icona:last-child { color: var(--muted); }
+.nou-element {
+  padding: 4px 12px;
+  border: 1px solid rgb(232 194 122 / .5);
+  border-radius: 999px;
+  background: rgb(232 194 122 / .12);
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+}
+.bosc-dreta { display: grid; justify-items: end; gap: 10px; flex: none; }
+.comptador { display: grid; justify-items: end; text-align: right; color: var(--muted); font-size: 13px; }
+.xifra-bosc { color: var(--ink); font-family: var(--font-titol); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.barra-arbre {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgb(22 32 31 / .85);
+  color: var(--muted);
+  font-size: 15px;
+}
+.barretes { display: flex; gap: 4px; flex: none; }
+.barretes span { width: 26px; height: 8px; border-radius: 4px; background: var(--sep-fort); }
+.barretes .feta { background: var(--green); }
+.barretes .cura { background: var(--gold); }
+.sota-bosc { margin: 16px 16px 0; }
+
+/* ================= Les teves valls ================= */
+.llista-valls { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.targeta-vall { overflow: hidden; border-radius: 18px; background: var(--panel); }
+.miniatura-vall { height: 150px; }
+.miniatura-vall svg { display: block; width: 100%; height: 100%; }
+.peu-vall { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 16px 4px 4px; }
+.nom-vall-boto {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.nom-vall-text { font-family: var(--font-titol); font-size: 20px; line-height: 1.15; }
+.nom-vall-boto .secundari { font-size: 13px; }
+.xifra-vall { font-family: var(--font-titol); font-size: 22px; }
+
+/* ================= Resum: el bosc d'abans i el d'ara ================= */
+.escena-resum {
+  position: relative;
+  height: calc(250px + env(safe-area-inset-top, 0px));
+  margin: calc(-24px - env(safe-area-inset-top, 0px)) -16px 0;
+  overflow: hidden;
+}
+.escena-abans, .escena-ara { position: absolute; inset: 0; }
+.escena-abans svg, .escena-ara svg { display: block; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .creix .escena-ara { animation: apareix 1.2s .4s ease-in-out both; }
+  @keyframes apareix { from { opacity: 0; } }
+}

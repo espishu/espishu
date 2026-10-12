@@ -23,6 +23,7 @@
 import { obte, actualitza, substitueix, enCadaCanvi, dadesInicials, desaAnteriors } from './store.js';
 import { obteClient, tancaSessio, ErrorCompte, motiuDe } from './compte.js';
 import { icona } from './icones.js';
+import { registraObjectiu } from './boscdades.js';
 
 const ESPERA_PUJADA = 1500;
 const PAGINA = 1000;
@@ -238,6 +239,9 @@ async function baixa(sb) {
     .sort((a, b) => posicio(a) - posicio(b) || a.dia - b.dia || a.hora.localeCompare(b.hora) || a.id.localeCompare(b.id));
   const abans = canonic([d.pla, d.ajustos.dolors, d.sessions]);
   actualitza(x => {
+    // Si l'objectiu s'ha canviat en un altre aparell, les setmanes passades es queden amb el d'abans
+    // (boscdades.js). La primera baixada no és un canvi: només porta el que ja hi havia.
+    if (x.compte.baixat && x.pla.objectiuSetmanal !== perfil.objectiu_setmanal) registraObjectiu(x, perfil.objectiu_setmanal);
     x.pla.objectiuSetmanal = perfil.objectiu_setmanal;
     x.ajustos.dolors = perfil.dolors ?? [];
     x.pla.cites = cites;

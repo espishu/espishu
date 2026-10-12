@@ -1,6 +1,7 @@
 /* Pestanya Bosc (PLA.md, seccions 7.5 i 13.3): l'escena del bosc i, a sota, plegats, l'historial i els gràfics. */
-import { obte } from '../store.js';
-import { sessionsDeLaSetmana, dilluns } from '../ratxa.js';
+import { obte, actualitza } from '../store.js';
+import { sessionsDeLaSetmana, dilluns, compta } from '../ratxa.js';
+import { valls, elementsNous, marcaVistos, nomElement, htmlEscena } from '../boscdades.js';
 import { exercici } from '../biblioteca.js';
 import { ACTIVITATS } from '../cites.js';
 import { htmlDetall, nomSessio, iconaSessio, dataCurta, minutsDe } from '../resum.js';
@@ -20,6 +21,9 @@ const ESTATS = { feta: 'Feta', 'no-acabada': 'No acabada', 'no-feta': 'No feta' 
 
 const diaMes = d => new Intl.DateTimeFormat('ca', { day: 'numeric', month: 'short' }).format(d);
 const diaMesNum = d => `${d.getDate()}/${d.getMonth() + 1}`;
+
+/* "el riu", "el riu i els ocells", "a, b i c" */
+const llistaNoms = noms => noms.length < 2 ? noms.join('') : `${noms.slice(0, -1).join(', ')} i ${noms.at(-1)}`;
 
 export function munta(contenidor, [id]) {
   return id ? muntaDetall(contenidor, id) : muntaResum(contenidor);
@@ -95,17 +99,41 @@ function muntaResum(contenidor) {
   const activitats = minutsPerSetmana(estat, ara);
   const seriesAmbDades = SERIES_ACTIVITAT.filter(sr => activitats.some(s => s.valors[sr.clau] > 0));
 
+  // La vall d'aquest any, el total de sessions i el que s'ha desbloquejat de nou.
+  const v = valls(estat, ara).at(-1);
+  const total = estat.sessions.filter(compta).length;
+  const nous = elementsNous(estat, v);
+  const { pending, dry } = v.estat;
+  const curant = pending.type === 'cura';
+  const objectiu = estat.pla.objectiuSetmanal;
+  const fetes = Math.min(objectiu, Math.round(pending.progress * objectiu));
+  const barretes = Array.from({ length: objectiu }, (_, i) => `<span class="${i < fetes ? (curant ? 'cura' : 'feta') : ''}"></span>`).join('');
+  const textBarra = curant ? (dry > 1 ? `Curant arbres secs (${dry})` : "Curant l'arbre sec") : 'El proper arbre';
 
   contenidor.innerHTML = `
-    <header class="capcalera amb-accio">
-      <h1>El bosc</h1>
-      <span class="capcalera-accions">
-        ${htmlPendents()}
-        <a class="boto-icona" href="#ajustos/progres" aria-label="Ajustos">${icona('ajustos')}</a>
-      </span>
-    </header>
+    <section class="bosc" aria-label="El bosc">
+      <div class="escena escena-bosc" aria-hidden="true">${htmlEscena(v)}</div>
+      <header class="capcalera-escena">
+        <div class="bosc-titol">
+          <h1>El bosc</h1>
+          <a class="nom-vall" href="#valls" aria-label="${esc(v.nom)}: les teves valls">${icona('muntanya')}${esc(v.nom)}${icona('endavant')}</a>
+          ${nous.length ? `<p class="nou-element">Nou: ${esc(llistaNoms(nous.map(e => nomElement(e, v.any))))}</p>` : ''}
+        </div>
+        <div class="bosc-dreta">
+          <p class="comptador"><span class="xifra-bosc">${total}</span><span>${total === 1 ? 'sessió' : 'sessions'}</span></p>
+          <span class="capcalera-accions">
+            ${htmlPendents('sobre-escena')}
+            <a class="boto-icona sobre-escena" href="#ajustos/progres" aria-label="Ajustos">${icona('ajustos')}</a>
+          </span>
+        </div>
+      </header>
+      <div class="barra-arbre">
+        <span>${esc(textBarra)}</span>
+        <span class="barretes" aria-label="${fetes} de ${objectiu} sessions">${barretes}</span>
+      </div>
+    </section>
 
-    <section class="targeta plegats">
+    <section class="targeta plegats sota-bosc">
     <details class="plegat">
       <summary><h2 class="titol-targeta">Historial</h2>${icona('endavant', 'icona plec')}</summary>
       ${historial ? `<ul class="historial">${historial}</ul>` : '<p class="secundari">Encara no hi ha cap sessió.</p>'}
@@ -135,6 +163,9 @@ function muntaResum(contenidor) {
       : '<p class="secundari">Encara no hi ha dades.</p>'}
     </details>
     </section>`;
+
+  // Les etiquetes "Nou: …" només surten la primera vegada.
+  if (nous.length) actualitza(d => marcaVistos(d, v));
 
   const select = contenidor.querySelector('[data-exercici]');
   function pintaLinia() {

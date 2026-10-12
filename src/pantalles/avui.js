@@ -7,6 +7,7 @@ import { properaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, 
 import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlPins } from '../tema.js';
+import { valls, htmlEscena, RETALL_AVUI } from '../boscdades.js';
 import { activaSo } from '../so.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { htmlPendents } from '../sincronitza.js';
@@ -101,7 +102,7 @@ export function munta(contenidor) {
 
   contenidor.innerHTML = `
     <div class="avui">
-      <div class="escena escena-avui" data-escena aria-hidden="true"></div>
+      <div class="escena escena-avui" aria-hidden="true">${htmlEscena(valls(estat, ara).at(-1), { retall: RETALL_AVUI })}</div>
       <header class="capcalera-escena">
         <h1>${salutacio(ara)}</h1>
         <span class="capcalera-accions">

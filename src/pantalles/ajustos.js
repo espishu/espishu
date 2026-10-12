@@ -9,6 +9,7 @@ import { tancaCompte } from '../sincronitza.js';
 import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
+import { registraObjectiu } from '../boscdades.js';
 
 function textUltimaCopia(data) {
   if (!data) return 'Cap còpia encara';
@@ -169,6 +170,8 @@ export function munta(contenidor, [origen]) {
           d.sessioEnCurs = null;
           // Les fletxes "↑" de pujada parlen de l'historial que s'esborra (les repeticions es queden).
           d.pla.cites.forEach(c => c.rutina?.exercicis.forEach(ex => { delete ex.pujada; }));
+          // El bosc torna a començar: les etiquetes "Nou: …" tornaran a sortir.
+          if (d.perfil.bosc) d.perfil.bosc.vist = {};
         });
         pinta();
         mostraAvis('Progrés reiniciat');
@@ -239,7 +242,12 @@ export function munta(contenidor, [origen]) {
     if (accio === 'reinicia') reinicia();
     if (accio === 'installa') installa().then(pinta);
     if (accio === 'objectiu') {
-      actualitza(d => { d.pla.objectiuSetmanal = Math.min(4, Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe))); });
+      // Les setmanes passades es queden amb l'objectiu que tenien (boscdades.js).
+      actualitza(d => {
+        const nou = Math.min(4, Math.max(1, d.pla.objectiuSetmanal + Number(boto.dataset.signe)));
+        if (nou !== d.pla.objectiuSetmanal) registraObjectiu(d, nou);
+        d.pla.objectiuSetmanal = nou;
+      });
       pinta();
       contenidor.querySelector(`[data-signe="${boto.dataset.signe}"]:not([disabled])`)?.focus();
     }

@@ -15,14 +15,15 @@ import * as editar from './pantalles/editar.js';
 import * as ajustos from './pantalles/ajustos.js';
 import * as entrar from './pantalles/entrar.js';
 import * as importar from './pantalles/importar.js';
+import * as valls from './pantalles/valls.js';
 import { iniciaSincronitzacio, escoltaSincronitzacio, sincronitza, calTornarAEntrar } from './sincronitza.js';
 import { mostraAvis } from './full.js';
 
-const PANTALLES = { avui, sessio, fet, progres, pla, editar, ajustos, entrar, importar };
+const PANTALLES = { avui, sessio, fet, progres, valls, pla, editar, ajustos, entrar, importar };
 const { obreTornaAEntrar } = entrar;
-const AMB_BARRA = new Set(['avui', 'progres', 'pla', 'ajustos']);
+const AMB_BARRA = new Set(['avui', 'progres', 'valls', 'pla', 'ajustos']);
 /* Pestanya que queda marcada a cada pantalla. Ajustos marca la pestanya des d'on s'ha obert (#ajustos/<pestanya>). */
-const PESTANYA = { ajustos: 'pla' };
+const PESTANYA = { ajustos: 'pla', valls: 'progres' };
 const PESTANYES = new Set(['avui', 'progres', 'pla']);
 
 const contenidor = document.getElementById('pantalla');
