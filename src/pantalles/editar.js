@@ -5,7 +5,7 @@
 import { obte, actualitza, rutinaGeneral } from '../store.js';
 import { DIES, ACTIVITATS, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
 import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
-import { renderAnimacio } from '../animacions.js';
+import { renderAnimacio } from '../animacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';

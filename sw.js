@@ -45,6 +45,8 @@ const FITXERS = [
   'src/dom.js',
   'src/icones.js',
   'src/animacions.js',
+  'src/animacio.js',
+  'src/figura.js',
   'src/tema.js',
   'src/bosc.js',
   'src/boscdades.js',

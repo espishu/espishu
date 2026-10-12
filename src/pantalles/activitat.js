@@ -4,7 +4,7 @@ import {
   ANIMACIO_ACTIVITAT, totalMs, actiuMs, restantMs, enPausa,
   comprovaFinal, pausa, repren, atura, continua, afegeixCinc, registreActivitat
 } from '../activitat.js';
-import { muntaAnimacio } from '../animacions.js';
+import { muntaAnimacio } from '../animacio.js';
 import { formatCompte } from '../temps.js';
 import { xiulet } from '../so.js';
 import { icona } from '../icones.js';

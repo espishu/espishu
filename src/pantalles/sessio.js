@@ -4,7 +4,7 @@
  */
 import { obte, actualitza } from '../store.js';
 import { exercici, alternativesDe, textObjectiu } from '../biblioteca.js';
-import { muntaAnimacio, renderAnimacio } from '../animacions.js';
+import { muntaAnimacio, renderAnimacio, esFigura } from '../animacio.js';
 import {
   exerciciAcabat, exerciciAMitges, serieActiva, primerPendent, totAcabat,
   confirmaSerie, vesA, saltaExercici, substitueix, afegeixSerie, registre, iniciaCompte,
@@ -110,9 +110,11 @@ export function munta(contenidor) {
     const s = sessio(), ex = s.exercicis[s.actual], info = exercici(ex.id);
     // Sota el títol només surt el que no diuen les sèries: "per costat" o la nota de l'exercici.
     const detall = [ex.perCostat && 'Per costat', ex.nota].filter(Boolean).join(' · ');
-    // Sota l'animació, només una icona de "toca": desapareix mentre es mou.
+    // Sota l'animació, una icona petita. Figura nova (bucle): pausa mentre es mou i play si està aturada.
+    // Animació antiga: play, que desapareix mentre es mou.
+    const figura = info?.animacio && esFigura(info.animacio);
     const imatge = info?.animacio
-      ? `<button type="button" class="escenari" aria-label="${esc(info.nom)}: toca per veure el moviment"></button>
+      ? `<button type="button" class="escenari" aria-label="${esc(info.nom)}: ${figura ? 'toca per aturar o reprendre' : 'toca per veure el moviment'}"></button>
          <p class="pista" aria-hidden="true" data-pista>${icona('play')}</p>`
       : info?.imatges?.length
         ? `<div class="fotos" role="img" aria-label="Fotos de ${esc(info.nom)}">${info.imatges.map(src => `<img src="${esc(src)}" alt="">`).join('')}</div>`
@@ -141,7 +143,10 @@ export function munta(contenidor) {
     if (escenari) {
       const pista = zona('exercici').querySelector('[data-pista]');
       desmuntaAnimacio = muntaAnimacio(escenari, info.animacio, {
-        onEstat: e => { pista.classList.toggle('amagada', e === 'moviment'); }
+        onEstat: e => {
+          if (figura) pista.innerHTML = icona(e === 'moviment' ? 'pausa' : 'play');
+          else pista.classList.toggle('amagada', e === 'moviment');
+        }
       });
     }
   }

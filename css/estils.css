@@ -330,7 +330,7 @@ main[data-pantalla="avui"], main[data-pantalla="progres"]:not([data-detall]) {
   background: none;
   cursor: pointer;
 }
-.escenari svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.escenari svg { display: block; width: 100%; height: auto; max-height: 240px; }
 .pista {
   display: flex;
   justify-content: center;
