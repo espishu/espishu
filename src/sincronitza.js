@@ -192,29 +192,41 @@ const comprova = ({ data, error }) => {
   return data;
 };
 
+/* Puja un element de la cua. Del pla i del bosc, retorna el text del que s'ha enviat (vegeu puja). */
 async function executa(sb, element) {
   const d = obte();
   if (element.tipus === 'pla') {
+    const enviat = textPla(d);
     comprova(await sb.rpc('desa_pla', { pla: plaServidor(d) }));
+    return enviat;
   } else if (element.tipus === 'sessio') {
     const s = d.sessions.find(x => x.id === element.id);
     if (s) comprova(await sb.rpc('desa_sessio', { sessio: sessioServidor(s, d) }));
   } else if (element.tipus === 'reinicia') {
     comprova(await sb.from('sessions').delete().eq('user_id', d.compte.id));
   } else if (element.tipus === 'bosc') {
+    const enviat = textBosc(d);
     comprova(await sb.rpc('desa_bosc', { dades: d.perfil.bosc ?? {} }));
+    return enviat;
   } else {
     // Un tipus que aquesta versió no coneix (no hauria de passar): es treu perquè no bloquegi la cua.
     console.warn('Element de la cua desconegut', element);
   }
+  return null;
 }
 
 async function puja(sb) {
   for (;;) {
     const element = obte().pendents?.[0];
     if (!element) return;
-    await executa(sb, element);
-    actualitza(d => { d.pendents = d.pendents.filter(p => p.n !== element.n); }, { remot: true });
+    const enviat = await executa(sb, element);
+    actualitza(d => {
+      d.pendents = d.pendents.filter(p => p.n !== element.n);
+      // Si el pla (o el bosc) ha canviat mentre es pujava, el canvi no hi anava (detecta no l'ha apuntat
+      // perquè ja era a la cua): es torna a apuntar. Si no, en baixar es perdria (una cita esborrada tornaria).
+      if (element.tipus === 'pla' && textPla(d) !== enviat) encuaPla(d);
+      if (element.tipus === 'bosc' && textBosc(d) !== enviat) encuaBosc(d);
+    }, { remot: true });
     avisa();
   }
 }
