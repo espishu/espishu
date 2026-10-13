@@ -31,6 +31,7 @@ export function nouId() {
  *  - perCostat: l'objectiu és per a cada costat
  *  - descans: segons de descans després de cada sèrie
  *  - nota: aclariment curt opcional
+ * Ja no s'afegeix sola a cap compte (versió 6); només la fa servir la migració 1 → 2.
  */
 export function rutinaGeneral() {
   return {
@@ -54,18 +55,16 @@ export function rutinaGeneral() {
  * Des de la versió 2, cada cita de casa (o de gimnàs) porta la seva rutina (`rutina: { nom, exercicis }`).
  * `compte`: { id, usuari } del compte amb què s'ha entrat (null si no s'ha entrat).
  * `pendents`: la cua de canvis per pujar a Supabase (src/sincronitza.js).
+ * Es comença sense cites (versió 6): cadascú crea les seves. Mai no es pugen a un compte que ja té
+ * dades (sincronitza.js només puja el pla després d'haver baixat el del compte).
  */
 export function dadesInicials() {
   return {
     versio: VERSIO,
     perfil: { nom: '', avisSalutVist: false, installacioVista: false, ultimaCopia: null },
     pla: {
-      objectiuSetmanal: 3,
-      cites: [
-        { id: nouId(), dia: 5, hora: '18:00', activitat: 'casa', rutina: rutinaGeneral() },
-        { id: nouId(), dia: 6, hora: '09:00', activitat: 'natacio', duracioMin: 90 },
-        { id: nouId(), dia: 7, hora: '09:00', activitat: 'caminar', duracioMin: 90 }
-      ]
+      objectiuSetmanal: 1,
+      cites: []
     },
     sessioEnCurs: null,
     sessions: [],

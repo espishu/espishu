@@ -3,7 +3,7 @@
  * salutació; a sota, un panell amb la propera cita, "Comença", la versió curta i els pins de la setmana.
  */
 import { obte, actualitza } from '../store.js';
-import { properaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, DIES, diaSetmana } from '../cites.js';
+import { properaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana } from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlPins } from '../tema.js';
@@ -79,12 +79,15 @@ export function munta(contenidor) {
     const { cita, data } = propera;
     const minuts = duracioCita(estat, cita);
     const rutina = rutinaDe(estat, cita);
-    const curta = rutina ? duracioCurta(rutina) : null;
+    const buida = rutinaBuida(rutina);
+    const curta = rutina && !buida ? duracioCurta(rutina) : null;
     cos = panell({
       etiqueta: textQuan(diesFins(data, ara)),
       dada: `${ABREUJATS[cita.dia]} ${formatHora(cita.hora)}${minuts ? ` · ${formatMinuts(minuts)}` : ''}`,
       nom: nomCita(estat, cita),
-      botons: `
+      // Una rutina sense exercicis no es pot començar: porta a l'edició per afegir-ne.
+      botons: buida ? `
+        <div class="botons-avui sol"><a class="boto principal" href="#editar/${esc(cita.id)}">Afegeix exercicis</a></div>` : `
         <div class="botons-avui${rutina ? '' : ' sol'}">
           <button type="button" class="boto principal" data-accio="comenca">Comença</button>
           ${rutina ? `<button type="button" class="boto contorn curta" data-accio="curta" aria-label="Versió curta de ${curta} minuts">${formatMinuts(curta)}</button>` : ''}
@@ -94,7 +97,7 @@ export function munta(contenidor) {
   } else {
     cos = panell({
       etiqueta: 'Setmana',
-      nom: 'Cap cita',
+      nom: 'Cap activitat programada',
       botons: '<div class="botons-avui sol"><a class="boto contorn" href="#pla">Pla</a></div>',
       pins
     });

@@ -2,7 +2,7 @@
  * Edició d'una cita (PLA.md, secció 8). És l'únic lloc amb controls d'edició.
  * Cada canvi es desa a l'acte; "Fet" només torna al pla.
  */
-import { obte, actualitza, rutinaGeneral } from '../store.js';
+import { obte, actualitza } from '../store.js';
 import { DIES, ACTIVITATS, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
 import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
 import { renderAnimacio } from '../animacio.js';
@@ -106,7 +106,7 @@ export function munta(contenidor, [id, nova]) {
                 <button type="button" class="boto contorn" data-accio="puja" data-i="${i}" aria-label="Amunt"${i === 0 ? ' disabled' : ''}>${icona('amunt')}</button>
                 <button type="button" class="boto contorn" data-accio="baixa" data-i="${i}" aria-label="Avall"${i === rutina.exercicis.length - 1 ? ' disabled' : ''}>${icona('avall')}</button>
                 <button type="button" class="boto contorn" data-accio="substitueix" data-i="${i}" aria-label="Canviar">${icona('canvia')}</button>
-                <button type="button" class="boto contorn" data-accio="treu" data-i="${i}" aria-label="Treure"${rutina.exercicis.length === 1 ? ' disabled' : ''}>${icona('paperera')}</button>
+                <button type="button" class="boto contorn" data-accio="treu" data-i="${i}" aria-label="Treure">${icona('paperera')}</button>
               </div>
             </div>` : ''}
         </li>`;
@@ -154,7 +154,7 @@ export function munta(contenidor, [id, nova]) {
 
       ${rutina ? `
         <section class="targeta camp-edicio">
-          <h2 class="titol-targeta">${esc(rutina.nom)} <span class="secundari">${duracioRutina(rutina)} min</span></h2>
+          <h2 class="titol-targeta">Exercicis${rutina.exercicis.length ? ` <span class="secundari">${duracioRutina(rutina)} min</span>` : ''}</h2>
           <ol class="llista-editor">${htmlExercicis(rutina)}</ol>
           <button type="button" class="boto contorn" data-accio="afegeix-ex">${icona('mes')} Afegir exercici</button>
         </section>` : `
@@ -226,10 +226,8 @@ export function munta(contenidor, [id, nova]) {
       if (c.activitat === nova) return;
       c.activitat = nova;
       if (nova === 'casa') {
-        // Una còpia de la rutina d'una altra cita de casa, si n'hi ha; si no, la rutina inicial.
-        const altra = d.pla.cites.find(x => x !== c && x.rutina)?.rutina;
-        c.rutina ??= altra ? JSON.parse(JSON.stringify(altra)) : rutinaGeneral();
-        c.rutina.exercicis.forEach(ex => { delete ex.pujada; });
+        // Comença buida: els exercicis s'afegeixen amb "Afegir exercici".
+        c.rutina ??= { nom: 'Rutina', exercicis: [] };
         delete c.duracioMin;
       } else {
         delete c.rutina;

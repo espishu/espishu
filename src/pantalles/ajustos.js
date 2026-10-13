@@ -1,5 +1,5 @@
 /* Ajustos (PLA.md, secció 7.7). */
-import { obte, actualitza, dadesInicials, substitueix } from '../store.js';
+import { obte, actualitza, substitueix } from '../store.js';
 import { ferCopia, llegeixCopia } from '../copia.js';
 import { mostraAvisSalut } from '../benvinguda.js';
 import { htmlInstruccions, installa } from '../installacio.js';
@@ -9,7 +9,7 @@ import { tancaCompte } from '../sincronitza.js';
 import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from '../formulari.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
-import { registraObjectiu, ajustaObjectiu, maxObjectiu } from '../boscdades.js';
+import { registraObjectiu, maxObjectiu } from '../boscdades.js';
 
 function textUltimaCopia(data) {
   if (!data) return 'Cap còpia encara';
@@ -85,7 +85,6 @@ export function munta(contenidor, [origen]) {
         <summary>Més ${icona('endavant', 'icona plec')}</summary>
         <div class="pila-botons">
           <button type="button" class="boto contorn" data-accio="salut">${icona('salut')} Avís de salut</button>
-          <button type="button" class="boto contorn" data-accio="restableix">${icona('restaura')} Restablir el pla inicial</button>
           <button type="button" class="boto contorn" data-accio="reinicia">${icona('paperera')} Reiniciar</button>
         </div>
         <div class="sobre">
@@ -250,22 +249,6 @@ export function munta(contenidor, [origen]) {
       });
       pinta();
       contenidor.querySelector(`[data-signe="${boto.dataset.signe}"]:not([disabled])`)?.focus();
-    }
-    if (accio === 'restableix') {
-      confirma({
-        titol: 'Restablir el pla inicial?',
-        text: 'Es perdran els canvis de les cites i dels exercicis. L\'historial es manté.',
-        boto: 'Restablir',
-        enConfirmar: () => {
-          const inicials = dadesInicials();
-          actualitza(d => {
-            const abans = d.pla.cites.length;
-            d.pla.cites = inicials.pla.cites;
-            ajustaObjectiu(d, abans);
-          });
-          mostraAvis('Pla inicial restablert');
-        }
-      });
     }
   };
   const canvi = e => {

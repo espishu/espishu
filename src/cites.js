@@ -50,10 +50,13 @@ export function duracioRutina(rutina) {
   return Math.max(5, Math.round(segons / 300) * 5);
 }
 
+/* Una rutina sense cap exercici: no es pot començar (Avui porta a afegir-ne). */
+export const rutinaBuida = rutina => !!rutina && !rutina.exercicis.length;
+
 /* Duració d'una cita en minuts, o null si no se sap. */
 export function duracioCita(estat, cita) {
   const rutina = rutinaDe(estat, cita);
-  if (rutina) return duracioRutina(rutina);
+  if (rutina) return rutinaBuida(rutina) ? null : duracioRutina(rutina);
   return cita.duracioMin ?? null;
 }
 

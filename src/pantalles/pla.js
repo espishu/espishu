@@ -59,7 +59,7 @@ export function munta(contenidor) {
       </span>
     </header>
     ${htmlCarena(cites)}
-    ${cites.length ? `<ul class="llista-cites">${targetes}</ul>` : '<section class="targeta"><p>Cap cita</p></section>'}
+    ${cites.length ? `<ul class="llista-cites">${targetes}</ul>` : ''}
     <button type="button" class="boto-afegir" data-accio="afegeix" aria-label="Afegir una cita">${icona('mes')}</button>`;
 
   const clic = e => {
