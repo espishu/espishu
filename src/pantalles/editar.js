@@ -7,8 +7,8 @@ import {
   DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, MAX_NOM_CITA, nomCita, nomPropi, posaNom,
   rutinaDe, duracioRutina, formatDuracio
 } from '../cites.js';
-import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
-import { renderAnimacio } from '../animacio.js';
+import { exercici, alternativesDe, textObjectiu } from '../biblioteca.js';
+import { miniatura, exerciciNou, htmlOpcio, obreCercador } from '../cercador.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
@@ -22,26 +22,6 @@ const LIMITS = {
   segons: { min: 5, max: 300, pas: 5 },
   descans: { min: 0, max: 180, pas: 5 }
 };
-const DESCANS_PER_DEFECTE = { força: 45, mobilitat: 30, estirament: 15 };
-
-function miniatura(info) {
-  if (info?.animacio) return renderAnimacio(info.animacio, 0);
-  return info?.imatges?.[0] ? `<img src="${esc(info.imatges[0])}" alt="" loading="lazy">` : '';
-}
-
-/* Un exercici de la biblioteca preparat per a la rutina, amb els valors per defecte. */
-function exerciciNou(info, base) {
-  const series = base ? Math.max(1, base.series.length) : info.tipus === 'força' ? 3 : 1;
-  return {
-    id: info.id,
-    tipus: info.tipus,
-    series: Array(series).fill(info.objectiu),
-    unitat: info.unitat,
-    perCostat: !!info.perCostat,
-    descans: base?.descans ?? DESCANS_PER_DEFECTE[info.tipus] ?? 30
-  };
-}
-
 function htmlPas({ etiqueta, valor, camp, i, pot }) {
   const dades = `data-camp="${camp}"${i !== undefined ? ` data-i="${i}"` : ''}`;
   return `
@@ -254,7 +234,7 @@ export function munta(contenidor, [id, nova]) {
         <ul class="llista-alt">${opcions.map(a => htmlOpcio(a)).join('')}</ul>` : ''}
       <button type="button" class="boto contorn" data-accio="cerca">${icona('cerca')} Buscar-ne un altre</button>`, {
       tria: ({ id: nou }) => { tancaFull(); substitueix(i, nou); },
-      cerca: () => obreCercador({ substitueix: i })
+      cerca: () => cerca({ substitueix: i })
     });
   }
 
@@ -262,58 +242,18 @@ export function munta(contenidor, [id, nova]) {
     canviaRutina(r => { r.exercicis[i] = exerciciNou(exercici(idNou), r.exercicis[i]); });
   }
 
-  function htmlOpcio(info) {
-    const falta = materialQueFalta(info);
-    return `
-      <li>
-        <button type="button" class="item-alt" data-accio="tria" data-id="${esc(info.id)}">
-          <span class="miniatura">${miniatura(info)}</span>
-          <span><span class="nom-item">${esc(info.nom)}</span>
-          <span class="secundari">${esc(GRUPS[info.grup])} · ${esc(textObjectiu(info.objectiu, info.unitat, info.perCostat))}${falta ? ` · <strong>${falta}</strong>` : ''}</span></span>
-        </button>
-      </li>`;
-  }
-
-  /* Cercador amb filtre per grup muscular. Serveix per afegir o per substituir. */
-  function obreCercador({ substitueix: index } = {}) {
-    let grup = 'tots', text = '';
-    const totes = totsElsExercicis();
-    const full = obreFull(`
-      <div class="full-cap"><h2>${index === undefined ? 'Afegir exercici' : 'Buscar un exercici'}</h2>${botoTanca}</div>
-      <label class="cerca">${icona('cerca')}<span class="visually-hidden">Cerca</span>
-        <input type="search" placeholder="Cerca per nom" data-cerca autocomplete="off"></label>
-      <div class="xips-filtre" role="group" aria-label="Grup muscular">
-        ${['tots', ...Object.keys(GRUPS)].map(g => `
-          <button type="button" class="xip" data-accio="grup" data-grup="${g}" aria-pressed="${g === 'tots'}">${g === 'tots' ? 'Tots' : GRUPS[g]}</button>`).join('')}
-      </div>
-      <ul class="llista-alt resultats" data-resultats></ul>`, {
-      grup: ({ grup: g }) => {
-        grup = g;
-        full.querySelectorAll('[data-accio="grup"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.grup === g));
-        pintaResultats();
-      },
-      tria: ({ id: triat }) => {
-        tancaFull();
+  /* El cercador (cercador.js), per afegir un exercici o per substituir el número `index`. */
+  function cerca({ substitueix: index } = {}) {
+    obreCercador({
+      titol: index === undefined ? 'Afegir exercici' : 'Buscar un exercici',
+      enTriar: triat => {
         if (index !== undefined) return substitueix(index, triat);
         canviaRutina(r => { r.exercicis.push(exerciciNou(exercici(triat))); });
         obert = rutinaDe(obte(), cita()).exercicis.length - 1;
         pinta();
         contenidor.querySelector(`[data-accio="obre"][data-i="${obert}"]`)?.scrollIntoView({ block: 'center' });
       }
-    }, { classe: 'alt' });
-
-    function pintaResultats() {
-      const cerca = text.trim().toLocaleLowerCase('ca');
-      const llista = totes
-        .filter(e => grup === 'tots' || e.grup === grup)
-        .filter(e => !cerca || e.nom.toLocaleLowerCase('ca').includes(cerca))
-        .sort((a, b) => (materialQueFalta(a) ? 1 : 0) - (materialQueFalta(b) ? 1 : 0) || a.nom.localeCompare(b.nom, 'ca'));
-      full.querySelector('[data-resultats]').innerHTML = llista.length
-        ? llista.map(htmlOpcio).join('')
-        : '<li class="secundari">Cap exercici amb aquest nom.</li>';
-    }
-    full.querySelector('[data-cerca]').addEventListener('input', e => { text = e.target.value; pintaResultats(); });
-    pintaResultats();
+    });
   }
 
   const ACCIONS = {
@@ -325,7 +265,7 @@ export function munta(contenidor, [id, nova]) {
     baixa: ({ i }) => mou(Number(i), 1),
     treu: ({ i }) => treu(Number(i)),
     substitueix: ({ i }) => obreSubstitucio(Number(i)),
-    'afegeix-ex': () => obreCercador(),
+    'afegeix-ex': () => cerca(),
     esborra: () => confirma({
       titol: 'Vols esborrar aquesta cita?',
       text: 'L\'historial de sessions no s\'esborra.',
