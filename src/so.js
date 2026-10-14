@@ -6,10 +6,13 @@
 
 let ctx = null;
 
-/* L'àudio sona encara que l'iPhone estigui en mode silenci (Safari 16.4 o més nou). */
+/*
+ * 'ambient': els xiulets es barregen amb la música d'altres apps (Spotify, pòdcasts) i no l'aturen
+ * (Safari 16.4 o més nou). En mode silenci no sonen.
+ */
 function posaSessioAudio() {
   try {
-    if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
+    if (navigator.audioSession && navigator.audioSession.type !== 'ambient') navigator.audioSession.type = 'ambient';
   } catch { /* no hi és */ }
 }
 
@@ -63,7 +66,7 @@ export function xiulet(curt = false) {
   else repren().then(sona);
 }
 
-/* En tornar a l'app, l'àudio es reprèn sol. */
+/* En tornar a l'app, l'àudio es reprèn sol (només si ja s'havia activat amb un toc). */
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') { posaSessioAudio(); repren(); }
+  if (document.visibilityState === 'visible' && ctx) { posaSessioAudio(); repren(); }
 });
