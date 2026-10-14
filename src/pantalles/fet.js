@@ -4,7 +4,7 @@
  * de la sessió a com és ara. A sota, el títol, els pins de la setmana i el detall.
  */
 import { obte } from '../store.js';
-import { compta } from '../ratxa.js';
+import { comptaPerAlPla } from '../ratxa.js';
 import { htmlDetall, nomSessio } from '../resum.js';
 import { htmlPins } from '../tema.js';
 import { valls, htmlEscena, RETALL_RESUM } from '../boscdades.js';
@@ -24,7 +24,7 @@ export function munta(contenidor, [id]) {
     return;
   }
   const ara = new Date();
-  const rega = compta(sessio);
+  const rega = comptaPerAlPla(sessio); // una extra no canvia el bosc
   const vall = d => valls(d, ara).at(-1);
   const despres = htmlEscena(vall(estat), { retall: RETALL_RESUM, alinea: 'xMidYMid slice' });
   const abans = rega ? htmlEscena(vall({ ...estat, sessions: estat.sessions.filter(s => s.id !== id) }), { retall: RETALL_RESUM, alinea: 'xMidYMid slice' }) : '';

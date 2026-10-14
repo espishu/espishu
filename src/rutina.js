@@ -266,6 +266,9 @@ export function afegeixSerie(ex, objectiuPerDefecte) {
   ex.series.push({ objectiu, fet: objectiu, feta: false });
 }
 
+/* Extra (fora del pla) i recuperada (el dia que tocava): passen de la sessió en curs a la desada. */
+export const marques = s => ({ ...(s.extra && { extra: true }), ...(s.recupera && { recupera: s.recupera }) });
+
 /* El registre que es desa a `sessions` en acabar. */
 export function registre(sessio, fi = new Date()) {
   const exercicis = sessio.exercicis.map(ex => {
@@ -285,6 +288,7 @@ export function registre(sessio, fi = new Date()) {
     nom: sessio.nom,
     curta: sessio.curta,
     estat: totAcabat(sessio) && algunaFeta ? 'feta' : algunaFeta ? 'no-acabada' : 'no-feta',
-    exercicis
+    exercicis,
+    ...marques(sessio)
   };
 }

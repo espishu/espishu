@@ -2,7 +2,8 @@
  * boscdades.js — de les sessions desades al bosc de cada any (PLA.md, secció 9).
  * El bosc no es desa enlloc: es torna a calcular cada vegada a partir de `sessions`.
  *
- * - Setmana de dilluns a diumenge (hora local). Compten les sessions fetes i no acabades (compta()).
+ * - Setmana de dilluns a diumenge (hora local). Compten les sessions del pla fetes i no acabades
+ *   (comptaPerAlPla(): les extres no), pel dia que compten (diaQueCompta: una recuperada, el dia que tocava).
  * - Una setmana és complerta si arriba a l'objectiu que hi havia aquella setmana (`perfil.bosc.objectius`).
  * - Es comença a la setmana de la primera sessió que compta; abans no hi ha setmanes fallades.
  * - La setmana en curs no és mai fallada: és el plançó (o l'arbre sec que es cura).
@@ -11,10 +12,10 @@
  * `perfil.bosc` (opcional, només en aquest aparell): { objectius: [{ des, objectiu }], noms: { any: nom }, vist: { any: [elements] } }.
  */
 import Bosc from './bosc.js';
-import { compta, dilluns } from './ratxa.js';
+import { compta, comptaPerAlPla, dilluns } from './ratxa.js';
+import { diaQueCompta, dataISO } from './cites.js';
 
 const mesDies = (data, dies) => new Date(data.getFullYear(), data.getMonth(), data.getDate() + dies);
-const dataISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 /* L'any d'una setmana és el del seu dijous. */
 const anyDe = dl => mesDies(dl, 3).getFullYear();
 
@@ -101,7 +102,10 @@ export function ajustaObjectiu(d, citesAbans, ara = new Date()) {
 export function valls(estat, ara = new Date()) {
   const actual = dilluns(ara);
   const anyActual = anyDe(actual);
-  const sessions = estat.sessions.filter(compta).map(s => new Date(s.inici)).filter(t => t < mesDies(actual, 7)).sort((a, b) => a - b);
+  // Pel dia que compten (una recuperada, el dia que tocava), fins al final d'aquesta setmana.
+  const dies = filtre => estat.sessions.filter(filtre).map(diaQueCompta).filter(t => t < mesDies(actual, 7)).sort((a, b) => a - b);
+  // Els arbres surten només de les sessions del pla: les extres no hi compten.
+  const sessions = dies(comptaPerAlPla);
   const perAny = new Map();
   const vall = any => {
     if (!perAny.has(any)) perAny.set(any, { setmanes: [], sessions: 0 });
@@ -120,11 +124,11 @@ export function valls(estat, ara = new Date()) {
       const n = compte.get(dataISO(dl)) ?? 0;
       const v = vall(anyDe(dl));
       v.setmanes.push(n >= objectiuDe(estat, dl));
-      v.sessions += n;
     }
   }
   const fetes = compte.get(dataISO(actual)) ?? 0;
-  vall(anyActual).sessions += fetes;
+  // Sessions de cada vall: totes les que compten, també les extres (any de la seva setmana).
+  for (const t of dies(compta)) vall(anyDe(dilluns(t))).sessions++;
 
   return [...perAny.keys()].sort((a, b) => a - b).map(any => {
     const v = perAny.get(any), esActual = any === anyActual;

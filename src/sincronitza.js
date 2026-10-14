@@ -129,6 +129,8 @@ function sessioServidor(s, d) {
     minuts_fets: s.minutsFets ?? null,
     minuts_pausa: s.minutsPausa ?? null,
     pujades: s.pujades ?? [],
+    extra: !!s.extra, // extra i recupera: migració 004
+    recupera: s.recupera ?? null,
     exercicis: (s.exercicis ?? []).map(e => ({
       exercici: e.id,
       substitueix: e.substitueix ?? null,
@@ -168,6 +170,8 @@ function sessioLocal(s) {
     nom: s.nom,
     estat: s.estat
   };
+  if (s.extra) sessio.extra = true;
+  if (s.recupera) sessio.recupera = s.recupera;
   if (s.tipus === 'rutina') {
     sessio.curta = s.curta;
     sessio.exercicis = [...(s.exercicis_sessio ?? [])].sort(perOrdre).map(e => {
@@ -253,7 +257,7 @@ async function baixa(sb) {
   const sessions = [];
   for (let des = 0; ; des += PAGINA) {
     const pagina = comprova(await sb.from('sessions')
-      .select('id, activitat_id, tipus, activitat, nom, inici, fi, estat, curta, minuts_previstos, minuts_fets, minuts_pausa, pujades, exercicis_sessio(ordre, exercici, substitueix, saltat, unitat, series_fetes(ordre, objectiu, fet))')
+      .select('id, activitat_id, tipus, activitat, nom, inici, fi, estat, curta, minuts_previstos, minuts_fets, minuts_pausa, pujades, extra, recupera, exercicis_sessio(ordre, exercici, substitueix, saltat, unitat, series_fetes(ordre, objectiu, fet))')
       .eq('user_id', uid).order('inici').order('id').range(des, des + PAGINA - 1));
     sessions.push(...pagina);
     if (pagina.length < PAGINA) break;

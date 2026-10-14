@@ -72,7 +72,7 @@ function minutsPerSetmana(estat, ara, quantes = 8) {
   return Array.from({ length: quantes }, (_, i) => {
     const inici = new Date(actual.getFullYear(), actual.getMonth(), actual.getDate() - 7 * (quantes - 1 - i));
     const valors = {};
-    for (const s of sessionsDeLaSetmana(estat, inici)) {
+    for (const s of sessionsDeLaSetmana(estat, inici, { extres: true })) {
       if (s.tipus === 'activitat') valors[s.activitat] = (valors[s.activitat] ?? 0) + s.minutsFets;
     }
     return { etiqueta: diaMesNum(inici), etiquetaLlarga: `setmana del ${diaMes(inici)}`, valors };

@@ -10,6 +10,7 @@
  */
 
 import { nouId } from './store.js';
+import { marques } from './rutina.js';
 
 /* Animació de cada activitat (src/animacions.js). */
 export const ANIMACIO_ACTIVITAT = {
@@ -101,6 +102,7 @@ export function registreActivitat(a, estat, ara = Date.now()) {
     estat,
     minutsPrevistos: a.minutsPrevistos,
     minutsFets: estat === 'no-feta' ? 0 : Math.round(Math.min(actiuMs(a, fi), totalMs(a)) / 60000),
-    minutsPausa: Math.round(pausaMs(a, fi) / 60000)
+    minutsPausa: Math.round(pausaMs(a, fi) / 60000),
+    ...marques(a)
   };
 }

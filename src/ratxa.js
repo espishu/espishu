@@ -2,12 +2,15 @@
  * ratxa.js — setmanes, ratxa i progressió automàtica (PLA.md, secció 9).
  * La setmana va de dilluns a diumenge, en hora local.
  */
-import { diaSetmana } from './cites.js';
+import { diaSetmana, diaQueCompta } from './cites.js';
 
 export const MAX_REPS = 15;
 
 /* Una sessió compta si ha sortit a fer-la (feta o no acabada). Les versions curtes també. */
 export const compta = s => s.estat === 'feta' || s.estat === 'no-acabada';
+
+/* Les extres (fora del pla) compten al total de sessions, però no per a l'objectiu setmanal ni el bosc. */
+export const comptaPerAlPla = s => compta(s) && !s.extra;
 
 /* Dilluns a les 00:00 de la setmana de `data`. */
 export function dilluns(data) {
@@ -18,20 +21,28 @@ function mesDies(data, dies) {
   return new Date(data.getFullYear(), data.getMonth(), data.getDate() + dies);
 }
 
-/* Sessions que compten dins la setmana que comença a `inici`. */
-export function sessionsDeLaSetmana(estat, inici) {
+/*
+ * Sessions del pla que compten dins la setmana que comença a `inici` (pel dia que compten: una
+ * recuperada, el dia que tocava). Amb `extres`, també les extres.
+ */
+export function sessionsDeLaSetmana(estat, inici, { extres = false } = {}) {
   const fi = mesDies(inici, 7);
   return estat.sessions.filter(s => {
-    const t = new Date(s.inici);
-    return compta(s) && t >= inici && t < fi;
+    const t = diaQueCompta(s);
+    return (extres ? compta(s) : comptaPerAlPla(s)) && t >= inici && t < fi;
   });
 }
 
-/* Estat de la setmana actual: { fetes, objectiu, complerta, extra } */
+/*
+ * Estat de la setmana actual: { fetes, objectiu, complerta, extra, extres }. `extra`: sessions del pla
+ * de més ("+1"); `extres`: sessions extra (fora del pla, pins grocs).
+ */
 export function setmana(estat, ara = new Date()) {
-  const fetes = sessionsDeLaSetmana(estat, dilluns(ara)).length;
+  const dl = dilluns(ara);
+  const fetes = sessionsDeLaSetmana(estat, dl).length;
+  const extres = sessionsDeLaSetmana(estat, dl, { extres: true }).length - fetes;
   const objectiu = estat.pla.objectiuSetmanal;
-  return { fetes, objectiu, complerta: fetes >= objectiu, extra: Math.max(0, fetes - objectiu) };
+  return { fetes, objectiu, complerta: fetes >= objectiu, extra: Math.max(0, fetes - objectiu), extres };
 }
 
 /*

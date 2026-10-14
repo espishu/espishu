@@ -106,8 +106,43 @@ export function formatHora(hora) {
   return hora.replace(/^0(\d)/, '$1');
 }
 
+/*
+ * El dia en què compta una sessió (setmana, bosc, cita feta): el de l'inici o, si és una cita
+ * recuperada, el dia que tocava (`recupera`, "2026-10-12"; a les 12:00 per no dependre de l'hora).
+ */
+export function diaQueCompta(s) {
+  if (s.recupera) {
+    const [a, m, d] = s.recupera.split('-').map(Number);
+    return new Date(a, m - 1, d, 12);
+  }
+  return new Date(s.inici);
+}
+
+export const dataISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
 function citaFetaAvui(estat, cita, ara) {
-  return estat.sessions.some(s => s.citaId === cita.id && mateixDia(new Date(s.inici), ara));
+  return estat.sessions.some(s => s.citaId === cita.id && mateixDia(diaQueCompta(s), ara));
+}
+
+/*
+ * Cites del pla que s'han passat els últims 7 dies sense fer-les (el dilluns, fins a les del dilluns
+ * passat; avui no, que encara és la propera). Una cita és feta si té una sessió que compta (feta o
+ * no acabada) aquella setmana, encara que fos un altre dia. Les rutines sense exercicis no hi surten.
+ * Retorna [{ cita, data }], de la més antiga a la més nova.
+ */
+export function perRecuperar(estat, ara = new Date()) {
+  const avui = diaSetmana(ara);
+  const dl = d => new Date(d.getFullYear(), d.getMonth(), d.getDate() - (diaSetmana(d) - 1)).getTime();
+  return estat.pla.cites
+    .filter(cita => !cita.rutina || cita.rutina.exercicis.length)
+    .map(cita => {
+      const enrere = (avui - cita.dia + 7) % 7 || 7;
+      const [h, m] = cita.hora.split(':').map(Number);
+      return { cita, data: new Date(ara.getFullYear(), ara.getMonth(), ara.getDate() - enrere, h, m) };
+    })
+    .filter(({ cita, data }) => !estat.sessions.some(s => s.citaId === cita.id
+      && (s.estat === 'feta' || s.estat === 'no-acabada') && dl(diaQueCompta(s)) === dl(data)))
+    .sort((a, b) => a.data - b.data);
 }
 
 /*
