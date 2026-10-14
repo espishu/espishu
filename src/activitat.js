@@ -89,8 +89,13 @@ export function afegeixCinc(a, ara = Date.now()) {
   if (a.aturada && actiuMs(a, ara) < totalMs(a)) continua(a, ara);
 }
 
-export function registreActivitat(a, estat, ara = Date.now()) {
+/*
+ * El registre que es desa en acabar. `completa` ("Completar": acabada abans d'hora però feta sencera):
+ * compta i surt com si s'hagués fet tot el temps (minutsFets = el total previst, amb els +5).
+ */
+export function registreActivitat(a, estat, ara = Date.now(), { completa = false } = {}) {
   const fi = a.aturada ?? ara;
+  const fets = completa ? totalMs(a) : Math.min(actiuMs(a, fi), totalMs(a));
   return {
     id: a.id,
     inici: a.inici,
@@ -101,7 +106,7 @@ export function registreActivitat(a, estat, ara = Date.now()) {
     nom: a.nom,
     estat,
     minutsPrevistos: a.minutsPrevistos,
-    minutsFets: estat === 'no-feta' ? 0 : Math.round(Math.min(actiuMs(a, fi), totalMs(a)) / 60000),
+    minutsFets: estat === 'no-feta' ? 0 : Math.round(fets / 60000),
     minutsPausa: Math.round(pausaMs(a, fi) / 60000),
     ...marques(a)
   };

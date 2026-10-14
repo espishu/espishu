@@ -7,6 +7,7 @@ import {
 import { muntaAnimacio } from '../animacio.js';
 import { formatCompte } from '../temps.js';
 import { xiulet } from '../so.js';
+import { obreFull, tancaFull, botoTanca } from '../full.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
 
@@ -99,8 +100,27 @@ export function munta(contenidor) {
     if (barra) barra.style.width = `${(r / totalMs(a)) * 100}%`;
   }
 
-  function desa(estat) {
-    const reg = registreActivitat(activitat(), estat);
+  /*
+   * "Feta" abans d'acabar el temps: Completar (compta tot el temps previst, p. ex. si s'apunta en acabar)
+   * o desar els minuts fets.
+   */
+  function feta() {
+    const a = activitat();
+    if (restantMs(a) === 0) return desa('feta');
+    const fets = Math.round(Math.min(actiuMs(a), totalMs(a)) / 60000);
+    obreFull(`
+      <div class="full-cap"><h2>Feta</h2>${botoTanca}</div>
+      <div class="pila-botons">
+        <button type="button" class="boto principal" data-accio="completa">Completar · ${a.minutsPrevistos + a.extraMin} min</button>
+        <button type="button" class="boto contorn" data-accio="aixi">Desar ${fets} min</button>
+      </div>`, {
+      completa: () => { tancaFull(); desa('feta', { completa: true }); },
+      aixi: () => { tancaFull(); desa('feta'); }
+    });
+  }
+
+  function desa(estat, opcions) {
+    const reg = registreActivitat(activitat(), estat, Date.now(), opcions);
     actualitza(d => {
       d.sessions.push(reg);
       d.sessioEnCurs = null;
@@ -114,7 +134,7 @@ export function munta(contenidor) {
     mes5: () => canvia(a => afegeixCinc(a)),
     'acaba-ara': () => canvia(a => atura(a)),
     continua: () => canvia(a => continua(a)),
-    desa: ({ estat }) => desa(estat)
+    desa: ({ estat }) => (estat === 'feta' ? feta() : desa(estat))
   };
 
   const clic = e => {
@@ -129,6 +149,7 @@ export function munta(contenidor) {
   pinta();
 
   return () => {
+    tancaFull();
     clearInterval(interval);
     desmuntaAnimacio?.();
     control.removeEventListener('click', clic);

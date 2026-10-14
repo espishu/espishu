@@ -7,7 +7,7 @@ import { exercici, alternativesDe, textObjectiu } from '../biblioteca.js';
 import { muntaAnimacio, renderAnimacio, esFigura } from '../animacio.js';
 import {
   exerciciAcabat, exerciciAMitges, serieActiva, primerPendent, totAcabat,
-  confirmaSerie, vesA, saltaExercici, substitueix, afegeixSerie, registre, iniciaCompte,
+  confirmaSerie, vesA, saltaExercici, substitueix, afegeixSerie, registre, registreComplet, iniciaCompte,
   autoEnMarxa, esperaPasAuto, avancaAuto, pausaAuto, reprenAuto, pausaVigent,
   aturaTemps, reprenTemps, algunaSerieFeta
 } from '../rutina.js';
@@ -463,8 +463,9 @@ export function munta(contenidor) {
     }
   }
 
-  function acaba() {
-    const reg = registre(sessio(), new Date());
+  /* `completa`: "Completar" (totes les sèries pendents com a fetes; rutina.js, registreComplet). */
+  function acaba({ completa = false } = {}) {
+    const reg = completa ? registreComplet(sessio()) : registre(sessio(), new Date());
     actualitza(d => {
       d.sessions.push(reg);
       reg.pujades = aplicaProgressio(d, reg);
@@ -499,7 +500,8 @@ export function munta(contenidor) {
   }
 
   /*
-   * Panell "Acabar" (capçalera): Desar, Descartar o Continuar. Mentre és obert, el temps s'atura.
+   * Panell "Acabar" (capçalera): Completar (tot fet), Desar així (el que s'ha fet), Descartar o Continuar.
+   * Mentre és obert, el temps s'atura.
    * Tancar-lo de qualsevol manera (Continuar, la creu o tocant fora) és continuar.
    * Si ja està tot fet, no cal panell: es desa com sempre.
    */
@@ -512,10 +514,12 @@ export function munta(contenidor) {
     mostraPanell(s => `
       <div class="full-cap"><h2>Acabar</h2>${botoTanca}</div>
       <div class="pila-botons">
-        ${algunaSerieFeta(s) ? '<button type="button" class="boto principal" data-accio="desa">Desar</button>' : ''}
+        <button type="button" class="boto principal" data-accio="completa">Completar</button>
+        ${algunaSerieFeta(s) ? '<button type="button" class="boto contorn" data-accio="desa">Desar així</button>' : ''}
         <button type="button" class="boto contorn" data-accio="descarta">Descartar</button>
         <button type="button" class="boto contorn" data-accio="tanca">Continuar</button>
       </div>`, {
+      completa: () => { tancaPanell(); acaba({ completa: true }); },
       desa: () => { tancaPanell(); acaba(); },
       descarta: () => confirmaDescartar()
     });

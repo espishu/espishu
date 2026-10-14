@@ -269,6 +269,21 @@ export function afegeixSerie(ex, objectiuPerDefecte) {
 /* Extra (fora del pla) i recuperada (el dia que tocava): passen de la sessió en curs a la desada. */
 export const marques = s => ({ ...(s.extra && { extra: true }), ...(s.recupera && { recupera: s.recupera }) });
 
+/*
+ * "Completar" (panell Acabar): la rutina es desa com a feta sencera, com si s'haguessin fet totes les sèries
+ * pendents amb el seu objectiu (les saltades es queden saltades). Si s'acaba abans del temps previst, el
+ * final és l'inici més la duració estimada, perquè l'historial mostri el temps de la rutina.
+ */
+export function registreComplet(sessio, ara = new Date()) {
+  const completa = {
+    ...sessio,
+    exercicis: sessio.exercicis.map(ex => (ex.saltat ? ex
+      : { ...ex, series: ex.series.map(s => (s.feta ? s : { ...s, fet: s.objectiu, feta: true })) }))
+  };
+  const minuts = duracioRutina({ exercicis: sessio.exercicis.map(ex => ({ ...ex, series: ex.series.map(s => s.objectiu) })) });
+  return registre(completa, new Date(Math.max(ara.getTime(), Date.parse(sessio.inici) + minuts * 60000)));
+}
+
 /* El registre que es desa a `sessions` en acabar. */
 export function registre(sessio, fi = new Date()) {
   const exercicis = sessio.exercicis.map(ex => {
