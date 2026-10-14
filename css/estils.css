@@ -9,6 +9,8 @@
 :root {
   --bg: #1E2B2A; --panel: #16201F; --card: var(--panel); --ink: #EDE6D3; --muted: #A9BFB4; --muted-fluix: #7F978C;
   --gold: #E8C27A; --green: #8DB36A;
+  /* Recuperar i Extra + (Avui), i els pins de les sessions extra: grocs més apagats que --gold. */
+  --recupera: #A8935F; --extra: #C79A4B;
   --acc: var(--gold); --acc-ink: #16201F; --acc-text: var(--gold);
   --soft: #24332F;            /* fons suau (sèrie feta, element triat) */
   --sep: #2C3D3B; --sep-fort: #3F5A54;
@@ -207,6 +209,16 @@ main[data-pantalla="avui"], main[data-pantalla="progres"]:not([data-detall]) {
 .botons-avui .boto.curta { padding: 0; font-size: 15px; }
 .botons-avui.sol { grid-template-columns: 1fr; }
 .panell-avui .recordatori { margin: -6px 0 -8px; justify-content: flex-start; padding-inline: 0; }
+/* Nom de la cita i, a la dreta (a sobre del 15′), els pins de la setmana. */
+.nom-fila { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.nom-fila .nom-gran { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.nom-fila .pins { flex: none; padding-bottom: 2px; }
+/* Recuperar i Extra +: meitat i meitat, més baixos, de dos grocs més apagats que "Comença". */
+.botons-secundaris { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: -4px; }
+.botons-secundaris .boto { min-height: 48px; padding: 0 10px; border: 0; color: var(--acc-ink); font-size: 16px; font-weight: 700; }
+.botons-secundaris .icona { width: 20px; height: 20px; }
+.boto.recupera { background: var(--recupera); }
+.boto.extra { background: var(--extra); }
 
 /* Pins de la setmana (verd fet, gris pendent) i "1/2". */
 .pins { display: flex; align-items: flex-end; gap: 6px; }
@@ -214,6 +226,10 @@ main[data-pantalla="avui"], main[data-pantalla="progres"]:not([data-detall]) {
 .pi { display: block; width: 22px; height: 30px; flex: none; fill: var(--sep-fort); }
 .pi.fet { fill: var(--green); }
 .pi.actual { fill: var(--gold); }
+.pi.extra { fill: var(--extra); }
+.pins.petits .pi, .nom-fila .pins .pi { width: 16px; height: 22px; }
+.pins.petits, .pins.petits .pins-icones, .nom-fila .pins, .nom-fila .pins-icones { gap: 4px; }
+.pins.molts .pins-icones { display: none; }
 .pins-xifra { margin-left: 6px; font-family: var(--font-titol); font-size: 20px; line-height: 1; }
 .pins-xifra .extra { margin-left: 6px; font-family: var(--font-text); font-size: 15px; color: var(--muted); }
 
@@ -1240,9 +1256,10 @@ details[open] > summary .icona.plec { transform: rotate(90deg); }
   font-size: 15px;
 }
 .barretes { display: flex; gap: 4px; flex: 0 1 auto; min-width: 0; }
-.barretes span { flex: 0 1 26px; min-width: 6px; height: 8px; border-radius: 4px; background: var(--sep-fort); }
+.barretes span { flex: 0 1 22px; width: 22px; min-width: 6px; height: 8px; border-radius: 4px; background: var(--sep-fort); }
 .barretes .feta { background: var(--green); }
 .barretes .cura { background: var(--gold); }
+.barretes .extra { background: var(--extra); }
 .sota-bosc { margin: 16px 16px 0; }
 
 /* ================= Les teves valls ================= */

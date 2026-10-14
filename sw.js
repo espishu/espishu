@@ -54,6 +54,7 @@ const FITXERS = [
   'src/compte.js',
   'src/formulari.js',
   'src/sincronitza.js',
+  'src/cercador.js',
   'src/vendor/supabase.js',
   'src/pantalles/avui.js',
   'src/pantalles/sessio.js',
@@ -63,6 +64,7 @@ const FITXERS = [
   'src/pantalles/valls.js',
   'src/pantalles/pla.js',
   'src/pantalles/editar.js',
+  'src/pantalles/extra.js',
   'src/pantalles/ajustos.js',
   'src/pantalles/entrar.js',
   'src/pantalles/importar.js'

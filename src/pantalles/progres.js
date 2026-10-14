@@ -1,6 +1,6 @@
 /* Pestanya Bosc (PLA.md, seccions 7.5 i 13.3): l'escena del bosc i, a sota, plegats, l'historial i els gràfics. */
 import { obte, actualitza } from '../store.js';
-import { sessionsDeLaSetmana, dilluns, compta } from '../ratxa.js';
+import { sessionsDeLaSetmana, dilluns, compta, setmana } from '../ratxa.js';
 import { valls, elementsNous, marcaVistos, nomElement, htmlEscena } from '../boscdades.js';
 import { exercici } from '../biblioteca.js';
 import { ACTIVITATS } from '../cites.js';
@@ -90,7 +90,7 @@ function muntaResum(contenidor) {
         <span class="icona-activitat petita">${icona(iconaSessio(s))}</span>
         <span class="text-historial">
           <span class="nom-item">${esc(nomSessio(s))}</span>
-          <span class="secundari">${esc(dataCurta(new Date(s.inici)))} · ${minutsDe(s)} min</span>
+          <span class="secundari">${esc(dataCurta(new Date(s.inici)))} · ${minutsDe(s)} min${s.extra ? ' · Extra' : s.recupera ? ' · Recuperada' : ''}</span>
         </span>
         <span class="estat-historial ${s.estat}">${ESTATS[s.estat]}</span>
       </a>
@@ -108,7 +108,9 @@ function muntaResum(contenidor) {
   const curant = pending.type === 'cura';
   const objectiu = estat.pla.objectiuSetmanal;
   const fetes = Math.min(objectiu, Math.round(pending.progress * objectiu));
-  const barretes = Array.from({ length: objectiu }, (_, i) => `<span class="${i < fetes ? (curant ? 'cura' : 'feta') : ''}"></span>`).join('');
+  const { extres } = setmana(estat, ara);
+  const barretes = Array.from({ length: objectiu }, (_, i) => `<span class="${i < fetes ? (curant ? 'cura' : 'feta') : ''}"></span>`).join('')
+    + '<span class="extra"></span>'.repeat(extres); // sessions extra: grogues, no fan créixer l'arbre
   const textBarra = curant ? (dry > 1 ? `Curant arbres secs (${dry})` : "Curant l'arbre sec") : 'El proper arbre';
 
   contenidor.innerHTML = `
@@ -130,7 +132,7 @@ function muntaResum(contenidor) {
       </header>
       <div class="barra-arbre">
         <span>${esc(textBarra)}</span>
-        <span class="barretes" aria-label="${fetes} de ${objectiu} sessions">${barretes}</span>
+        <span class="barretes" aria-label="${fetes} de ${objectiu} sessions${extres ? ` i ${extres} ${extres === 1 ? 'extra' : 'extres'}` : ''}">${barretes}</span>
       </div>
     </section>
 

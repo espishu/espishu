@@ -1,9 +1,12 @@
 /*
  * Pantalla Avui (PLA.md, seccions 7.1 i 13.3; bosc-pantalles.html): a dalt l'escena del bosc amb la
- * salutació; a sota, un panell amb la propera cita, "Comença", la versió curta i els pins de la setmana.
+ * salutació; a sota, un panell amb la propera cita, els pins de la setmana, "Comença", la versió curta i,
+ * a sota, "Recuperar" (cites dels últims 7 dies sense fer) i "Extra +" (una sessió fora del pla).
  */
 import { obte, actualitza } from '../store.js';
-import { properaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana } from '../cites.js';
+import {
+  properaCita, perRecuperar, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana, dataISO
+} from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
 import { htmlPins } from '../tema.js';
@@ -11,7 +14,9 @@ import { valls, htmlEscena, RETALL_AVUI } from '../boscdades.js';
 import { activaSo } from '../so.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { htmlPendents } from '../sincronitza.js';
-import { confirma } from '../full.js';
+import { confirma, obreFull, tancaFull, botoTanca, mostraAvis, amagaAvis } from '../full.js';
+import { dataCurta } from '../resum.js';
+import { ordenaCites } from './pla.js';
 import { esc } from '../dom.js';
 import { icona } from '../icones.js';
 
@@ -44,16 +49,26 @@ function textEnCurs(s) {
   return enPausa(s) ? `Pausa · ${queden}` : queden;
 }
 
-function panell({ etiqueta, dada = '', nom, botons, pins }) {
+/* Recuperar (esquerra) i Extra + (dreta): la meitat de l'amplada, més baixos i d'un groc més apagat. */
+const SECUNDARIS = `
+  <div class="botons-secundaris">
+    <button type="button" class="boto recupera" data-accio="recupera">${icona('recupera')} Recuperar</button>
+    <button type="button" class="boto extra" data-accio="extra">Extra ${icona('mes')}</button>
+  </div>`;
+
+function panell({ etiqueta, dada = '', nom, botons, pins, secundaris = SECUNDARIS }) {
   return `
     <section class="panell-avui" aria-labelledby="nom-cita">
       <div class="panell-cap">
         <span class="quan-etiqueta">${esc(etiqueta)}</span>
         ${dada ? `<span class="quan-dada">${esc(dada)}</span>` : ''}
       </div>
-      <h2 class="nom-gran" id="nom-cita">${esc(nom)}</h2>
+      <div class="nom-fila">
+        <h2 class="nom-gran" id="nom-cita">${esc(nom)}</h2>
+        ${pins}
+      </div>
       ${botons}
-      ${pins}
+      ${secundaris}
       ${esInstallada() ? '' : `
         <button type="button" class="boto-text discret recordatori" data-accio="installa">${icona('mobil')} Instal·lar accés directe</button>`}
     </section>`;
@@ -73,7 +88,8 @@ export function munta(contenidor) {
       dada: textEnCurs(enCurs),
       nom: enCurs.nom,
       botons: `<div class="botons-avui sol"><button type="button" class="boto principal" data-accio="continua">Continua</button></div>`,
-      pins
+      pins,
+      secundaris: ''
     });
   } else if (propera) {
     const { cita, data } = propera;
@@ -130,13 +146,69 @@ export function munta(contenidor) {
   }
 
   function comenca(curta) {
+    inicia(propera.cita, { curta });
+  }
+
+  /*
+   * Comença una sessió d'una cita del pla. `extra`: una còpia fora del pla (citaId null, no compta per a
+   * l'objectiu ni el bosc, el pla no canvia). `recupera`: el dia que tocava ("2026-10-12"), on compta.
+   */
+  function inicia(cita, { curta = false, extra = false, recupera = null } = {}) {
     activaSo();
-    const { cita } = propera;
     const estat = obte();
     const rutina = rutinaDe(estat, cita);
     const sessio = rutina ? iniciaAuto(creaSessio(rutina, cita, curta)) : creaActivitat(cita, nomCita(estat, cita));
+    if (extra) {
+      sessio.extra = true;
+      sessio.citaId = null;
+      sessio.exercicis?.forEach(ex => { ex.pujada = null; }); // les fletxes de pujada són de la cita
+    }
+    if (recupera) sessio.recupera = recupera;
     actualitza(d => { d.sessioEnCurs = sessio; });
     location.hash = '#sessio';
+  }
+
+  const iconaCita = cita => icona(cita.rutina ? 'casa' : cita.activitat);
+  const htmlCita = (cita, accio, i, secundari) => `
+    <li>
+      <button type="button" class="item-alt" data-accio="${accio}" data-i="${i}">
+        <span class="icona-activitat petita">${iconaCita(cita)}</span>
+        <span><span class="nom-item">${esc(nomCita(obte(), cita))}</span><span class="secundari">${esc(secundari)}</span></span>
+      </button>
+    </li>`;
+  const textDuracio = cita => {
+    const minuts = duracioCita(obte(), cita);
+    return minuts ? ` · ${formatMinuts(minuts)}` : '';
+  };
+
+  /* Les cites dels últims 7 dies que no s'han fet: es fan ara i compten el dia que tocava. */
+  function recupera() {
+    const llista = perRecuperar(obte(), new Date());
+    if (!llista.length) return mostraAvis('No tens cap activitat per recuperar');
+    obreFull(`
+      <div class="full-cap"><h2>Recuperar</h2>${botoTanca}</div>
+      <ul class="llista-alt">${llista.map(({ cita, data }, i) => htmlCita(cita, 'tria', i, `${dataCurta(data)}${textDuracio(cita)}`)).join('')}</ul>`, {
+      tria: ({ i }) => {
+        const { cita, data } = llista[Number(i)];
+        tancaFull();
+        inicia(cita, { recupera: dataISO(data) });
+      }
+    });
+  }
+
+  /* Una sessió fora del pla: una còpia d'una cita (el pla no canvia) o una de nova (#extra). */
+  function extra() {
+    const cites = ordenaCites(obte().pla.cites).filter(c => !rutinaBuida(c.rutina));
+    if (!cites.length) return void (location.hash = '#extra');
+    obreFull(`
+      <div class="full-cap"><h2>Extra</h2>${botoTanca}</div>
+      <ul class="llista-alt">${cites.map((cita, i) => htmlCita(cita, 'copia', i, `${ABREUJATS[cita.dia]}${textDuracio(cita)}`)).join('')}</ul>
+      <a class="boto contorn" href="#extra" data-accio="tanca">${icona('mes')} Nova</a>`, {
+      copia: ({ i }) => {
+        tancaFull();
+        inicia(cites[Number(i)], { extra: true });
+      }
+    });
   }
 
   const clic = e => {
@@ -145,8 +217,14 @@ export function munta(contenidor) {
     if (accio === 'comenca') demanaComencar(false);
     if (accio === 'curta') demanaComencar(true);
     if (accio === 'continua') { activaSo(); location.hash = '#sessio'; }
+    if (accio === 'recupera') recupera();
+    if (accio === 'extra') extra();
     if (accio === 'installa') mostraInstallacio().then(() => { if (esInstallada()) boto.remove(); });
   };
   contenidor.addEventListener('click', clic);
-  return () => contenidor.removeEventListener('click', clic);
+  return () => {
+    amagaAvis();
+    tancaFull();
+    contenidor.removeEventListener('click', clic);
+  };
 }
