@@ -22,7 +22,7 @@
   --floor: #2C3D3B; --towel: #C46A4A;
   --water: #2C5C86; --water-line: #4C8CC8; --bike: #C98A48;
   /* Activitats: el pi de cada cita al Pla i els gràfics */
-  --pi-casa: #E8C27A; --pi-natacio: #8DB36A; --pi-caminar: #A9BFB4; --pi-correr: #D9967A; --pi-bici: #9FB6E0;
+  --pi-casa: #E8C27A; --pi-natacio: #8DB36A; --pi-caminar: #A9BFB4; --pi-correr: #D9967A; --pi-bici: #9FB6E0; --pi-altra: #CDB8A8;
   --barra-alt: 64px;
   --fulla: 18px; --fulla-petita: 14px;
   --font-titol: "Gloock", Georgia, serif;
@@ -718,7 +718,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .icona-activitat.petita .icona { width: 22px; height: 22px; }
 
 /* Colors fixos per activitat als gràfics (to i lluminositat diferents, sobre fons fosc). */
-:root { --a-natacio: #6AA6E0; --a-caminar: #8DB36A; --a-correr: #E0906A; --a-bici: #B48CD8; }
+:root { --a-natacio: #6AA6E0; --a-caminar: #8DB36A; --a-correr: #E0906A; --a-bici: #B48CD8; --a-altra: #CDB8A8; }
 
 /* ================= Activitat sola ================= */
 .compte-activitat { text-align: center; }
@@ -861,6 +861,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .pi.caminar { fill: var(--pi-caminar); }
 .pi.correr { fill: var(--pi-correr); }
 .pi.bici { fill: var(--pi-bici); }
+.pi.altra { fill: var(--pi-altra); }
 /* Afegir: botó rodó de línia discontínua només amb "+". */
 .boto-afegir {
   display: grid;

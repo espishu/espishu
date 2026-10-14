@@ -15,7 +15,8 @@ const SERIES_ACTIVITAT = [
   { clau: 'natacio', nom: ACTIVITATS.natacio, color: 'var(--a-natacio)' },
   { clau: 'caminar', nom: ACTIVITATS.caminar, color: 'var(--a-caminar)' },
   { clau: 'correr', nom: ACTIVITATS.correr, color: 'var(--a-correr)' },
-  { clau: 'bici', nom: ACTIVITATS.bici, color: 'var(--a-bici)' }
+  { clau: 'bici', nom: ACTIVITATS.bici, color: 'var(--a-bici)' },
+  { clau: 'altra', nom: 'Altres', color: 'var(--a-altra)' }
 ];
 const ESTATS = { feta: 'Feta', 'no-acabada': 'No acabada', 'no-feta': 'No feta' };
 

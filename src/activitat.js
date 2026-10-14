@@ -1,5 +1,5 @@
 /*
- * activitat.js — lògica d'una sessió d'activitat sola (natació, caminar, bici, córrer).
+ * activitat.js — lògica d'una sessió d'activitat sola (natació, caminar, bici, córrer o una altra).
  * El temps surt sempre de marques desades (inici, pauses, aturada), mai d'un comptador,
  * perquè l'iPhone atura el JavaScript amb la pantalla bloquejada.
  *

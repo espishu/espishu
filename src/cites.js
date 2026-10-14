@@ -11,11 +11,12 @@ export const ACTIVITATS = {
   caminar: 'Caminar',
   correr: 'Córrer',
   bici: 'Bici',
-  natacio: 'Natació'
+  natacio: 'Natació',
+  altra: 'Altra' // activitat sola amb el nom que hi posi l'usuari (sense animació ni icona pròpia)
 };
 
 /* Les que es poden triar en crear o editar una cita, en aquest ordre ("Gimnàs", més endavant). */
-export const OPCIONS_ACTIVITAT = ['casa', 'natacio', 'caminar', 'bici', 'correr'];
+export const OPCIONS_ACTIVITAT = ['casa', 'natacio', 'caminar', 'bici', 'correr', 'altra'];
 
 /* Temps de treball d'una repetició: per calcular la duració d'una rutina i les sèries automàtiques. */
 export const SEGONS_PER_REP = 3;
