@@ -105,12 +105,17 @@ export function munta(contenidor, [origen]) {
     mostraVersio();
   }
 
-  /* La versió instal·lada en aquest aparell: el número de la còpia del service worker (sw.js, "espishu-4"). */
+  /*
+   * La versió instal·lada en aquest aparell: el número de la còpia del service worker (sw.js, "espishu-7",
+   * o "espishu-7.1" per a una edició petita de la 7).
+   */
   async function mostraVersio() {
     let numero = null;
     try {
-      const numeros = (await caches.keys()).map(nom => /^espishu-(\d+)$/.exec(nom)?.[1]).filter(Boolean).map(Number);
-      if (numeros.length) numero = Math.max(...numeros);
+      const parts = text => text.split('.').map(Number);
+      const mesNova = (a, b) => { const [x, y] = [parts(a), parts(b)]; return x[0] - y[0] || (x[1] ?? 0) - (y[1] ?? 0); };
+      const numeros = (await caches.keys()).map(nom => /^espishu-(\d+(?:\.\d+)?)$/.exec(nom)?.[1]).filter(Boolean);
+      if (numeros.length) numero = numeros.sort(mesNova).at(-1);
     } catch { /* sense memòria cau (navegador antic o mode privat) */ }
     const lloc = contenidor.querySelector('[data-versio]');
     if (lloc) lloc.textContent = numero ? `Versió ${numero}` : '';

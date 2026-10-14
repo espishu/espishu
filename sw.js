@@ -4,12 +4,12 @@
  * Amb connexió, primer la xarxa (sempre la versió més nova) i, si no respon en 3 segons
  * o no hi ha connexió, la còpia desada. Les fotos i la lletra no canvien: primer la còpia.
  *
- * Actualitzacions: a cada publicació es puja VERSIO (un número més). En obrir l'app (o tornar-hi),
+ * Actualitzacions: a cada publicació es puja VERSIO (un número més; "espishu-7.1" per a una edició petita). En obrir l'app (o tornar-hi),
  * app.js demana al navegador que compari aquest fitxer amb el publicat; si VERSIO ha canviat,
  * s'instal·la la versió nova, passa a controlar l'app i l'app es recarrega sola, però mai enmig
  * d'una sessió. El número surt a Ajustos ("Versió 4").
  */
-const VERSIO = 'espishu-7';
+const VERSIO = 'espishu-7.1';
 const ESPERA_XARXA = 3000;
 
 const FITXERS = [
