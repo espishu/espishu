@@ -2,10 +2,10 @@
  * Edició d'una cita (PLA.md, secció 8). És l'únic lloc amb controls d'edició.
  * Cada canvi es desa a l'acte; "Fet" només torna al pla.
  */
-import { obte, actualitza } from '../store.js';
+import { obte, actualitza, nouId } from '../store.js';
 import {
   DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, MAX_NOM_CITA, nomCita, nomPropi, posaNom,
-  rutinaDe, duracioRutina, formatDuracio
+  rutinaDe, clauGrup, duracioRutina, formatDuracio
 } from '../cites.js';
 import { exercici, alternativesDe, textObjectiu } from '../biblioteca.js';
 import { miniatura, exerciciNou, htmlOpcio, obreCercador } from '../cercador.js';
@@ -42,19 +42,66 @@ export function munta(contenidor, [id, nova]) {
   }
   let obert = null; // exercici desplegat
 
+  /*
+   * Una activitat de diversos dies són diverses cites iguals excepte el dia (cites.js, clauGrup).
+   * `ids`: les d'aquesta activitat, fixades en obrir. Cada canvi s'aplica a totes.
+   */
+  const clau = clauGrup(obte().pla.cites.find(c => c.id === id));
+  let ids = obte().pla.cites.filter(c => clauGrup(c) === clau).map(c => c.id);
+  const membres = d => d.pla.cites.filter(c => ids.includes(c.id));
   const cita = () => obte().pla.cites.find(c => c.id === id);
 
   function canviaCita(fn) {
-    actualitza(d => fn(d.pla.cites.find(c => c.id === id), d));
+    actualitza(d => membres(d).forEach(c => fn(c, d)));
     pinta();
   }
 
   function canviaRutina(fn) {
-    actualitza(d => {
-      const r = d.pla.cites.find(x => x.id === id)?.rutina;
-      if (r) fn(r, d);
-    });
+    actualitza(d => membres(d).forEach(c => { if (c.rutina) fn(c.rutina, d); }));
     pinta();
+  }
+
+  /* Marcar un dia hi afegeix l'activitat (una cita igual); desmarcar-lo la treu d'aquell dia (amb "Desfer"). */
+  function commutaDia(dia) {
+    const delDia = membres(obte()).find(c => c.dia === dia);
+    if (!delDia) {
+      const copia = structuredClone(cita());
+      copia.id = nouId();
+      copia.dia = dia;
+      copia.rutina?.exercicis.forEach(ex => { delete ex.pujada; });
+      actualitza(d => {
+        const abans = d.pla.cites.length;
+        d.pla.cites.push(copia);
+        ajustaObjectiu(d, abans);
+      });
+      ids.push(copia.id);
+      return pinta();
+    }
+    if (ids.length === 1) return; // almenys un dia
+    const treta = structuredClone(delDia);
+    actualitza(d => {
+      const abans = d.pla.cites.length;
+      d.pla.cites = d.pla.cites.filter(c => c.id !== treta.id);
+      ajustaObjectiu(d, abans);
+    });
+    ids = ids.filter(x => x !== treta.id);
+    if (id === treta.id) {
+      id = ids[0];
+      history.replaceState(null, '', `#editar/${id}${nova ? '/nova' : ''}`);
+    }
+    pinta();
+    mostraAvis(`${DIES[dia]} tret`, {
+      accio: 'Desfer',
+      enAccio: () => {
+        actualitza(d => {
+          const abans = d.pla.cites.length;
+          d.pla.cites.push(treta);
+          ajustaObjectiu(d, abans);
+        });
+        ids.push(treta.id);
+        pinta();
+      }
+    });
   }
 
   /* ---------- Dibuix ---------- */
@@ -99,6 +146,7 @@ export function munta(contenidor, [id, nova]) {
     const estat = obte(), c = cita();
     if (!c) return;
     const rutina = rutinaDe(estat, c);
+    const dies = new Set(membres(estat).map(x => x.dia));
     const focus = document.activeElement?.closest?.('[data-accio]');
     const clauFocus = focus && contenidor.contains(focus)
       ? `[data-accio="${focus.dataset.accio}"]${focus.dataset.i ? `[data-i="${focus.dataset.i}"]` : ''}${focus.dataset.camp ? `[data-camp="${focus.dataset.camp}"]` : ''}${focus.dataset.signe ? `[data-signe="${focus.dataset.signe}"]` : ''}${focus.dataset.valor ? `[data-valor="${focus.dataset.valor}"]` : ''}`
@@ -114,11 +162,11 @@ export function munta(contenidor, [id, nova]) {
       </header>
 
       <section class="targeta camp-edicio">
-        <h2 class="titol-targeta" id="t-dia">Dia</h2>
-        <div class="dies" role="radiogroup" aria-labelledby="t-dia">
+        <h2 class="titol-targeta" id="t-dia">Dies</h2>
+        <div class="dies" role="group" aria-labelledby="t-dia">
           ${[1, 2, 3, 4, 5, 6, 7].map(d => `
-            <button type="button" role="radio" class="dia" data-accio="dia" data-valor="${d}"
-              aria-checked="${d === c.dia}" aria-label="${DIES[d]}">${ABREUJATS[d]}</button>`).join('')}
+            <button type="button" role="checkbox" class="dia" data-accio="dia" data-valor="${d}"
+              aria-checked="${dies.has(d)}" aria-label="${DIES[d]}">${ABREUJATS[d]}</button>`).join('')}
         </div>
         <label class="titol-targeta" for="hora">Hora</label>
         <input id="hora" class="camp-hora" type="time" value="${esc(c.hora)}" data-camp="hora">
@@ -202,7 +250,7 @@ export function munta(contenidor, [id, nova]) {
     canviaRutina(r => { r.exercicis.splice(i, 1); });
     mostraAvis(`${exercici(ex.id)?.nom ?? 'Exercici'} tret`, {
       accio: 'Desfer',
-      enAccio: () => { canviaRutina(r => { r.exercicis.splice(i, 0, ex); }); }
+      enAccio: () => { canviaRutina(r => { r.exercicis.splice(i, 0, structuredClone(ex)); }); }
     });
   }
 
@@ -257,7 +305,7 @@ export function munta(contenidor, [id, nova]) {
   }
 
   const ACCIONS = {
-    dia: ({ valor }) => canviaCita(c => { c.dia = Number(valor); }),
+    dia: ({ valor }) => commutaDia(Number(valor)),
     activitat: ({ valor }) => canviaActivitat(valor),
     pas,
     obre: ({ i }) => { obert = obert === Number(i) ? null : Number(i); pinta(); },
@@ -268,12 +316,12 @@ export function munta(contenidor, [id, nova]) {
     'afegeix-ex': () => cerca(),
     esborra: () => confirma({
       titol: 'Vols esborrar aquesta cita?',
-      text: 'L\'historial de sessions no s\'esborra.',
+      text: `${ids.length > 1 ? 'S\'esborra de tots els dies. ' : ''}L'historial de sessions no s'esborra.`,
       boto: 'Esborrar la cita',
       enConfirmar: () => {
         actualitza(d => {
           const abans = d.pla.cites.length;
-          d.pla.cites = d.pla.cites.filter(c => c.id !== id);
+          d.pla.cites = d.pla.cites.filter(c => !ids.includes(c.id));
           ajustaObjectiu(d, abans);
         });
         location.hash = '#pla';
@@ -289,13 +337,13 @@ export function munta(contenidor, [id, nova]) {
   const escriu = e => {
     if (e.target.dataset.camp !== 'nom') return;
     const text = e.target.value;
-    actualitza(d => { posaNom(d.pla.cites.find(c => c.id === id), text); });
+    actualitza(d => { membres(d).forEach(c => posaNom(c, text)); });
     contenidor.querySelector('h1').textContent = nomCita(obte(), cita());
   };
   const canvi = e => {
     if (e.target.dataset.camp === 'hora' && /^\d{2}:\d{2}$/.test(e.target.value)) {
       const hora = e.target.value;
-      actualitza(d => { d.pla.cites.find(c => c.id === id).hora = hora; });
+      actualitza(d => { membres(d).forEach(c => { c.hora = hora; }); });
     }
   };
 

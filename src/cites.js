@@ -79,6 +79,29 @@ export function nomCita(estat, cita) {
   return nomPropi(cita) || (cita.rutina ? RUTINA_PER_DEFECTE : ACTIVITATS[cita.activitat] ?? cita.activitat);
 }
 
+/*
+ * Una activitat de diversos dies (gimnàs dilluns, dimecres i divendres) són diverses cites iguals
+ * excepte el dia: la base de dades només té un dia per activitat. Es reconeixen per l'activitat, el nom,
+ * l'hora, la durada i els exercicis (en ordre; no les sèries, que la progressió pot fer pujar en un dia).
+ */
+export function clauGrup(cita) {
+  // Una rutina buida només va amb ella mateixa: dues rutines noves encara sense exercicis no són la mateixa.
+  if (rutinaBuida(cita.rutina)) return cita.id;
+  return JSON.stringify([cita.activitat, nomPropi(cita), cita.hora, cita.rutina ? null : cita.duracioMin ?? null,
+    cita.rutina?.exercicis.map(ex => ex.id) ?? null]);
+}
+
+/* Les cites agrupades (cada grup ordenat per dia), en l'ordre del primer dia i l'hora. */
+export function grups(cites) {
+  const perClau = new Map();
+  for (const c of [...cites].sort((a, b) => a.dia - b.dia || a.hora.localeCompare(b.hora))) {
+    const clau = clauGrup(c);
+    if (!perClau.has(clau)) perClau.set(clau, []);
+    perClau.get(clau).push(c);
+  }
+  return [...perClau.values()];
+}
+
 /* Desa el nom de la cita; buit = el per defecte. */
 export function posaNom(cita, text) {
   const nom = text.trim().slice(0, MAX_NOM_CITA);

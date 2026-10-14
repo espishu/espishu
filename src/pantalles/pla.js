@@ -3,7 +3,7 @@
  * sobre els que tenen cita, i una targeta per cita. Tocar-la obre l'edició.
  */
 import { obte, actualitza, nouId } from '../store.js';
-import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
+import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, grups, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
 import { obreFull, tancaFull, botoTanca } from '../full.js';
 import { htmlPendents } from '../sincronitza.js';
 import { htmlPi } from '../tema.js';
@@ -36,15 +36,18 @@ export function munta(contenidor) {
   const estat = obte();
   const cites = ordenaCites(estat.pla.cites);
 
-  const targetes = cites.map(cita => {
+  // Una targeta per activitat: si es fa diversos dies (cites iguals excepte el dia), "Dl · Dc · Dv".
+  const targetes = grups(cites).map(grup => {
+    const cita = grup[0];
     const nom = nomCita(estat, cita), minuts = duracioCita(estat, cita);
+    const dies = grup.map(c => DIES[c.dia].toLowerCase());
     return `
       <li>
-        <a class="cita-pla" href="#editar/${esc(cita.id)}" aria-label="Editar ${esc(nom)} del ${DIES[cita.dia].toLowerCase()} a les ${formatHora(cita.hora)}">
+        <a class="cita-pla" href="#editar/${esc(cita.id)}" aria-label="Editar ${esc(nom)}: ${dies.join(', ')}, a les ${formatHora(cita.hora)}">
           ${htmlPi(cita.activitat)}
           <span class="cita-text">
             <span class="cita-nom">${esc(nom)}</span>
-            <span class="secundari">${ABREUJATS[cita.dia]}${minuts ? ` · ${formatMinuts(minuts)}` : ''}</span>
+            <span class="secundari">${grup.map(c => ABREUJATS[c.dia]).join(' · ')}${minuts ? ` · ${formatMinuts(minuts)}` : ''}</span>
           </span>
           <span class="cita-hora">${formatHora(cita.hora)}</span>
         </a>

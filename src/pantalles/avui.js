@@ -5,7 +5,7 @@
  */
 import { obte, actualitza } from '../store.js';
 import {
-  properaCita, perRecuperar, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana, dataISO
+  properaCita, perRecuperar, grups, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana, dataISO
 } from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
@@ -16,7 +16,6 @@ import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { htmlPendents } from '../sincronitza.js';
 import { confirma, obreFull, tancaFull, botoTanca, mostraAvis, amagaAvis } from '../full.js';
 import { dataCurta } from '../resum.js';
-import { ordenaCites } from './pla.js';
 import { esc } from '../dom.js';
 import { icona } from '../icones.js';
 
@@ -198,11 +197,13 @@ export function munta(contenidor) {
 
   /* Una sessió fora del pla: una còpia d'una cita (el pla no canvia) o una de nova (#extra). */
   function extra() {
-    const cites = ordenaCites(obte().pla.cites).filter(c => !rutinaBuida(c.rutina));
+    // Una fila per activitat (la de diversos dies, un sol cop: "Dl · Dc · Dv").
+    const llista = grups(obte().pla.cites).filter(g => !rutinaBuida(g[0].rutina));
+    const cites = llista.map(g => g[0]);
     if (!cites.length) return void (location.hash = '#extra');
     obreFull(`
       <div class="full-cap"><h2>Extra</h2>${botoTanca}</div>
-      <ul class="llista-alt">${cites.map((cita, i) => htmlCita(cita, 'copia', i, `${ABREUJATS[cita.dia]}${textDuracio(cita)}`)).join('')}</ul>
+      <ul class="llista-alt">${llista.map((g, i) => htmlCita(g[0], 'copia', i, `${g.map(c => ABREUJATS[c.dia]).join(' · ')}${textDuracio(g[0])}`)).join('')}</ul>
       <a class="boto contorn" href="#extra" data-accio="tanca">${icona('mes')} Nova</a>`, {
       copia: ({ i }) => {
         tancaFull();
