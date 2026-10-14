@@ -10,6 +10,7 @@ import { htmlCampContrasenya, htmlError, commutaUll, mostraError, ocupat } from 
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
 import { registraObjectiu, maxObjectiu } from '../boscdades.js';
+import { sonsActius, activaSo, xiulet } from '../so.js';
 
 function textUltimaCopia(data) {
   if (!data) return 'Cap còpia encara';
@@ -59,6 +60,14 @@ export function munta(contenidor, [origen]) {
             <button type="button" class="pas" data-accio="objectiu" data-signe="1" aria-label="Una sessió més"${objectiu >= max ? ' disabled' : ''}>${icona('mes')}</button>
           </div>
         </div>
+      </section>
+
+      <section class="targeta">
+        <button type="button" class="opcio-interruptor" role="switch" aria-checked="${sonsActius()}" data-accio="sons">
+          <span class="icona-activitat petita">${icona('so')}</span>
+          <span class="text-opcio"><span class="nom-item">Sons</span><span class="secundari">En mode silenci no sonen</span></span>
+          <span class="interruptor" aria-hidden="true"></span>
+        </button>
       </section>
 
       <section class="targeta">
@@ -240,6 +249,14 @@ export function munta(contenidor, [origen]) {
     if (accio === 'salut') mostraAvisSalut();
     if (accio === 'reinicia') reinicia();
     if (accio === 'installa') installa().then(pinta);
+    if (accio === 'sons') {
+      // D'aquest aparell: perfil.sons no es puja a Supabase (sincronitza.js només puja perfil.bosc).
+      const actius = !sonsActius();
+      actualitza(d => { d.perfil.sons = actius; });
+      if (actius) { activaSo(); xiulet(true); } // dins el toc: es pot sentir com sona
+      pinta();
+      contenidor.querySelector('[data-accio="sons"]')?.focus();
+    }
     if (accio === 'objectiu') {
       // Les setmanes passades es queden amb l'objectiu que tenien (boscdades.js).
       actualitza(d => {

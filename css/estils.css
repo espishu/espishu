@@ -1001,8 +1001,8 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   height: 28px;
   border-radius: 999px;
   background: var(--sep);
-  opacity: .7;
 }
+.interruptor[aria-disabled="true"] { opacity: .7; }
 .interruptor::after {
   content: "";
   position: absolute;
@@ -1013,6 +1013,25 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   border-radius: 50%;
   background: var(--card);
 }
+/* Interruptor que funciona: tota la fila és el botó (àrea tàctil gran). */
+.opcio-interruptor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+}
+.opcio-interruptor .icona-activitat { background: var(--bg); color: var(--muted); }
+.opcio-interruptor[aria-checked="true"] .icona-activitat { color: var(--acc); }
+.opcio-interruptor[aria-checked="true"] .interruptor { background: var(--acc); }
+.opcio-interruptor[aria-checked="true"] .interruptor::after { transform: translateX(18px); background: var(--acc-ink); }
+@media (prefers-reduced-motion: no-preference) { .interruptor::after { transition: transform .2s; } }
 
 /* Text verd sobre el fons suau: un to més fosc perquè es llegeixi bé (contrast 4.5:1). */
 .nou, .aviat, .item-ex.actual .estat-item, .item-ex.mitges .estat-item, .item-ex.mitges .marca,

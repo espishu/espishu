@@ -2,9 +2,13 @@
  * so.js — un xiulet curt i suau en acabar un descans o un compte enrere.
  * L'iPhone només deixa fer sons si l'àudio s'ha activat amb un toc: crida activaSo() des d'un clic.
  * Un sol AudioContext per a tota l'app. Tot falla en silenci als navegadors que no ho suporten.
+ * "Sons" (Ajustos) és d'aquest aparell: `perfil.sons`, que no es puja a Supabase; si no hi és, activats.
  */
+import { obte } from './store.js';
 
 let ctx = null;
+
+export const sonsActius = () => obte().perfil?.sons !== false;
 
 /*
  * 'ambient': els xiulets es barregen amb la música d'altres apps (Spotify, pòdcasts) i no l'aturen
@@ -27,7 +31,7 @@ function repren() {
 export function activaSo() {
   try {
     const Context = window.AudioContext || window.webkitAudioContext;
-    if (!Context) return;
+    if (!Context || !sonsActius()) return;
     posaSessioAudio();
     ctx ??= new Context();
     repren();
@@ -53,7 +57,7 @@ function to(frequencia, inici, durada) {
 
 /* Dues notes curtes. `curt` en fa només una (per avisar de canviar de costat). */
 export function xiulet(curt = false) {
-  if (!ctx) return;
+  if (!ctx || !sonsActius()) return;
   const sona = () => {
     try {
       if (ctx.state !== 'running') return;
