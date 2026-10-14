@@ -8,6 +8,16 @@ Per veure quines s'han executat:
 select * from public.migracions order by nom;
 ```
 
+## Migracions
+
+| Fitxer | Què fa | Abans de la versió |
+|---|---|---|
+| `001_inicial.sql` | Taules, seguretat (RLS), `desa_pla` i `desa_sessio` | 4 |
+| `002_bosc.sql` | `perfils.bosc`, `desa_bosc`; objectiu de 1 a 10 | 5 |
+| `003_altra.sql` | Tipus d'activitat `altra` | 6 |
+| `004_extra.sql` | `sessions.extra` i `sessions.recupera`; `desa_sessio` els desa | 6 |
+| `005_icona.sql` | `activitats.icona`; `desa_pla` la desa (sense esborrar-la si una versió anterior no l'envia) | 8 |
+
 ## Normes
 
 1. **No es perden mai dades d'usuari.** Res de `drop table`, `truncate`, `delete` sense filtre ni recrear taules que tinguin dades.

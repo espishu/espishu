@@ -109,7 +109,7 @@ function muntaResum(contenidor) {
   const historial = sessions.length ? sessions.map(s => `
     <li>
       <a class="item-historial" href="#progres/${esc(s.id)}">
-        <span class="icona-activitat petita">${icona(iconaSessio(s))}</span>
+        <span class="icona-activitat petita">${icona(iconaSessio(s, estat))}</span>
         <span class="text-historial">
           <span class="nom-item">${esc(nomSessio(s))}</span>
           <span class="secundari">${esc(dataCurta(new Date(s.inici)))} · ${minutsDe(s)} min${s.extra ? ' · Extra' : s.recupera ? ' · Recuperada' : ''}</span>

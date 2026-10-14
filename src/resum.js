@@ -1,6 +1,6 @@
 /* resum.js — peces compartides: nom, icona, data i detall d'una sessió feta. */
 import { exercici } from './biblioteca.js';
-import { ACTIVITATS, formatDuracio } from './cites.js';
+import { ACTIVITATS, formatDuracio, iconaCita, nomCita } from './cites.js';
 import { icona } from './icones.js';
 import { esc, majuscula } from './dom.js';
 
@@ -11,7 +11,16 @@ export function nomSessio(s) {
   return s.curta ? `${nom} (curta)` : nom;
 }
 
-export function iconaSessio(s) {
+/*
+ * La icona d'una sessió feta: la de la seva cita al pla d'ara (iconaCita). Una extra copiada no té cita:
+ * la d'una cita del pla amb el mateix nom i tipus. Si no n'hi ha cap, la del tipus. No es desa a la sessió.
+ */
+export function iconaSessio(s, estat = null) {
+  const cites = estat?.pla.cites ?? [];
+  const tipus = c => (c.rutina ? 'rutina' : 'activitat');
+  const cita = cites.find(c => c.id === s.citaId)
+    ?? (s.citaId ? null : cites.find(c => tipus(c) === s.tipus && (s.tipus === 'rutina' || c.activitat === s.activitat) && nomCita(estat, c) === s.nom));
+  if (cita) return iconaCita(cita);
   return s.tipus === 'rutina' ? 'casa' : s.activitat;
 }
 

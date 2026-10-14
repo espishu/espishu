@@ -5,7 +5,7 @@
  */
 import { obte, actualitza } from '../store.js';
 import {
-  properaCita, perRecuperar, grups, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana, dataISO
+  properaCita, perRecuperar, grups, iconaCita, nomCita, duracioCita, formatMinuts, formatHora, rutinaDe, rutinaBuida, DIES, diaSetmana, dataISO
 } from '../cites.js';
 import { creaSessio, iniciaAuto, exerciciAcabat, duracioCurta } from '../rutina.js';
 import { creaActivitat, restantMs, enPausa } from '../activitat.js';
@@ -167,11 +167,10 @@ export function munta(contenidor) {
     location.hash = '#sessio';
   }
 
-  const iconaCita = cita => icona(cita.rutina ? 'casa' : cita.activitat);
   const htmlCita = (cita, accio, i, secundari) => `
     <li>
       <button type="button" class="item-alt" data-accio="${accio}" data-i="${i}">
-        <span class="icona-activitat petita">${iconaCita(cita)}</span>
+        <span class="icona-activitat petita">${icona(iconaCita(cita))}</span>
         <span><span class="nom-item">${esc(nomCita(obte(), cita))}</span><span class="secundari">${esc(secundari)}</span></span>
       </button>
     </li>`;

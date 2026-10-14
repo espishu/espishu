@@ -1112,7 +1112,27 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 }
 
 /* Menys text (8 d'octubre): dia i hora a la mateixa targeta, botons d'icona a Editar. */
-.dies + .titol-targeta, .activitats + .titol-targeta { margin-top: 18px; }
+.dies + .titol-targeta, .activitats + .titol-targeta, .camp-text + .titol-targeta { margin-top: 18px; }
+/* Icona de l'activitat (Editar): el botó amb la icona actual i el full amb la graella de 6 columnes. */
+.icona-triada { border: 0; cursor: pointer; touch-action: manipulation; }
+.graella-icones { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.opcio-icona {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.opcio-icona .icona { width: 26px; height: 26px; }
+.opcio-icona[aria-pressed="true"] { border-color: var(--gold); background: var(--soft); color: var(--gold); }
+/* A 320 px: caselles de 44 px sense desplaçament horitzontal. */
+@media (max-width: 360px) { .graella-icones { gap: 3px; } }
 .fila-botons.icones { grid-template-columns: repeat(4, 1fr); }
 .fila-botons.icones .icona { width: 24px; height: 24px; }
 .mes-opcions { padding-block: 6px; }

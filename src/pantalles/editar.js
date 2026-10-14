@@ -5,12 +5,12 @@
 import { obte, actualitza, nouId } from '../store.js';
 import {
   DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, MAX_NOM_CITA, nomCita, nomPropi, posaNom,
-  rutinaDe, clauGrup, duracioRutina, formatDuracio
+  rutinaDe, clauGrup, iconaCita, duracioRutina, formatDuracio
 } from '../cites.js';
 import { exercici, alternativesDe, textObjectiu } from '../biblioteca.js';
 import { miniatura, exerciciNou, htmlOpcio, obreCercador } from '../cercador.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
-import { icona } from '../icones.js';
+import { icona, ICONES_ACTIVITAT } from '../icones.js';
 import { esc } from '../dom.js';
 import { ajustaObjectiu } from '../boscdades.js';
 
@@ -183,6 +183,9 @@ export function munta(contenidor, [id, nova]) {
         <label class="titol-targeta" for="nom-cita">Nom</label>
         <input id="nom-cita" class="camp-text" type="text" data-camp="nom" maxlength="${MAX_NOM_CITA}" autocomplete="off"
           placeholder="${esc(c.rutina ? RUTINA_PER_DEFECTE : ACTIVITATS[c.activitat] ?? '')}" value="${esc(nomPropi(c))}">
+        <h2 class="titol-targeta">Icona</h2>
+        <button type="button" class="icona-activitat icona-triada" data-accio="icona"
+          aria-label="Icona: ${esc(ICONES_ACTIVITAT.find(x => x.clau === iconaCita(c))?.nom ?? '')}">${icona(iconaCita(c))}</button>
       </section>
 
       ${rutina ? `
@@ -273,6 +276,24 @@ export function munta(contenidor, [id, nova]) {
     });
   }
 
+  /* Graella amb les icones (src/icones.js): un toc tria, desa (a tots els dies de l'activitat) i tanca. */
+  function triaIcona() {
+    const actual = iconaCita(cita());
+    obreFull(`
+      <div class="full-cap"><h2>Icona</h2>${botoTanca}</div>
+      <div class="graella-icones">
+        ${ICONES_ACTIVITAT.map(({ clau, nom }) => `
+          <button type="button" class="opcio-icona" data-accio="tria-icona" data-clau="${clau}" aria-label="${esc(nom)}"
+            aria-pressed="${clau === actual}">${icona(clau)}</button>`).join('')}
+      </div>`, {
+      'tria-icona': ({ clau }) => {
+        tancaFull();
+        canviaCita(c => { c.icona = clau; });
+        contenidor.querySelector('[data-accio="icona"]')?.focus({ preventScroll: true });
+      }
+    });
+  }
+
   function obreSubstitucio(i) {
     const ex = rutinaDe(obte(), cita()).exercicis[i];
     const opcions = alternativesDe(ex.id);
@@ -307,6 +328,7 @@ export function munta(contenidor, [id, nova]) {
   const ACCIONS = {
     dia: ({ valor }) => commutaDia(Number(valor)),
     activitat: ({ valor }) => canviaActivitat(valor),
+    icona: () => triaIcona(),
     pas,
     obre: ({ i }) => { obert = obert === Number(i) ? null : Number(i); pinta(); },
     puja: ({ i }) => mou(Number(i), -1),

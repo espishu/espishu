@@ -114,6 +114,7 @@ function plaServidor(d) {
       hora: c.hora,
       duracio_min: c.rutina ? null : c.duracioMin ?? null,
       nom: (c.rutina ? c.rutina.nom : c.nom) || null, // activitats soles: el nom que hi ha posat l'usuari (opcional)
+      icona: c.icona ?? null, // la triada a Editar (migració 005); null = la del tipus
       exercicis: (c.rutina?.exercicis ?? []).map(ex => ({
         exercici: ex.id,
         tipus: ex.tipus,
@@ -173,6 +174,7 @@ function citaLocal(a) {
     cita.duracioMin = a.duracio_min ?? 60;
     if (a.nom) cita.nom = a.nom;
   }
+  if (a.icona) cita.icona = a.icona; // migració 005
   return cita;
 }
 
@@ -270,7 +272,7 @@ async function baixa(sb) {
   const [perfil, activitats] = await Promise.all([
     llegeixCompte(sb, uid),
     sb.from('activitats')
-      .select('id, tipus, dia, hora, duracio_min, nom, exercicis_activitat(ordre, exercici, tipus, unitat, series, per_costat, descans, nota, pujada_abans, pujada_ara)')
+      .select('id, tipus, dia, hora, duracio_min, nom, icona, exercicis_activitat(ordre, exercici, tipus, unitat, series, per_costat, descans, nota, pujada_abans, pujada_ara)')
       .eq('user_id', uid).then(comprova)
   ]);
   const sessions = [];

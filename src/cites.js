@@ -79,16 +79,21 @@ export function nomCita(estat, cita) {
   return nomPropi(cita) || (cita.rutina ? RUTINA_PER_DEFECTE : ACTIVITATS[cita.activitat] ?? cita.activitat);
 }
 
+/* La icona d'una cita: la triada a Editar (`cita.icona`, opcional) o la del tipus (les rutines, 'casa'). */
+export function iconaCita(cita) {
+  return cita.icona ?? (cita.rutina ? 'casa' : cita.activitat);
+}
+
 /*
  * Una activitat de diversos dies (gimnàs dilluns, dimecres i divendres) són diverses cites iguals
  * excepte el dia: la base de dades només té un dia per activitat. Es reconeixen per l'activitat, el nom,
- * l'hora, la durada i els exercicis (en ordre; no les sèries, que la progressió pot fer pujar en un dia).
+ * l'hora, la durada, els exercicis (en ordre; no les sèries, que la progressió pot fer pujar en un dia) i la icona.
  */
 export function clauGrup(cita) {
   // Una rutina buida només va amb ella mateixa: dues rutines noves encara sense exercicis no són la mateixa.
   if (rutinaBuida(cita.rutina)) return cita.id;
   return JSON.stringify([cita.activitat, nomPropi(cita), cita.hora, cita.rutina ? null : cita.duracioMin ?? null,
-    cita.rutina?.exercicis.map(ex => ex.id) ?? null]);
+    cita.rutina?.exercicis.map(ex => ex.id) ?? null, cita.icona ?? null]);
 }
 
 /* Les cites agrupades (cada grup ordenat per dia), en l'ordre del primer dia i l'hora. */
