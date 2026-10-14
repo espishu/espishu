@@ -1096,7 +1096,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 }
 
 /* Menys text (8 d'octubre): dia i hora a la mateixa targeta, botons d'icona a Editar. */
-.dies + .titol-targeta { margin-top: 18px; }
+.dies + .titol-targeta, .activitats + .titol-targeta { margin-top: 18px; }
 .fila-botons.icones { grid-template-columns: repeat(4, 1fr); }
 .fila-botons.icones .icona { width: 24px; height: 24px; }
 .mes-opcions { padding-block: 6px; }
