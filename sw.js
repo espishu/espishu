@@ -9,7 +9,7 @@
  * s'instal·la la versió nova, passa a controlar l'app i l'app es recarrega sola, però mai enmig
  * d'una sessió. El número surt a Ajustos ("Versió 4").
  */
-const VERSIO = 'espishu-5';
+const VERSIO = 'espishu-6';
 const ESPERA_XARXA = 3000;
 
 const FITXERS = [
