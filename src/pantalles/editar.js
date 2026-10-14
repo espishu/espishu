@@ -3,7 +3,7 @@
  * Cada canvi es desa a l'acte; "Fet" només torna al pla.
  */
 import { obte, actualitza } from '../store.js';
-import { DIES, ACTIVITATS, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
+import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
 import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
 import { renderAnimacio } from '../animacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
@@ -12,7 +12,6 @@ import { esc } from '../dom.js';
 import { ajustaObjectiu } from '../boscdades.js';
 
 const ABREUJATS = ['', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
-const OPCIONS_ACTIVITAT = ['casa', 'natacio', 'caminar', 'bici', 'correr'];
 const LIMITS = {
   duracio: { min: 15, max: 180, pas: 15 },
   series: { min: 1, max: 6, pas: 1 },

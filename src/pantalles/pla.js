@@ -3,7 +3,8 @@
  * sobre els que tenen cita, i una targeta per cita. Tocar-la obre l'edició.
  */
 import { obte, actualitza, nouId } from '../store.js';
-import { DIES, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
+import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
+import { obreFull, tancaFull, botoTanca } from '../full.js';
 import { htmlPendents } from '../sincronitza.js';
 import { htmlPi } from '../tema.js';
 import { ajustaObjectiu } from '../boscdades.js';
@@ -62,18 +63,40 @@ export function munta(contenidor) {
     ${cites.length ? `<ul class="llista-cites">${targetes}</ul>` : ''}
     <button type="button" class="boto-afegir" data-accio="afegeix" aria-label="Afegir una cita">${icona('mes')}</button>`;
 
-  const clic = e => {
-    if (!e.target.closest('[data-accio="afegeix"]')) return;
+  /* Es tria l'activitat abans de crear res: un toc sense voler al "+" no deixa cap cita al pla. */
+  function triaActivitat() {
+    obreFull(`
+      <div class="full-cap"><h2>Cita nova</h2>${botoTanca}</div>
+      <div class="activitats">
+        ${OPCIONS_ACTIVITAT.map(a => `
+          <button type="button" class="opcio-activitat" data-accio="crea" data-activitat="${a}">
+            ${icona(a)}<span>${ACTIVITATS[a]}</span>
+          </button>`).join('')}
+      </div>`, {
+      crea: ({ activitat }) => { tancaFull(); crea(activitat); }
+    });
+  }
+
+  function crea(activitat) {
     const ocupats = new Set(obte().pla.cites.map(c => c.dia));
     const dia = [6, 7, 5, 1, 2, 3, 4].find(d => !ocupats.has(d)) ?? 6;
-    const cita = { id: nouId(), dia, hora: '09:00', activitat: 'caminar', duracioMin: 60 };
+    const cita = { id: nouId(), dia, hora: '09:00', activitat };
+    if (activitat === 'casa') cita.rutina = { nom: 'Rutina', exercicis: [] };
+    else cita.duracioMin = 60;
     actualitza(d => {
       const abans = d.pla.cites.length;
       d.pla.cites.push(cita);
       ajustaObjectiu(d, abans);
     });
     location.hash = `#editar/${cita.id}/nova`;
+  }
+
+  const clic = e => {
+    if (e.target.closest('[data-accio="afegeix"]')) triaActivitat();
   };
   contenidor.addEventListener('click', clic);
-  return () => contenidor.removeEventListener('click', clic);
+  return () => {
+    tancaFull();
+    contenidor.removeEventListener('click', clic);
+  };
 }

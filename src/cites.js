@@ -14,6 +14,9 @@ export const ACTIVITATS = {
   natacio: 'Natació'
 };
 
+/* Les que es poden triar en crear o editar una cita, en aquest ordre ("Gimnàs", més endavant). */
+export const OPCIONS_ACTIVITAT = ['casa', 'natacio', 'caminar', 'bici', 'correr'];
+
 /* Temps de treball d'una repetició: per calcular la duració d'una rutina i les sèries automàtiques. */
 export const SEGONS_PER_REP = 3;
 
