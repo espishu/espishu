@@ -3,7 +3,10 @@
  * Cada canvi es desa a l'acte; "Fet" només torna al pla.
  */
 import { obte, actualitza } from '../store.js';
-import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, nomCita, rutinaDe, duracioRutina, formatDuracio } from '../cites.js';
+import {
+  DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, MAX_NOM_CITA, nomCita, nomPropi, posaNom,
+  rutinaDe, duracioRutina, formatDuracio
+} from '../cites.js';
 import { exercici, alternativesDe, totsElsExercicis, textObjectiu, GRUPS, materialQueFalta } from '../biblioteca.js';
 import { renderAnimacio } from '../animacio.js';
 import { obreFull, tancaFull, botoTanca, confirma, mostraAvis, amagaAvis } from '../full.js';
@@ -149,6 +152,9 @@ export function munta(contenidor, [id, nova]) {
               ${icona(a)}<span>${ACTIVITATS[a]}</span>
             </button>`).join('')}
         </div>
+        <label class="titol-targeta" for="nom-cita">Nom</label>
+        <input id="nom-cita" class="camp-text" type="text" data-camp="nom" maxlength="${MAX_NOM_CITA}" autocomplete="off"
+          placeholder="${esc(c.rutina ? RUTINA_PER_DEFECTE : ACTIVITATS[c.activitat] ?? '')}" value="${esc(nomPropi(c))}">
       </section>
 
       ${rutina ? `
@@ -224,11 +230,15 @@ export function munta(contenidor, [id, nova]) {
     canviaCita((c, d) => {
       if (c.activitat === nova) return;
       c.activitat = nova;
+      // El nom que hi ha posat l'usuari es queda; el per defecte canvia amb l'activitat.
       if (nova === 'casa') {
         // Comença buida: els exercicis s'afegeixen amb "Afegir exercici".
-        c.rutina ??= { nom: 'Rutina', exercicis: [] };
+        c.rutina ??= { nom: c.nom || RUTINA_PER_DEFECTE, exercicis: [] };
+        delete c.nom;
         delete c.duracioMin;
       } else {
+        const nom = c.rutina?.nom;
+        if (nom && nom !== RUTINA_PER_DEFECTE && nom !== 'Rutina general') c.nom = nom;
         delete c.rutina;
         c.duracioMin ??= 60;
       }
@@ -335,6 +345,13 @@ export function munta(contenidor, [id, nova]) {
     const boto = e.target.closest('[data-accio]');
     if (boto && contenidor.contains(boto) && !boto.disabled) ACCIONS[boto.dataset.accio]?.(boto.dataset);
   };
+  // El nom es desa a cada lletra sense tornar a dibuixar la pantalla (no es perd el focus ni el que s'escriu).
+  const escriu = e => {
+    if (e.target.dataset.camp !== 'nom') return;
+    const text = e.target.value;
+    actualitza(d => { posaNom(d.pla.cites.find(c => c.id === id), text); });
+    contenidor.querySelector('h1').textContent = nomCita(obte(), cita());
+  };
   const canvi = e => {
     if (e.target.dataset.camp === 'hora' && /^\d{2}:\d{2}$/.test(e.target.value)) {
       const hora = e.target.value;
@@ -344,6 +361,7 @@ export function munta(contenidor, [id, nova]) {
 
   contenidor.addEventListener('click', clic);
   contenidor.addEventListener('change', canvi);
+  contenidor.addEventListener('input', escriu);
   pinta();
 
   return () => {
@@ -351,5 +369,6 @@ export function munta(contenidor, [id, nova]) {
     tancaFull();
     contenidor.removeEventListener('click', clic);
     contenidor.removeEventListener('change', canvi);
+    contenidor.removeEventListener('input', escriu);
   };
 }

@@ -3,7 +3,7 @@
  * sobre els que tenen cita, i una targeta per cita. Tocar-la obre l'edició.
  */
 import { obte, actualitza, nouId } from '../store.js';
-import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
+import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
 import { obreFull, tancaFull, botoTanca } from '../full.js';
 import { htmlPendents } from '../sincronitza.js';
 import { htmlPi } from '../tema.js';
@@ -81,7 +81,7 @@ export function munta(contenidor) {
     const ocupats = new Set(obte().pla.cites.map(c => c.dia));
     const dia = [6, 7, 5, 1, 2, 3, 4].find(d => !ocupats.has(d)) ?? 6;
     const cita = { id: nouId(), dia, hora: '09:00', activitat };
-    if (activitat === 'casa') cita.rutina = { nom: 'Rutina', exercicis: [] };
+    if (activitat === 'casa') cita.rutina = { nom: RUTINA_PER_DEFECTE, exercicis: [] };
     else cita.duracioMin = 60;
     actualitza(d => {
       const abans = d.pla.cites.length;

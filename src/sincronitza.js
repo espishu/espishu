@@ -97,7 +97,7 @@ function plaServidor(d) {
       dia: c.dia,
       hora: c.hora,
       duracio_min: c.rutina ? null : c.duracioMin ?? null,
-      nom: c.rutina?.nom ?? null,
+      nom: (c.rutina ? c.rutina.nom : c.nom) || null, // activitats soles: el nom que hi ha posat l'usuari (opcional)
       exercicis: (c.rutina?.exercicis ?? []).map(ex => ({
         exercici: ex.id,
         tipus: ex.tipus,
@@ -149,8 +149,12 @@ function citaLocal(a) {
     if (e.pujada_ara !== null && e.pujada_ara !== undefined) ex.pujada = { abans: e.pujada_abans, ara: e.pujada_ara };
     return ex;
   });
-  if (a.tipus === 'casa' || a.tipus === 'gimnas' || exercicis.length) cita.rutina = { nom: a.nom ?? 'Rutina', exercicis };
-  else cita.duracioMin = a.duracio_min ?? 60;
+  if (a.tipus === 'casa' || a.tipus === 'gimnas' || exercicis.length) {
+    cita.rutina = { nom: a.nom ?? 'Rutina', exercicis };
+  } else {
+    cita.duracioMin = a.duracio_min ?? 60;
+    if (a.nom) cita.nom = a.nom;
+  }
   return cita;
 }
 

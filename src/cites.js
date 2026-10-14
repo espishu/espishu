@@ -63,8 +63,27 @@ export function duracioCita(estat, cita) {
   return cita.duracioMin ?? null;
 }
 
+/*
+ * El nom que l'usuari ha posat a la cita (Editar): el de la rutina o, a les activitats soles, `cita.nom`
+ * (opcional). Si no n'hi ha, el de l'activitat ("Natació").
+ */
+export const MAX_NOM_CITA = 30;
+export const RUTINA_PER_DEFECTE = 'Rutina';
+
+export function nomPropi(cita) {
+  return (cita.rutina ? cita.rutina.nom : cita.nom) || '';
+}
+
 export function nomCita(estat, cita) {
-  return rutinaDe(estat, cita)?.nom ?? ACTIVITATS[cita.activitat] ?? cita.activitat;
+  return nomPropi(cita) || (cita.rutina ? RUTINA_PER_DEFECTE : ACTIVITATS[cita.activitat] ?? cita.activitat);
+}
+
+/* Desa el nom de la cita; buit = el per defecte. */
+export function posaNom(cita, text) {
+  const nom = text.trim().slice(0, MAX_NOM_CITA);
+  if (cita.rutina) cita.rutina.nom = nom || RUTINA_PER_DEFECTE;
+  else if (nom) cita.nom = nom;
+  else delete cita.nom;
 }
 
 /* "25 min", "1 h 30 min", "2 h" */
