@@ -8,7 +8,8 @@ import { htmlDetall, nomSessio, iconaSessio, dataCurta, minutsDe } from '../resu
 import { muntaLinia, muntaColumnes } from '../grafics.js';
 import { icona } from '../icones.js';
 import { esc, majuscula } from '../dom.js';
-import { htmlPendents } from '../sincronitza.js';
+import { htmlPendents, esborraSessio } from '../sincronitza.js';
+import { confirma, mostraAvis, tancaFull } from '../full.js';
 
 /* Ordre i color fixos per activitat (to i lluminositat diferents sobre fons fosc). */
 const SERIES_ACTIVITAT = [
@@ -41,7 +42,28 @@ function muntaDetall(contenidor, id) {
         <h1>${esc(nomSessio(sessio))}</h1>
       </div>
     </header>
-    ${htmlDetall(sessio)}`;
+    ${htmlDetall(sessio)}
+    <button type="button" class="boto-text discret" data-accio="esborra">${icona('paperera')} Esborrar la sessió</button>`;
+
+  // Si t'has equivocat o no la vols comptar: surt de l'historial, dels gràfics, del total i del bosc.
+  const clic = e => {
+    if (!e.target.closest('[data-accio="esborra"]')) return;
+    confirma({
+      titol: 'Esborrar la sessió?',
+      text: 'No es pot desfer.',
+      boto: 'Esborrar',
+      enConfirmar: () => {
+        actualitza(d => esborraSessio(d, id));
+        location.hash = '#progres';
+        mostraAvis('Sessió esborrada');
+      }
+    });
+  };
+  contenidor.addEventListener('click', clic);
+  return () => {
+    tancaFull();
+    contenidor.removeEventListener('click', clic);
+  };
 }
 
 /* Exercicis amb historial, per triar-ne un al gràfic de repeticions. */

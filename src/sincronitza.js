@@ -9,7 +9,8 @@
  * Elements de la cua: { n, tipus: 'pla' } (tot el pla: cites, exercicis, objectiu i dolors),
  * { n, tipus: 'sessio', id }, { n, tipus: 'reinicia' } (esborrar l'historial de Supabase) i,
  * des de la versió 5, { n, tipus: 'bosc' } (tot `perfil.bosc`: historial de l'objectiu, noms de les
- * valls i elements vistos; RPC desa_bosc, migració 002).
+ * valls i elements vistos; RPC desa_bosc, migració 002) i, des de la versió 7.1, { n, tipus: 'esborra-sessio', id }
+ * (esborrar una sola sessió de l'historial; esborraSessio).
  * El pla i el bosc es pugen com estan en el moment de pujar-los, no com estaven en apuntar-los.
  *
  * Entre versions de l'app: la cua es desa amb les dades (localStorage) i una versió nova la puja
@@ -45,6 +46,19 @@ function prenFoto(d) {
 
 const op = (tipus, extra = {}) => ({ n: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, tipus, ...extra });
 
+/*
+ * Esborra una sessió de l'historial (dins actualitza). A Supabase s'esborra només aquella (element
+ * 'esborra-sessio'), no tot l'historial. Si encara no s'havia pujat, ja no es puja.
+ */
+export function esborraSessio(d, id) {
+  d.sessions = d.sessions.filter(s => s.id !== id);
+  if (!d.compte || d.compte.nou) return;
+  d.pendents ??= [];
+  d.pendents = d.pendents.filter(p => !(p.tipus === 'sessio' && p.id === id));
+  d.pendents.push(op('esborra-sessio', { id }));
+  programa();
+}
+
 /* Afegeix el pla (o el bosc) a la cua si encara no hi és. */
 function encuaPla(d) {
   if (!d.pendents.some(p => p.tipus === 'pla')) d.pendents.push(op('pla'));
@@ -67,7 +81,9 @@ function detecta(d) {
   if (d.compte.baixat && textPla(d) !== abans.pla) { encuaPla(d); canvis = true; }
   if (d.compte.baixat && textBosc(d) !== abans.bosc) { encuaBosc(d); canvis = true; }
 
-  if ([...abans.sessions].some(id => !actuals.has(id))) {
+  // Les esborrades una a una (esborraSessio) ja tenen el seu element a la cua: no cal reiniciar.
+  const esborrades = new Set(d.pendents.filter(p => p.tipus === 'esborra-sessio').map(p => p.id));
+  if ([...abans.sessions].some(id => !actuals.has(id) && !esborrades.has(id))) {
     // S'han esborrat sessions (Reiniciar o restaurar una còpia): Supabase ha de quedar igual que aquí.
     d.pendents = d.pendents.filter(p => p.tipus !== 'sessio');
     d.pendents.push(op('reinicia'), ...ids.map(id => op('sessio', { id })));
@@ -212,6 +228,9 @@ async function executa(sb, element) {
     if (s) comprova(await sb.rpc('desa_sessio', { sessio: sessioServidor(s, d) }));
   } else if (element.tipus === 'reinicia') {
     comprova(await sb.from('sessions').delete().eq('user_id', d.compte.id));
+  } else if (element.tipus === 'esborra-sessio') {
+    // Els exercicis i les sèries de la sessió s'esborren amb ella (on delete cascade, 001).
+    comprova(await sb.from('sessions').delete().eq('user_id', d.compte.id).eq('id', element.id));
   } else if (element.tipus === 'bosc') {
     const enviat = textBosc(d);
     comprova(await sb.rpc('desa_bosc', { dades: d.perfil.bosc ?? {} }));
