@@ -1,12 +1,11 @@
 /*
  * Pantalla Pla (PLA.md, seccions 7.6 i 13.3; bosc-pantalles.html): la carena amb els set dies i un pi
- * sobre els que tenen cita, i una targeta per cita. Tocar-la obre l'edició.
+ * sobre els que tenen cita, i una targeta per activitat amb la seva icona. Tocar-la obre l'edició.
  */
 import { obte, actualitza, nouId } from '../store.js';
-import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, grups, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
+import { DIES, ACTIVITATS, OPCIONS_ACTIVITAT, RUTINA_PER_DEFECTE, grups, iconaCita, nomCita, formatHora, duracioCita, formatMinuts } from '../cites.js';
 import { obreFull, tancaFull, botoTanca } from '../full.js';
 import { htmlPendents } from '../sincronitza.js';
-import { htmlPi } from '../tema.js';
 import { ajustaObjectiu } from '../boscdades.js';
 import { icona } from '../icones.js';
 import { esc } from '../dom.js';
@@ -44,7 +43,7 @@ export function munta(contenidor) {
     return `
       <li>
         <a class="cita-pla" href="#editar/${esc(cita.id)}" aria-label="Editar ${esc(nom)}: ${dies.join(', ')}, a les ${formatHora(cita.hora)}">
-          ${htmlPi(cita.activitat)}
+          <span class="icona-activitat petita icona-cita ${esc(cita.activitat)}">${icona(iconaCita(cita))}</span>
           <span class="cita-text">
             <span class="cita-nom">${esc(nom)}</span>
             <span class="secundari">${grup.map(c => ABREUJATS[c.dia]).join(' · ')}${minuts ? ` · ${formatMinuts(minuts)}` : ''}</span>

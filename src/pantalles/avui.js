@@ -15,7 +15,7 @@ import { activaSo } from '../so.js';
 import { esInstallada, mostraInstallacio } from '../installacio.js';
 import { htmlPendents } from '../sincronitza.js';
 import { confirma, obreFull, tancaFull, botoTanca, mostraAvis, amagaAvis } from '../full.js';
-import { dataCurta } from '../resum.js';
+import { dataCurta, iconaSessio } from '../resum.js';
 import { esc } from '../dom.js';
 import { icona } from '../icones.js';
 
@@ -55,7 +55,10 @@ const SECUNDARIS = `
     <button type="button" class="boto extra" data-accio="extra">Extra ${icona('mes')}</button>
   </div>`;
 
-function panell({ etiqueta, dada = '', nom, botons, pins, secundaris = SECUNDARIS }) {
+/* La icona assignada a l'activitat (Editar → Icona), al costat del nom, amb el color del tipus. */
+const htmlIcona = (clau, tipus) => `<span class="icona-activitat petita icona-cita ${esc(tipus)}">${icona(clau)}</span>`;
+
+function panell({ etiqueta, dada = '', nom, iconaNom = '', botons, pins, secundaris = SECUNDARIS }) {
   return `
     <section class="panell-avui" aria-labelledby="nom-cita">
       <div class="panell-cap">
@@ -63,7 +66,8 @@ function panell({ etiqueta, dada = '', nom, botons, pins, secundaris = SECUNDARI
         ${dada ? `<span class="quan-dada">${esc(dada)}</span>` : ''}
       </div>
       <div class="nom-fila">
-        <h2 class="nom-gran" id="nom-cita">${esc(nom)}</h2>
+        ${iconaNom}
+        <h2 class="nom-gran${nom.length > 14 ? ' llarg' : ''}" id="nom-cita">${esc(nom)}</h2>
         ${pins}
       </div>
       ${botons}
@@ -86,6 +90,7 @@ export function munta(contenidor) {
       etiqueta: 'A mitges',
       dada: textEnCurs(enCurs),
       nom: enCurs.nom,
+      iconaNom: htmlIcona(iconaSessio(enCurs, estat), enCurs.tipus === 'rutina' ? 'casa' : enCurs.activitat),
       botons: `<div class="botons-avui sol"><button type="button" class="boto principal" data-accio="continua">Continua</button></div>`,
       pins,
       secundaris: ''
@@ -100,6 +105,7 @@ export function munta(contenidor) {
       etiqueta: textQuan(diesFins(data, ara)),
       dada: `${ABREUJATS[cita.dia]} ${formatHora(cita.hora)}${minuts ? ` · ${formatMinuts(minuts)}` : ''}`,
       nom: nomCita(estat, cita),
+      iconaNom: htmlIcona(iconaCita(cita), cita.activitat),
       // Una rutina sense exercicis no es pot començar: porta a l'edició per afegir-ne.
       botons: buida ? `
         <div class="botons-avui sol"><a class="boto principal" href="#editar/${esc(cita.id)}">Afegeix exercicis</a></div>` : `

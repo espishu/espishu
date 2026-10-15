@@ -211,8 +211,11 @@ main[data-pantalla="avui"], main[data-pantalla="progres"]:not([data-detall]) {
 .panell-avui .recordatori { margin: -6px 0 -8px; justify-content: flex-start; padding-inline: 0; }
 /* Nom de la cita i, a la dreta (a sobre del 15′), els pins de la setmana. */
 .nom-fila { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.nom-fila .nom-gran { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.nom-fila .nom-gran { flex: 1; min-width: 0; overflow-wrap: break-word; hyphens: manual; }
+/* Noms llargs ("Entrenament de pàdel"): una mica més petits, perquè hi càpiguen la icona i els pins. */
+.nom-gran.llarg { font-size: 28px; }
 .nom-fila .pins { flex: none; padding-bottom: 2px; }
+.nom-fila .icona-cita { align-self: center; }
 /* Recuperar i Extra +: meitat i meitat, més baixos, de dos grocs més apagats que "Comença". */
 .botons-secundaris { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: -4px; }
 .botons-secundaris .boto { min-height: 48px; padding: 0 10px; border: 0; color: var(--acc-ink); font-size: 16px; font-weight: 700; }
@@ -857,7 +860,7 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
 .llista-cites { display: grid; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
 .cita-pla {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   min-height: 72px;
@@ -868,6 +871,13 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   text-decoration: none;
 }
 .cita-pla .pi { justify-self: center; }
+/* La icona assignada a cada activitat (Pla i Avui), amb el color del seu tipus (el dels pins d'abans). */
+.icona-cita { color: var(--pi-casa); }
+.icona-cita.natacio { color: var(--pi-natacio); }
+.icona-cita.caminar { color: var(--pi-caminar); }
+.icona-cita.correr { color: var(--pi-correr); }
+.icona-cita.bici { color: var(--pi-bici); }
+.icona-cita.altra { color: var(--pi-altra); }
 .cita-text { min-width: 0; }
 .cita-nom { display: block; font-family: var(--font-titol); font-size: 22px; line-height: 1.15; }
 .cita-text .secundari { display: block; font-size: 14px; color: var(--muted-fluix); }
