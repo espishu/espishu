@@ -16,10 +16,10 @@ export function obreFull(html, accions = {}, { classe = '' } = {}) {
   full.innerHTML = `<div class="full-dins">${html}</div>`;
   document.body.append(full);
   full.addEventListener('click', e => {
-    if (e.target === full) return full.close();
+    if (e.target === full) return tanca(full);
     const boto = e.target.closest('[data-accio]');
     if (!boto) return;
-    if (boto.dataset.accio === 'tanca') return full.close();
+    if (boto.dataset.accio === 'tanca') return tanca(full);
     accions[boto.dataset.accio]?.(boto.dataset, boto);
   });
   full.addEventListener('close', () => {
@@ -32,7 +32,16 @@ export function obreFull(html, accions = {}, { classe = '' } = {}) {
 }
 
 export function tancaFull() {
-  fullObert?.close();
+  if (fullObert) tanca(fullObert);
+}
+
+/*
+ * Primer es treu el focus del camp (el cercador): a l'iPhone, si el teclat encara és obert quan el
+ * full desapareix, la pàgina de sota pot quedar sense poder baixar fins al final (vegeu app.js).
+ */
+function tanca(full) {
+  if (full.contains(document.activeElement)) document.activeElement.blur();
+  full.close();
 }
 
 /* Confirmació senzilla: títol, text i un botó principal. */

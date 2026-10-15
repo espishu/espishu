@@ -99,6 +99,27 @@ window.addEventListener('hashchange', mostra);
 escoltaInstallacio();
 
 /*
+ * iPhone (app instal·lada): quan el teclat es tanca, de vegades la pàgina no recupera l'alçada i,
+ * en deixar de lliscar, torna amunt sense deixar arribar als botons de baix (Editar amb molts
+ * exercicis). Un desplaçament d'un píxel, anada i tornada, li fa tornar a calcular.
+ */
+let reajust = 0;
+function reajustaPantalla() {
+  clearTimeout(reajust);
+  reajust = setTimeout(() => {
+    const y = window.scrollY;
+    window.scrollTo(window.scrollX, y + 1);
+    window.scrollTo(window.scrollX, y);
+  }, 300);
+}
+document.addEventListener('focusout', e => {
+  if (e.target.matches?.('input, textarea, select')) reajustaPantalla();
+});
+window.visualViewport?.addEventListener('resize', () => {
+  if (window.innerHeight - window.visualViewport.height < 2) reajustaPantalla();
+});
+
+/*
  * Indicador de canvis pendents (a la capçalera d'Avui, Bosc i Pla). En tocar-lo, es puja tot
  * ara mateix; si cal tornar a entrar, demana la contrasenya. Si arriben dades noves, es torna a dibuixar.
  */
