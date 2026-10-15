@@ -1098,6 +1098,11 @@ body:not(.amb-barra) main { padding-bottom: calc(96px + env(safe-area-inset-bott
   /* Canvi de pantalla: lliscament curt amb fosa. */
   main.entra { animation: entra .3s ease-out; }
   @keyframes entra { from { opacity: 0; transform: translateY(10px); } }
+  /* Lliscant el dit entre Avui, Bosc i Pla: entra pel costat. */
+  main.entra.des-dreta { animation-name: entra-dreta; }
+  main.entra.des-esquerra { animation-name: entra-esquerra; }
+  @keyframes entra-dreta { from { opacity: 0; transform: translateX(24px); } }
+  @keyframes entra-esquerra { from { opacity: 0; transform: translateX(-24px); } }
 
   .boto:active, .boto-franja:active, .confirma:active, .pas:active, .boto-discontinu:active { transform: scale(.97); }
 

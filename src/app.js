@@ -32,6 +32,7 @@ const barra = document.querySelector('.barra');
 let actual = null;
 let hashActual = null;
 let desmunta = null;
+let costat = null; // 'dreta' o 'esquerra': d'on entra la pantalla nova en lliscar el dit
 
 /* Hi ha una versió nova de l'app esperant: es recarrega en arribar a una pantalla on es pot (a sota). */
 let recarregaPendent = false;
@@ -67,10 +68,13 @@ function mostra() {
   desmunta = PANTALLES[nom].munta(contenidor, parametres) || null;
   // Transició curta en canviar de pantalla (13.7); no en tornar a dibuixar la mateixa.
   if (canvia && hashActual !== null) {
-    contenidor.classList.remove('entra');
+    contenidor.classList.remove('entra', 'des-dreta', 'des-esquerra');
     void contenidor.offsetWidth;
     contenidor.classList.add('entra');
+    // Si s'hi ha arribat lliscant el dit, la pantalla entra pel costat d'on ve.
+    if (costat) contenidor.classList.add(`des-${costat}`);
   }
+  costat = null;
   actual = nom;
 
   barra.hidden = !AMB_BARRA.has(nom);
@@ -118,6 +122,47 @@ document.addEventListener('focusout', e => {
 window.visualViewport?.addEventListener('resize', () => {
   if (window.innerHeight - window.visualViewport.height < 2) reajustaPantalla();
 });
+
+/*
+ * Lliscar el dit entre Avui, Bosc i Pla (com tocar la barra): cap a l'esquerra, la pestanya de la
+ * dreta, i al revés; no dona la volta. Només a les tres pantalles (no al detall d'una sessió) i sense
+ * cap full obert. Ha de ser clarament horitzontal (desplaçar amunt i avall no canvia de pestanya), i
+ * no compta si comença a la vora de la pantalla, en un camp, als gràfics o en una fila que es desplaça.
+ */
+const ORDRE_PESTANYES = ['avui', 'progres', 'pla'];
+let toc = null;
+
+function esLliscable(element) {
+  if (element.closest('input, textarea, select, .svg-grafic')) return false;
+  for (let e = element; e && e !== document.body; e = e.parentElement) {
+    if (e.scrollWidth > e.clientWidth && /auto|scroll/.test(getComputedStyle(e).overflowX)) return false;
+  }
+  return true;
+}
+
+document.addEventListener('touchstart', e => {
+  toc = null;
+  if (e.touches.length !== 1 || !ORDRE_PESTANYES.includes(actual) || 'detall' in contenidor.dataset) return;
+  if (document.querySelector('dialog[open]')) return;
+  const { clientX: x, clientY: y } = e.touches[0];
+  if (x < 20 || x > window.innerWidth - 20 || !esLliscable(e.target)) return;
+  toc = { x, y, temps: e.timeStamp };
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!toc || e.touches.length) return;
+  const { x, y, temps } = toc;
+  toc = null;
+  const dx = e.changedTouches[0].clientX - x, dy = e.changedTouches[0].clientY - y;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < 1.5 * Math.abs(dy) || e.timeStamp - temps > 800) return;
+  if (document.querySelector('dialog[open]')) return;
+  const seguent = ORDRE_PESTANYES[ORDRE_PESTANYES.indexOf(actual) + (dx < 0 ? 1 : -1)];
+  if (!seguent) return;
+  costat = dx < 0 ? 'dreta' : 'esquerra';
+  location.hash = `#${seguent}`;
+}, { passive: true });
+
+document.addEventListener('touchcancel', () => { toc = null; });
 
 /*
  * Indicador de canvis pendents (a la capçalera d'Avui, Bosc i Pla). En tocar-lo, es puja tot
